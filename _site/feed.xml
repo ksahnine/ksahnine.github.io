@@ -6,8 +6,8 @@
 </description>
     <link>http://ksahnine.github.io/</link>
     <atom:link href="http://ksahnine.github.io/feed.xml" rel="self" type="application/rss+xml" />
-    <pubDate>Wed, 05 Aug 2015 19:30:48 +0200</pubDate>
-    <lastBuildDate>Wed, 05 Aug 2015 19:30:48 +0200</lastBuildDate>
+    <pubDate>Wed, 05 Aug 2015 20:49:35 +0200</pubDate>
+    <lastBuildDate>Wed, 05 Aug 2015 20:49:35 +0200</lastBuildDate>
     <generator>Jekyll v2.5.3</generator>
     
       <item>
@@ -26,7 +26,7 @@
 &lt;p&gt;La représentation visuelle du nuage des prénoms est réalisée avec &lt;strong&gt;GNU Plot&lt;/strong&gt;, avec le pourcentage des mentions TB en abscisse et le nombre d’élèves en ordonnée (cliquer sur l’image pour l’agrandir).
 &lt;center&gt;&lt;a href=&quot;http://blog.inovia-conseil.fr/wp-content/uploads/2015/07/brevet-mentions-2015.png&quot;&gt;&lt;img width=&quot;60%&quot; src=&quot;http://blog.inovia-conseil.fr/wp-content/uploads/2015/07/brevet-mentions-2015.png&quot; /&gt;&lt;/a&gt;&lt;/center&gt;&lt;/p&gt;
 
-&lt;p&gt;Dans cet article, je décrirai chacune des étapes m’ayant permis d’établir ce résultat, en usant abondamment de la &lt;strong&gt;ligne de commande&lt;/strong&gt;.&lt;br/&gt;A travers cet article, j’espère pouvoir faire la démonstration qu’un Unixien est aussi un Data Scientist qui s’ignore.&lt;/p&gt;
+&lt;p&gt;Dans cet article, je décrirai chacune des étapes m’ayant permis d’établir ce résultat, en usant abondamment de la &lt;strong&gt;ligne de commande&lt;/strong&gt;.&lt;br/&gt;A travers cet article, j’espère pouvoir faire la démonstration qu’un Unixien est aussi un &lt;em&gt;Data Scientist&lt;/em&gt; qui s’ignore.&lt;/p&gt;
 
 &lt;p&gt;L’ensemble du code dont il est fait référence dans l’article est disponible dans &lt;a href=&quot;https://github.com/ksahnine/datascience-brevet-mentions&quot;&gt;mon dépôt GitHub&lt;/a&gt;.&lt;/p&gt;
 
@@ -60,7 +60,7 @@ Le schéma ci-dessous décrit l’architecture de l’ensemble :
 Il faut disposer d’un compte AWS (Amazon Web Services). Pour information, Amazon propose de tester (quasi) &lt;a href=&quot;http://aws.amazon.com/fr/free/&quot;&gt;gratuitement ses services&lt;/a&gt; pendant 12 mois à hauteur de 750 heures de consommation mensuelle.&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;Une fois votre compte créé, installer &lt;code&gt;awscli&lt;/code&gt;, le client en ligne de commande de l’API AWS ainsi que l’utilitaire &lt;code&gt;jq&lt;/code&gt;, un véritable couteau suisse de JSON. Ce dernier nous sera très utile car la sortie standard du client awscli est au format JSON :&lt;/p&gt;
+&lt;p&gt;Une fois votre compte créé, installer &lt;code&gt;awscli&lt;/code&gt;, le client en ligne de commande de l’API AWS ainsi que l’utilitaire &lt;code&gt;jq&lt;/code&gt;, un véritable couteau suisse de JSON. Ce dernier nous sera très utile car la sortie standard du client &lt;code&gt;awscli&lt;/code&gt; est au format JSON :&lt;/p&gt;
 
 &lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;pip install awscli
 brew install jq&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
@@ -161,7 +161,7 @@ La parallélisation peut être &lt;strong&gt;verticale&lt;/strong&gt;, c’est-�
 
 &lt;h3&gt;Installation de BeautifulSoup sur les instances EC2&lt;/h3&gt;
 
-&lt;p&gt;Les instances EC2 sous Ubuntu disposent de l’interpréteur Python mais pas de la librairie BeautifulSoup.&lt;br /&gt;
+&lt;p&gt;Les instances EC2 sous Ubuntu disposent de l’interpréteur Python mais pas de la librairie &lt;code&gt;BeautifulSoup&lt;/code&gt;.&lt;br /&gt;
 Créons le fichier &lt;code&gt;machines&lt;/code&gt; contenant toutes les adresses IP publiques des instances EC2 :&lt;/p&gt;
 
 &lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;./aws-ec2-get_public_ips.sh &amp;gt; machines&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
@@ -211,14 +211,14 @@ find output -type f -name &lt;span class=&quot;s2&quot;&gt;&amp;quot;Serie-Gener
 &lt;ul&gt;
 &lt;li&gt;de tous les candidats :&lt;br /&gt;&lt;pre&gt;
 parallel --nonall --basefile get&lt;em&gt;prenoms&lt;/em&gt;full.sh --slf machines \
-         --pipe &amp;quot;./get&lt;em&gt;prenoms&lt;/em&gt;full.sh&amp;quot; | sort | uniq -c | \
-         sort -k2 &amp;gt; stats&lt;em&gt;brevet&lt;/em&gt;full.csv
+         --pipe &amp;quot;./get_prenoms_full.sh&amp;quot; | sort | uniq -c | \
+         sort -k2 &amp;gt; stats_brevet_full.csv
 &lt;/pre&gt;
 &lt;a href=&quot;https://github.com/ksahnine/datascience-brevet-mentions/blob/master/app/parallel-get_prenoms_full.sh&quot;&gt;&lt;sub&gt;&lt;sup&gt;Source : &lt;code&gt;parallel-get_prenoms_full.sh&lt;/code&gt;&lt;/sup&gt;&lt;/sub&gt;&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;des candidats ayant obtenu une mention TB :&lt;br /&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;parallel --nonall --basefile get&lt;em&gt;prenoms&lt;/em&gt;meTB.sh --slf machines &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
-         --pipe &lt;span class=&quot;s2&quot;&gt;&amp;quot;./get&lt;em&gt;prenoms&lt;/em&gt;meTB.sh&amp;quot;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; sort &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; uniq -c &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
-         sort -k2 &amp;gt; stats&lt;em&gt;brevet&lt;/em&gt;meTB.csv&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/li&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;parallel --nonall --basefile get&lt;span class=&quot;se&quot;&gt;_&lt;/span&gt;prenoms&lt;span class=&quot;se&quot;&gt;_&lt;/span&gt;meTB.sh --slf machines &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+         --pipe &lt;span class=&quot;s2&quot;&gt;&amp;quot;./get_prenoms_meTB.sh&amp;quot;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; sort &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; uniq -c &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+         sort -k2 &amp;gt; stats&lt;span class=&quot;se&quot;&gt;_&lt;/span&gt;brevet&lt;span class=&quot;se&quot;&gt;_&lt;/span&gt;meTB.csv&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;p&gt;&lt;a href=&quot;https://github.com/ksahnine/datascience-brevet-mentions/blob/master/app/parallel-get_prenoms_meTB.sh&quot;&gt;&lt;sub&gt;&lt;sup&gt;Source : &lt;code&gt;parallel-get_prenoms_meTB.sh&lt;/code&gt;&lt;/sup&gt;&lt;/sub&gt;&lt;/a&gt;&lt;/p&gt;

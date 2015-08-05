@@ -76,7 +76,7 @@
 <p>La représentation visuelle du nuage des prénoms est réalisée avec <strong>GNU Plot</strong>, avec le pourcentage des mentions TB en abscisse et le nombre d’élèves en ordonnée (cliquer sur l’image pour l’agrandir).
 <center><a href="http://blog.inovia-conseil.fr/wp-content/uploads/2015/07/brevet-mentions-2015.png"><img width="60%" src="http://blog.inovia-conseil.fr/wp-content/uploads/2015/07/brevet-mentions-2015.png" /></a></center></p>
 
-<p>Dans cet article, je décrirai chacune des étapes m’ayant permis d’établir ce résultat, en usant abondamment de la <strong>ligne de commande</strong>.<br/>A travers cet article, j’espère pouvoir faire la démonstration qu’un Unixien est aussi un Data Scientist qui s’ignore.</p>
+<p>Dans cet article, je décrirai chacune des étapes m’ayant permis d’établir ce résultat, en usant abondamment de la <strong>ligne de commande</strong>.<br/>A travers cet article, j’espère pouvoir faire la démonstration qu’un Unixien est aussi un <em>Data Scientist</em> qui s’ignore.</p>
 
 <p>L’ensemble du code dont il est fait référence dans l’article est disponible dans <a href="https://github.com/ksahnine/datascience-brevet-mentions">mon dépôt GitHub</a>.</p>
 
@@ -110,7 +110,7 @@ Le schéma ci-dessous décrit l’architecture de l’ensemble :
 Il faut disposer d’un compte AWS (Amazon Web Services). Pour information, Amazon propose de tester (quasi) <a href="http://aws.amazon.com/fr/free/">gratuitement ses services</a> pendant 12 mois à hauteur de 750 heures de consommation mensuelle.</li>
 </ul>
 
-<p>Une fois votre compte créé, installer <code>awscli</code>, le client en ligne de commande de l’API AWS ainsi que l’utilitaire <code>jq</code>, un véritable couteau suisse de JSON. Ce dernier nous sera très utile car la sortie standard du client awscli est au format JSON :</p>
+<p>Une fois votre compte créé, installer <code>awscli</code>, le client en ligne de commande de l’API AWS ainsi que l’utilitaire <code>jq</code>, un véritable couteau suisse de JSON. Ce dernier nous sera très utile car la sortie standard du client <code>awscli</code> est au format JSON :</p>
 
 <div class="highlight"><pre><code class="language-sh" data-lang="sh">pip install awscli
 brew install jq</code></pre></div>
@@ -211,7 +211,7 @@ La parallélisation peut être <strong>verticale</strong>, c’est-à-dire explo
 
 <h3>Installation de BeautifulSoup sur les instances EC2</h3>
 
-<p>Les instances EC2 sous Ubuntu disposent de l’interpréteur Python mais pas de la librairie BeautifulSoup.<br />
+<p>Les instances EC2 sous Ubuntu disposent de l’interpréteur Python mais pas de la librairie <code>BeautifulSoup</code>.<br />
 Créons le fichier <code>machines</code> contenant toutes les adresses IP publiques des instances EC2 :</p>
 
 <div class="highlight"><pre><code class="language-sh" data-lang="sh">./aws-ec2-get_public_ips.sh &gt; machines</code></pre></div>
@@ -261,14 +261,14 @@ find output -type f -name <span class="s2">&quot;Serie-Generale.csv&quot;</span>
 <ul>
 <li>de tous les candidats :<br /><pre>
 parallel --nonall --basefile get<em>prenoms</em>full.sh --slf machines \
-         --pipe &quot;./get<em>prenoms</em>full.sh&quot; | sort | uniq -c | \
-         sort -k2 &gt; stats<em>brevet</em>full.csv
+         --pipe &quot;./get_prenoms_full.sh&quot; | sort | uniq -c | \
+         sort -k2 &gt; stats_brevet_full.csv
 </pre>
 <a href="https://github.com/ksahnine/datascience-brevet-mentions/blob/master/app/parallel-get_prenoms_full.sh"><sub><sup>Source : <code>parallel-get_prenoms_full.sh</code></sup></sub></a></li>
 <li>des candidats ayant obtenu une mention TB :<br />
-<div class="highlight"><pre><code class="language-sh" data-lang="sh">parallel --nonall --basefile get<em>prenoms</em>meTB.sh --slf machines <span class="se">\</span>
-         --pipe <span class="s2">&quot;./get<em>prenoms</em>meTB.sh&quot;</span> <span class="p">|</span> sort <span class="p">|</span> uniq -c <span class="p">|</span> <span class="se">\</span>
-         sort -k2 &gt; stats<em>brevet</em>meTB.csv</code></pre></div></li>
+<div class="highlight"><pre><code class="language-sh" data-lang="sh">parallel --nonall --basefile get<span class="se">_</span>prenoms<span class="se">_</span>meTB.sh --slf machines <span class="se">\</span>
+         --pipe <span class="s2">&quot;./get_prenoms_meTB.sh&quot;</span> <span class="p">|</span> sort <span class="p">|</span> uniq -c <span class="p">|</span> <span class="se">\</span>
+         sort -k2 &gt; stats<span class="se">_</span>brevet<span class="se">_</span>meTB.csv</code></pre></div></li>
 </ul>
 
 <p><a href="https://github.com/ksahnine/datascience-brevet-mentions/blob/master/app/parallel-get_prenoms_meTB.sh"><sub><sup>Source : <code>parallel-get_prenoms_meTB.sh</code></sup></sub></a></p>

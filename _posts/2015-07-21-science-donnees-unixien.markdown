@@ -19,7 +19,7 @@ Sur le plan de l’analyse sociologique, j’aboutis aux mêmes conclusions que 
 La représentation visuelle du nuage des prénoms est réalisée avec **GNU Plot**, avec le pourcentage des mentions TB en abscisse et le nombre d’élèves en ordonnée (cliquer sur l’image pour l’agrandir).
 <center><a href="http://blog.inovia-conseil.fr/wp-content/uploads/2015/07/brevet-mentions-2015.png"><img width="60%" src="http://blog.inovia-conseil.fr/wp-content/uploads/2015/07/brevet-mentions-2015.png" /></a></center>
 
-Dans cet article, je décrirai chacune des étapes m’ayant permis d’établir ce résultat, en usant abondamment de la **ligne de commande**.<br/>A travers cet article, j’espère pouvoir faire la démonstration qu’un Unixien est aussi un Data Scientist qui s’ignore.
+Dans cet article, je décrirai chacune des étapes m’ayant permis d’établir ce résultat, en usant abondamment de la **ligne de commande**.<br/>A travers cet article, j’espère pouvoir faire la démonstration qu’un Unixien est aussi un *Data Scientist* qui s’ignore.
 
 L’ensemble du code dont il est fait référence dans l’article est disponible dans [mon dépôt GitHub](https://github.com/ksahnine/datascience-brevet-mentions).
 
@@ -46,7 +46,7 @@ Le schéma ci-dessous décrit l’architecture de l’ensemble :
 ## <a name="2"></a>Création du cluster EC2
 Il faut disposer d’un compte AWS (Amazon Web Services). Pour information, Amazon propose de tester (quasi) [gratuitement ses services](http://aws.amazon.com/fr/free/) pendant 12 mois à hauteur de 750 heures de consommation mensuelle.
 
-Une fois votre compte créé, installer `awscli`, le client en ligne de commande de l’API AWS ainsi que l’utilitaire `jq`, un véritable couteau suisse de JSON. Ce dernier nous sera très utile car la sortie standard du client awscli est au format JSON :
+Une fois votre compte créé, installer `awscli`, le client en ligne de commande de l’API AWS ainsi que l’utilitaire `jq`, un véritable couteau suisse de JSON. Ce dernier nous sera très utile car la sortie standard du client `awscli` est au format JSON :
 {% highlight sh %}
 pip install awscli
 brew install jq
@@ -129,7 +129,7 @@ Installons GNU Parallel sur le portable de contrôle :
 - sous Ubuntu : `sudo apt-get install parallel`
 
 ### Installation de BeautifulSoup sur les instances EC2
-Les instances EC2 sous Ubuntu disposent de l’interpréteur Python mais pas de la librairie BeautifulSoup.<br />
+Les instances EC2 sous Ubuntu disposent de l’interpréteur Python mais pas de la librairie `BeautifulSoup`.<br />
 Créons le fichier `machines` contenant toutes les adresses IP publiques des instances EC2 :
 {% highlight sh %}
 ./aws-ec2-get_public_ips.sh > machines
@@ -173,14 +173,14 @@ find output -type f -name "Serie-Generale.csv" -exec cat {} \; | grep "TRES BIEN
 
 - de tous les candidats :<br /><pre>
 parallel --nonall --basefile get_prenoms_full.sh --slf machines \
-             --pipe "./get_prenoms_full.sh" | sort | uniq -c | \
-             sort -k2 > stats_brevet_full.csv
+             --pipe "./get\_prenoms\_full.sh" | sort | uniq -c | \
+             sort -k2 > stats\_brevet\_full.csv
 </pre>
 [<sub><sup>Source : `parallel-get_prenoms_full.sh`</sup></sub>](https://github.com/ksahnine/datascience-brevet-mentions/blob/master/app/parallel-get_prenoms_full.sh)
 - des candidats ayant obtenu une mention TB :<br />{% highlight sh %}
-parallel --nonall --basefile get_prenoms_meTB.sh --slf machines \\
-             --pipe "./get_prenoms_meTB.sh" | sort | uniq -c | \\
-             sort -k2 > stats_brevet_meTB.csv
+parallel --nonall --basefile get\_prenoms\_meTB.sh --slf machines \\
+             --pipe "./get\_prenoms\_meTB.sh" | sort | uniq -c | \\
+             sort -k2 > stats\_brevet\_meTB.csv
 {% endhighlight %}
 [<sub><sup>Source : `parallel-get_prenoms_meTB.sh`</sup></sub>](https://github.com/ksahnine/datascience-brevet-mentions/blob/master/app/parallel-get_prenoms_meTB.sh)
 
