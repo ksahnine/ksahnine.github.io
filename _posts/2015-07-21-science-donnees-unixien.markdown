@@ -193,7 +193,7 @@ Le format des fichiers générés est du type :
    1 Hosni
 [...]
 {% endhighlight %}
-## <a name="4"></a>Consolidation et visualisation des résultats
+## <a name="5"></a>Consolidation et visualisation des résultats
 Utilisons la commande `join` pour assembler les fichiers `stats_brevet_full.csv` et `stats_brevet_meTB.csv` de façon à obtenir, pour chaque prénom, le nombre total d’occurrences et le nombre de mentions TB :
 {% highlight sh %}
 join -1 2 -2 2 stats_brevet_full.csv stats_brevet_meTB.csv > brevet-mentions-2015.csv
