@@ -2,12 +2,12 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Inovia Blog</title>
-    <description>Digressions technologiques par Kadda SAHNINE
+    <description>Excursions technologiques par Kadda SAHNINE
 </description>
-    <link>http://myblog.***.***/</link>
-    <atom:link href="http://myblog.***.***/feed.xml" rel="self" type="application/rss+xml" />
-    <pubDate>Wed, 05 Aug 2015 18:10:52 +0200</pubDate>
-    <lastBuildDate>Wed, 05 Aug 2015 18:10:52 +0200</lastBuildDate>
+    <link>http://ksahnine.github.io/</link>
+    <atom:link href="http://ksahnine.github.io/feed.xml" rel="self" type="application/rss+xml" />
+    <pubDate>Wed, 05 Aug 2015 19:05:06 +0200</pubDate>
+    <lastBuildDate>Wed, 05 Aug 2015 19:05:06 +0200</lastBuildDate>
     <generator>Jekyll v2.5.3</generator>
     
       <item>
@@ -275,8 +275,8 @@ Ambre 79 403 19,6
 &lt;p&gt;&lt;center&gt;&lt;a href=&quot;http://blog.inovia-conseil.fr/wp-content/uploads/2015/07/brevet-mentions-2015.png&quot;&gt;&lt;img width=&quot;60%&quot; src=&quot;http://blog.inovia-conseil.fr/wp-content/uploads/2015/07/brevet-mentions-2015.png&quot; /&gt;&lt;/a&gt;&lt;/center&gt;&lt;/p&gt;
 </description>
         <pubDate>Tue, 21 Jul 2015 08:00:00 +0200</pubDate>
-        <link>http://myblog.***.***/datascience/cloudcomputing/bigdata/2015/07/21/science-donnees-unixien.html</link>
-        <guid isPermaLink="true">http://myblog.***.***/datascience/cloudcomputing/bigdata/2015/07/21/science-donnees-unixien.html</guid>
+        <link>http://ksahnine.github.io/datascience/cloudcomputing/bigdata/2015/07/21/science-donnees-unixien.html</link>
+        <guid isPermaLink="true">http://ksahnine.github.io/datascience/cloudcomputing/bigdata/2015/07/21/science-donnees-unixien.html</guid>
         
         <category>regular</category>
         

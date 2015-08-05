@@ -7,14 +7,12 @@ gems:
 # Site settings
 title: "Inovia Blog"
 description: > # this means to ignore newlines until "email:"
-   Digressions technologiques par Kadda SAHNINE
+   Excursions technologiques par Kadda SAHNINE
 
 email: ksahnine@gmail.com
 #blog logo
-#logo: "/assets/images/df_logo.jpg"
 logo: "/assets/images/ks.png"
 # blog cover
-#cover: "/assets/images/cA4aKEIPQrerBnp1yGHv_IMG_9534-3-2.jpg"
 cover: "http://www.kylemarcus.com/wp-content/uploads/2014/02/code-1038x576.jpg"
 
 name: 'Kadda SAHNINE'
@@ -23,7 +21,7 @@ author_image: "/assets/images/kad.png"
 
 paginate:	5
 
-url: "http://myblog.***.***" # the base hostname & protocol for your site
+url: "http://ksahnine.github.io" # the base hostname & protocol for your site
 baseurl: ""
 
 # social icons and sharing options
@@ -35,16 +33,16 @@ social:
     share_title: ?text=
     share_link: "&amp;url="
 
-#  - icon:	facebook
-#    url:	https://facebook.com/???
-#    desc: Connect with me facebook
-#    share_url: https://www.facebook.com/sharer.php
-#    share_title: ?t=
-#    share_link: "&amp;u="
+  - icon:	linkedin
+    url:	http://fr.linkedin.com/in/ksahnine
+    desc: Voir mon profil Linkedin
+    share_url:
+    share_title:
+    share_link:
 
   - icon:	github
     url:	https://github.com/ksahnine
-    desc:	Fork me on github
+    desc:	Suivez moi sur github
     share_url:
     share_title:
     share_link:

@@ -4,7 +4,7 @@ title:  "La science des données vue d'un unixien"
 date:   2015-07-21 06:00:00
 categories: datascience cloudcomputing bigdata
 tags: regular featured 
-image: http://history-computer.com/ModernComputer/Software/images/Dennis-Ritchie-Ken-Thompson-and-PDP11-UNIX-1972.jpg
+image: /assets/article_images/Dennis-Ritchie-Ken-Thompson-and-PDP11-UNIX-1972.jpg
 legend: Ken Thompson (assis) et Dennis Ritchie, créateurs du système UNIX
 ---
 [Baptiste Coulmont](http://coulmont.com/bac/nuage.html), un universitaire spécialiste de la sociologie des prénoms, diffuse chaque année le classement des prénoms de candidats ayant obtenu une mention *Très Bien* au baccalauréat. Comme pour les années précédentes, ses résultats mettent en évidence une forme de déterminisme social où **Apolline**, par exemple, est beaucoup plus susceptible d’obtenir une mention que **Jordan**.
