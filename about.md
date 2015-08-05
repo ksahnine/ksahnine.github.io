@@ -12,5 +12,5 @@ Ce blog est principalement un site miroir de mon blog professionnel, [Inovia Blo
 
 N'hésitez pas à :
 
-- [me suivre et/ou échanger sur Twitter](https://twitter.com/ksahnine)
+- [me suivre et/ou échanger sur *Twitter*](https://twitter.com/ksahnine)
 - [consulter mon profil *Linked in*](http://fr.linkedin.com/in/ksahnine)
