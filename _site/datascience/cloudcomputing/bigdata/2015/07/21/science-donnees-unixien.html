@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <meta charset="utf-8">
+  <!-- (1) Optimize for mobile versions: http://goo.gl/EOpFl -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- (1) force latest IE rendering engine: bit.ly/1c8EiC9 -->
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  <title>La science des données vue d'un unixien</title>
+  <meta name="description" content="Digressions technologiques par Kadda SAHNINE
+" />
+
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="MobileOptimized" content="320" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+  <link rel="canonical" href="http://myblog.***.***/datascience/cloudcomputing/bigdata/2015/07/21/science-donnees-unixien.html">
+
+  <link rel="shortcut icon" href="/assets/images/favicon.ico">
+<!--  <link rel="stylesheet" href=""> -->
+  <link rel="stylesheet" href="http://brick.a.ssl.fastly.net/Linux+Libertine:400,400i,700,700i/Open+Sans:400,400i,700,700i">
+  <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+
+  <link rel="stylesheet" type="text/css" media="screen" href="/css/main.css" />
+  <link rel="stylesheet" type="text/css" media="print" href="/css/print.css" />
+</head>
+
+  <body itemscope itemtype="http://schema.org/Article">
+    <!-- header start -->
+
+<a href="http://myblog.***.***" class="logo-readium"><span class="logo" style="background-image: url(/assets/images/ks.png)"></span></a>
+
+<!-- header end -->
+
+    <main class="content" role="main">
+      <article class="post">
+        
+        <div class="article-image">
+          <div class="post-image-image" style="background-image: url(http://history-computer.com/ModernComputer/Software/images/Dennis-Ritchie-Ken-Thompson-and-PDP11-UNIX-1972.jpg)">
+            Article Image
+          </div>
+          <div class="post-meta">
+            <h1 class="post-title">La science des données vue d'un unixien</h1>
+            <div class="cf post-meta-text">
+              <div class="author-image" style="background-image: url(/assets/images/kad.png)">Blog Logo</div>
+              <h4 class="author-name" itemprop="author" itemscope itemtype="http://schema.org/Person">Kadda SAHNINE</h4>
+              on
+              <time datetime="2015-07-21 08:00">21 Jul 2015</time>
+              <!-- , tagged on <span class="post-tag-">, <a href="/tag/"></a></span> -->
+            </div>
+            <div style="text-align:center">
+              <a href="#topofpage" class="topofpage"><i class="fa fa-angle-down"></i></a>
+            </div>
+          </div>
+          <div class="legend">Ken Thompson (assis) et Dennis Ritchie, créateurs du système UNIX</div>
+        </div>
+        
+        <section class="post-content">
+          <div class="post-reading">
+            <span class="post-reading-time"></span> read
+          </div>
+          <a name="topofpage"></a>
+          <p><a href="http://coulmont.com/bac/nuage.html">Baptiste Coulmont</a>, un universitaire spécialiste de la sociologie des prénoms, diffuse chaque année le classement des prénoms de candidats ayant obtenu une mention <em>Très Bien</em> au baccalauréat. Comme pour les années précédentes, ses résultats mettent en évidence une forme de déterminisme social où <strong>Apolline</strong>, par exemple, est beaucoup plus susceptible d’obtenir une mention que <strong>Jordan</strong>.</p>
+
+<p><a href="http://www.lemonde.fr/bac-lycee/article/2015/07/10/du-prenom-a-la-mention-au-bac-des-determinismes-sociaux-toujours-puissants_4678806_4401499.html">La médiatisation de ces travaux</a> a suscité ma curiosité. En bon Unixien, je me suis adonné à la pratique de la <strong>science des données</strong> (<em>data science</em>) en ligne de commande, en prenant pour objet d’étude les résultats du brevet des collèges 2015 (série générale).</p>
+
+<p>Sur le plan de l’analyse sociologique, j’aboutis aux mêmes conclusions que Baptiste Coulmont :</p>
+
+<ul>
+<li><strong>Adèle</strong>, <strong>Apolline</strong>, <strong>Alix</strong>, <strong>Louise</strong> (entre autres) sont sur-représentées chez les détenteurs (détentrices devrais-je écrire) de la mention <em>Très Bien</em> au brevet des collèges alors que <strong>Steven</strong>, <strong>Alan</strong>, <strong>Dylan</strong>, <strong>Jordan</strong> ou <strong>Bryan</strong> sont les moins bien représentés</li>
+<li>par ailleurs, les filles obtiennent de bien meilleurs résultats scolaires que les garçons</li>
+</ul>
+
+<p>La représentation visuelle du nuage des prénoms est réalisée avec <strong>GNU Plot</strong>, avec le pourcentage des mentions TB en abscisse et le nombre d’élèves en ordonnée (cliquer sur l’image pour l’agrandir).
+<center><a href="http://blog.inovia-conseil.fr/wp-content/uploads/2015/07/brevet-mentions-2015.png"><img width="60%" src="http://blog.inovia-conseil.fr/wp-content/uploads/2015/07/brevet-mentions-2015.png" /></a></center></p>
+
+<p>Dans cet article, je décrirai chacune des étapes m’ayant permis d’établir ce résultat, en usant abondamment de la <strong>ligne de commande</strong>.<br/>A travers cet article, j’espère pouvoir faire la démonstration qu’un Unixien est aussi un Data Scientist qui s’ignore.</p>
+
+<p>L’ensemble du code dont il est fait référence dans l’article est disponible dans <a href="https://github.com/ksahnine/datascience-brevet-mentions">mon dépôt GitHub</a>.</p>
+
+<blockquote>
+<p><strong>Plan de l&#39;article :</strong></p>
+
+<ul>
+<li><a href="#1">Méthodologie et outils</a></li>
+<li><a href="#2">Création du cluster EC2</a></li>
+<li><a href="#3">Le script d’extraction des données</a></li>
+<li><a href="#4">Distribution des traitements avec GNU Parallel</a></li>
+<li><a href="#5">Consolidation et visualisation des résultats</a></li>
+</ul>
+</blockquote>
+
+<h2><a name="1"></a>Méthodologie et outils</h2>
+
+<p>Le site <a href="http://www.francetvinfo.fr/">FranceTV info</a> publie les <a href="http://www.francetvinfo.fr/brevet">résultats du brevet des collèges</a> par commune, mais il ne s’agit que d’une publication partielle. Néanmoins, le site permet de constituer un échantillon significatif de plus de 250 000 résultats.<br />
+La méthode utilisée suit les étapes suivantes :</p>
+
+<ul>
+<li><strong>Extraction des données</strong> : comme on peut s’en douter, aucun fichier formaté n’est mis à disposition. J’ai donc utilisé la technique du <em>harvesting</em> (ou <em>web scraping</em>) consistant à extraire le contenu du site, suivi d’un formatage afin de faciliter son exploitation ultérieure.
+<br/>Techniquement, c’est un script développé en <strong>Python</strong> qui est chargé de l’extraction. Il s’appuie sur l’excellente librairie <a href="http://www.crummy.com/software/BeautifulSoup/"><strong>BeautifulSoup</strong></a> dont j’ai déjà vanté les qualités dans un précédent article.<br />
+Le script d’extraction est conçu pour être <strong>parallélisable</strong>, sans quoi la durée du traitement serait au bas mot d’une journée sur une machine de série. Il n’extrait que les résultats des collèges d’une commune dont l’identifiant est passé en paramètre.</li>
+<li><strong>Parallélisation des traitements</strong> : les traitements d’extraction et d’analyse des données sont distribués via <a href="http://www.gnu.org/software/parallel/"><strong>GNU Parallel</strong></a> sur un <strong>cluster Amazon EC2</strong> constitué de <strong>10 instances</strong> <code>t2.micro</code> (1 CPU 3,3 Ghz / 1 Go RAM) sous Ubuntu. La parallélisation est orchestrée depuis un portable sous OS X.
+Le schéma ci-dessous décrit l’architecture de l’ensemble :
+<img src="http://blog.inovia-conseil.fr/wp-content/uploads/2015/07/architecture.png" alt="Nuage des prénoms"></li>
+<li><strong>Agrégation des données</strong> : la consolidation des données issue des traitements réalisés par le cluster est effectuée sur un portable (sous OS X) à l’aide des outils de tout bon Unixien (<code>grep</code>, <code>awk</code>, <code>sed</code>, <code>join</code>, <code>paste</code>, <code>bc</code>, <code>sort</code>, <code>uniq</code>, etc)</li>
+<li><strong>Visualisation</strong> : pour faciliter l’interprétation des résultats, la visualisation des données est effectuée avec <code>gnuplot</code> sur un portable (sous OS X)
+## <a name="2"></a>Création du cluster EC2
+Il faut disposer d’un compte AWS (Amazon Web Services). Pour information, Amazon propose de tester (quasi) <a href="http://aws.amazon.com/fr/free/">gratuitement ses services</a> pendant 12 mois à hauteur de 750 heures de consommation mensuelle.</li>
+</ul>
+
+<p>Une fois votre compte créé, installer <code>awscli</code>, le client en ligne de commande de l’API AWS ainsi que l’utilitaire <code>jq</code>, un véritable couteau suisse de JSON. Ce dernier nous sera très utile car la sortie standard du client awscli est au format JSON :</p>
+
+<div class="highlight"><pre><code class="language-sh" data-lang="sh">pip install awscli
+brew install jq</code></pre></div>
+
+<p>Configurer votre client <code>awscli</code> :</p>
+
+<div class="highlight"><pre><code class="language-sh" data-lang="sh">aws configure</code></pre></div>
+
+<p>Plutôt que d’utiliser directement le client <code>aws</code>, <a href="https://github.com/ksahnine/datascience-brevet-mentions/tree/master/ec2">je mets à disposition</a> un ensemble de scripts Shell prêts à l’emploi permettant de mettre en place le cluster EC2 depuis une invite de commande sur un simple portable :</p>
+
+<ul>
+<li><code>aws-ec2-create_key_pair.sh</code> : créer une paire de clés asymétriques</li>
+<li><code>aws-ec2-create_security_group.sh</code> : créer un groupe de sécurité</li>
+<li><code>aws-ec2-run_instances.sh</code> : créer un nombre prédéfini d’instances EC2</li>
+<li><code>aws-ec2-config_ssh.sh</code> : mettre à jour la config SSH locale pour accéder aux instances EC2</li>
+<li><code>aws-ec2-get_public_ips.sh</code> : afficher la liste des IP publiques de toutes les instances EC2</li>
+</ul>
+
+<p>Pour récupérer les scripts localement, utiliser les commandes :</p>
+
+<div class="highlight"><pre><code class="language-sh" data-lang="sh">git clone https://github.com/ksahnine/datascience-brevet-mentions.git
+<span class="nb">cd </span>datascience-brevet-mentions/ec2</code></pre></div>
+
+<p>Effectuons pas à pas toutes les opérations de construction du cluster depuis un ordinateur de contrôle (le laptop du schéma ci-dessus) :</p>
+
+<ul>
+<li>créer une paire de clé asymétriques dont le nom est passé en paramètre (<code>inovia-kp</code> dans notre cas) : <br/><code>
+./aws-ec2-create_key_pair.sh inovia-kp
+</code> <br/>Le script sauvegarde la <strong>clé privée</strong> dans le fichier <code>~/.ssh/inovia-kp.pem</code>.</li>
+<li>créer un groupe de sécurité dont le nom est passé en paramètre (<code>inovia-sg</code> dans notre cas) :<br /><code>
+./aws-ec2-create_security_group.sh inovia-sg
+</code> <br />Le script rajoute une <strong>règle d’accès par SSH</strong> mais restreint à l’adresse IP publique de votre ordinateur si vous êtes derrière un routeur.</li>
+<li>créer et démarrer 10 instances EC2 de type <code>t2.micro</code> :<br /><code>
+./aws-ec2-run_instances.sh inovia-kp inovia-sg 10</code><br />Les noms de clé asymétrique et de groupe de sécurité créés ci-dessus sont passés en paramètre.</li>
+<li>configurer le fichier <code>~/.ssh/config</code> pour chacune des instances EC2 :<br /><code>
+./aws-ec2-config_ssh.sh inovia-kp
+</code> <br />Ce script configure automatiquement le fichier <code>~/.ssh/config</code> pour toutes les instances EC2 du cluster, et dont voici un extrait :
+<pre>
+Host 52.11.189.180
+IdentityFile ~/.ssh/inovia-kp.pem
+User ubuntu
+StrictHostKeyChecking no
+</pre></li>
+<li>pour afficher toutes les adresses IP publiques des instances EC2, exécuter le script <code>./aws-ec2-get_public_ips.sh</code></li>
+</ul>
+
+<p>A ce stade, vous pouvez accéder à n’importe quelle instance EC2 par SSH sans avoir besoin de saisir un mot de passe. Ex : <code>ssh ubuntu@52.11.189.180</code></p>
+
+<h2><a name="3"></a>Le script d&#39;extraction des données</h2>
+
+<p>Développé en Python, il utilise la technique du <em>harvesting</em> via la librairie <strong>BeautifulSoup</strong> installable comme suit :</p>
+
+<ul>
+<li>sous Mac OS X : <code>sudo pip install beautifulsoup4</code></li>
+<li>sous Ubuntu : <code>sudo apt-get install python-bs4</code> (ou via <code>pip</code>)</li>
+</ul>
+
+<p>Je ne vais pas rentrer dans les détails du développement. Je vous renvoie au <a href="https://github.com/ksahnine/datascience-brevet-mentions/blob/master/app/extract_brevet.py">code source</a> pour plus de détails.<br/>
+Retenez qu’il fonctionne de la manière suivante :</p>
+
+<ul>
+<li>la commande <code>./extract_brevet.py</code> retourne une liste de triplets (académie, département, commune) dont voici un très court échantillon :
+<pre>
+bordeaux Pyrenees-Atlantiques bedous
+bordeaux Pyrenees-Atlantiques biarritz
+bordeaux Pyrenees-Atlantiques bidache
+</pre></li>
+<li>la commande <code>./extract_brevet.py -a bordeaux -d Pyrenees-Atlantiques -c biarritz</code> extrait les résultats obtenus par les candidats de la commune de Biarritz (dans l’académie de Bordeaux). <br />Le script produit 2 fichiers (un par série) :
+
+<ul>
+<li>pour la série générale : <code>output/bordeaux/Pyrenees-Atlantiques/biarritz/Serie-Generale.csv</code></li>
+<li>pour la série professionnelle : <code>output/bordeaux/Pyrenees-Atlantiques/biarritz/Serie-Professionnelle.csv</code>
+<br />Les données extraites sont au format CSV, dont voici un exemple fictif :
+<pre>
+bordeaux;Pyrenees-Atlantiques;biarritz;ADMIS;MENTION BIEN;Dupont;Lucie
+</pre></li>
+</ul></li>
+</ul>
+
+<h2><a name="4"></a>Distribution des traitements avec GNU Parallel</h2>
+
+<p><a href="http://www.gnu.org/software/parallel/"><strong>GNU Parallel</strong></a> est un formidable outil en ligne de commande permettant de paralléliser l’exécution de scripts shell sur un système UNIX.
+<br />
+La parallélisation peut être <strong>verticale</strong>, c’est-à-dire exploitant tous les coeurs du processeur, et/ou <strong>horizontale</strong> en distribuant les traitements sur plusieurs machines, ce qui sera le cas dans cet article.</p>
+
+<blockquote>
+<p><strong>Note</strong> : Il n’est pas nécessaire d’installer GNU Parallel sur les machines distantes. Seul un accès SSH suffit.</p>
+</blockquote>
+
+<h3>Installation de GNU Parallel</h3>
+
+<p>Installons GNU Parallel sur le portable de contrôle :</p>
+
+<ul>
+<li>sous Mac OS X : <code>brew install parallel</code></li>
+<li>sous Ubuntu : <code>sudo apt-get install parallel</code></li>
+</ul>
+
+<h3>Installation de BeautifulSoup sur les instances EC2</h3>
+
+<p>Les instances EC2 sous Ubuntu disposent de l’interpréteur Python mais pas de la librairie BeautifulSoup.<br />
+Créons le fichier <code>machines</code> contenant toutes les adresses IP publiques des instances EC2 :</p>
+
+<div class="highlight"><pre><code class="language-sh" data-lang="sh">./aws-ec2-get_public_ips.sh &gt; machines</code></pre></div>
+
+<p>A l’aide de GNU Parallel, installons <em>BeautifulSoup</em> à distance sur l’ensemble des instances EC2 :</p>
+
+<div class="highlight"><pre><code class="language-sh" data-lang="sh">parallel --nonall --slf machines <span class="s2">&quot;sudo apt-get install python-bs4&quot;</span></code></pre></div>
+
+<p><a href="https://github.com/ksahnine/datascience-brevet-mentions/blob/master/app/parallel-install-bs4.sh"><sub><sup>Source : <code>parallel-install-bs4.sh</code></sup></sub></a></p>
+
+<h3>Distribution du traitement d’extraction des données</h3>
+
+<p>Dans un premier temps, générons le fichier <code>communes.csv</code> contenant les triplets (académie, dépa    rtement, commune) pour l’ensemble des académies :</p>
+
+<div class="highlight"><pre><code class="language-sh" data-lang="sh">./extract_brevet.py &gt; communes.csv</code></pre></div>
+
+<p>Dans un second temps, lançons les traitements d’extraction répartis sur les instances du cluster par lots de 10 jobs. Ainsi, en rythme de croisière, 100 communes sont traitées simultanément :</p>
+
+<div class="highlight"><pre><code class="language-sh" data-lang="sh">parallel -a communes.csv --colsep <span class="s1">&#39; &#39;</span> -j <span class="m">10</span> --basefile ac_scrap.py <span class="se">\</span>
+         --slf machines <span class="s2">&quot;./ac_scrap.py -a {1} -d {2} -c {3} 2&gt; {3}.log&quot;</span></code></pre></div>
+
+<p><a href="https://github.com/ksahnine/datascience-brevet-mentions/blob/master/app/parallel-extract-data.sh"><sub><sup>Source : <code>parallel-extract-data.sh</code></sup></sub></a></p>
+
+<p>On notera que :</p>
+
+<ul>
+<li>le flag <code>-a</code> est suivi du fichier contenant les triplets</li>
+<li>le flag <code>--basefile</code> est suivi du nom du script téléversé et exécuté sur chacune des machines distantes</li>
+<li>le flag <code>--colsep</code> est suivi du séparateur de champ dans le fichier en entrée (le caractère espace dans notre cas).</li>
+<li>le flag <code>-j</code> est suivi du nombre de jobs par machine</li>
+<li>le flag <code>--slf</code> est suivi du fichier contenant la liste des adresses IP des machines du cluster</li>
+</ul>
+
+<h3>Distribution du traitement statistique</h3>
+
+<p>L’extraction étant terminée, mettons au point deux scripts, l’un affichant tous les prénoms des candidats de série générale, l’autre les candidats ayant obtenu une mention très bien :</p>
+
+<div class="highlight"><pre><code class="language-sh" data-lang="sh"><span class="nv">$ </span>cat get_prenoms_full.sh
+find output -type f -name <span class="s2">&quot;Serie-Generale.csv&quot;</span> -exec cat <span class="o">{}</span> <span class="se">\;</span> <span class="p">|</span> cut -d<span class="s1">&#39;;&#39;</span> -f7
+
+<span class="nv">$ </span>cat get_prenoms_meTB.sh
+find output -type f -name <span class="s2">&quot;Serie-Generale.csv&quot;</span> -exec cat <span class="o">{}</span> <span class="se">\;</span> <span class="p">|</span> grep <span class="s2">&quot;TRES BIEN&quot;</span> <span class="p">|</span> cut -d<span class="s1">&#39;;&#39;</span> -f7</code></pre></div>
+
+<p><a href="https://github.com/ksahnine/datascience-brevet-mentions/blob/master/app/get_prenoms_full.sh"><sub><sup>Source : <code>get_prenoms_full.sh</code></sup></sub></a> <a href="https://github.com/ksahnine/datascience-brevet-mentions/blob/master/app/get_prenoms_meTB.sh"><sub><sup>Source : <code>get_prenoms_meTB.sh</code></sup></sub></a>
+<br/>Distribuons les traitements sur le cluster (<em>map</em>) et comptabilisons les prénoms (<em>reduce</em>), triés par ordre alphabétique :</p>
+
+<ul>
+<li>de tous les candidats :<br /><pre>
+parallel --nonall --basefile get<em>prenoms</em>full.sh --slf machines \
+         --pipe &quot;./get<em>prenoms</em>full.sh&quot; | sort | uniq -c | \
+         sort -k2 &gt; stats<em>brevet</em>full.csv
+</pre>
+<a href="https://github.com/ksahnine/datascience-brevet-mentions/blob/master/app/parallel-get_prenoms_full.sh"><sub><sup>Source : <code>parallel-get_prenoms_full.sh</code></sup></sub></a></li>
+<li>des candidats ayant obtenu une mention TB :<br />
+<div class="highlight"><pre><code class="language-sh" data-lang="sh">parallel --nonall --basefile get<em>prenoms</em>meTB.sh --slf machines <span class="se">\</span>
+         --pipe <span class="s2">&quot;./get<em>prenoms</em>meTB.sh&quot;</span> <span class="p">|</span> sort <span class="p">|</span> uniq -c <span class="p">|</span> <span class="se">\</span>
+         sort -k2 &gt; stats<em>brevet</em>meTB.csv</code></pre></div></li>
+</ul>
+
+<p><a href="https://github.com/ksahnine/datascience-brevet-mentions/blob/master/app/parallel-get_prenoms_meTB.sh"><sub><sup>Source : <code>parallel-get_prenoms_meTB.sh</code></sup></sub></a></p>
+
+<p>Le format des fichiers générés est du type :</p>
+
+<div class="highlight"><pre><code class="language-text" data-lang="text">[...]
+   1 Hormoz
+  69 Hortense
+   2 Hosanna
+   1 Hosni
+[...]</code></pre></div>
+
+<h2><a name="4"></a>Consolidation et visualisation des résultats</h2>
+
+<p>Utilisons la commande <code>join</code> pour assembler les fichiers <code>stats_brevet_full.csv</code> et <code>stats_brevet_meTB.csv</code> de façon à obtenir, pour chaque prénom, le nombre total d’occurrences et le nombre de mentions TB :</p>
+
+<div class="highlight"><pre><code class="language-sh" data-lang="sh">join -1 <span class="m">2</span> -2 <span class="m">2</span> stats_brevet_full.csv stats_brevet_meTB.csv &gt; brevet-mentions-2015.csv</code></pre></div>
+
+<p>Le fichier produit ressemble à ceci :</p>
+
+<div class="highlight"><pre><code class="language-text" data-lang="text">[…]
+Hortense 24 69
+Houda 1 11
+Houdaifa 1 2
+Housni 1 2
+[…]</code></pre></div>
+
+<p>Ainsi, sur 69 candidats prénommés Hortense, 24 ont eu une mention TB.</p>
+
+<p>Nous y sommes presque. Rajoutons pour chaque enregistrement ayant plus de 190 candidats, le pourcentage ayant obtenu une mention TB :</p>
+
+<div class="highlight"><pre><code class="language-sh" data-lang="sh">join -1 <span class="m">2</span> -2 <span class="m">2</span> stats_brevet_meTB.csv stats_brevet_full.csv <span class="p">|</span> <span class="se">\</span>
+       awk <span class="s1">&#39;$3 &gt; 190 { printf(&quot;%s %d %d %2.1f\n&quot;, $1, $2, $3, ($2/$3)*100) }&#39;</span> &gt; brevet-mentions-2015.csv</code></pre></div>
+
+<p><a href="https://github.com/ksahnine/datascience-brevet-mentions/blob/master/app/reduce-join_results.sh"><sub><sup>Source : <code>reduce-join_results.sh</code></sup></sub></a></p>
+
+<p>Voici un extrait du fichier `brevet-mentions-2015.csv où l’on relève que 16,3 % des prénommées Amandine ont obtenu une mention TB :</p>
+
+<div class="highlight"><pre><code class="language-text" data-lang="text">[…]
+Allan 12 228 5,3
+Amandine 144 884 16,3
+Ambre 79 403 19,6
+[…]</code></pre></div>
+
+<p>Enfin, visualisons le résultat final avec <strong>GNU Plot</strong> sous la forme d’un nuage de prénoms où le nombre de candidats est représenté en ordonnée et le pourcentage de mention TB en abscisse :</p>
+
+<div class="highlight"><pre><code class="language-sh" data-lang="sh">gnuplot <span class="s">&lt;&lt;EOF</span>
+<span class="s">plot &quot;brevet-mentions-2015.csv&quot; u 4:3:1 w labels rotate by 20 font &quot;Helvetica,8&quot;</span>
+<span class="s">EOF</span></code></pre></div>
+
+<p><a href="https://github.com/ksahnine/datascience-brevet-mentions/blob/master/app/dataviz-results.sh"><sub><sup>Source : <code>dataviz-results.sh</code></sup></sub></a></p>
+
+<p><center><a href="http://blog.inovia-conseil.fr/wp-content/uploads/2015/07/brevet-mentions-2015.png"><img width="60%" src="http://blog.inovia-conseil.fr/wp-content/uploads/2015/07/brevet-mentions-2015.png" /></a></center></p>
+
+        </section>
+        <footer class="post-footer">
+          <section class="share">
+            
+              
+                <a class="icon-twitter" href="http://twitter.com/ksahnine?text=La+science+des+donn%C3%A9es+vue+d%27un+unixien&amp;url=http://myblog.***.***/datascience/cloudcomputing/bigdata/2015/07/21/science-donnees-unixien"
+                  onclick="window.open(this.href, 'twitter-share', 'width=550,height=255');return false;">
+                <i class="fa fa-twitter"></i><span class="hidden">twitter</span>
+                </a>
+              
+            
+              
+            
+          </section>
+        </footer>
+        <div class="bottom-teaser cf">
+          <div class="isLeft">
+            <h5 class="index-headline featured"><span>Written by</span></h5>
+            <section class="author">
+              <div class="author-image" style="background-image: url(/assets/images/kad.png)">Blog Logo</div>
+              <h4>Kadda SAHNINE</h4>
+              <p class="bio"></p>
+              <hr>
+              <p class="published">Published <time datetime="2015-07-21 08:00">21 Jul 2015</time></p>
+            </section>
+          </div>
+          
+          <div class="isRight">
+            <h5 class="index-headline featured"><span>Supported by</span></h5>
+            <footer class="site-footer">
+              <section class="poweredby">Proudly published with <a href="http://jekyllrb.com"> Jekyll</a></section>
+              <a class="subscribe" href="/feed.xml"> <span class="tooltip"> <i class="fa fa-rss"></i> You should subscribe to my feed.</span></a>
+              <div class="inner">
+                <section class="copyright">All content copyright <a href="/">Kadda SAHNINE</a> &copy; 2015<br>All rights reserved.</section>
+              </div>
+            </footer>
+          </div>
+        </div>
+      </article>
+    </main>
+    <div class="bottom-closer">
+      <div class="background-closer-image"  style="background-image: url(http://www.kylemarcus.com/wp-content/uploads/2014/02/code-1038x576.jpg)">
+        Image
+      </div>
+      <div class="inner">
+        <h1 class="blog-title">Inovia Blog</h1>
+        <h2 class="blog-description">Digressions technologiques par Kadda SAHNINE
+</h2>
+        <a href="/" class="btn">Back to Overview</a>
+      </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
+<script type="text/javascript" src="/assets/js/jquery.fitvids.js"></script>
+<script type="text/javascript" src="/assets/js/index.js"></script>
+<script type="text/javascript" src="/assets/js/readingTime.min.js"></script>
+<script>
+(function ($) {
+  "use strict";
+  $(document).ready(function(){
+
+    var $window = $(window),
+    $image = $('.post-image-image, .teaserimage-image');
+    
+      $window.on('scroll', function() {
+        var top = $window.scrollTop();
+
+        if (top < 0 || top > 1500) { return; }
+        $image
+          .css('transform', 'translate3d(0px, '+top/3+'px, 0px)')
+          .css('opacity', 1-Math.max(top/700, 0));
+      });
+      $window.trigger('scroll');
+
+      var height = $('.article-image').height();
+      $('.post-content').css('padding-top', height + 'px');
+
+      $('a[href*=#]:not([href=#])').click(function() {
+        if (location.pathname.replace(/^\//,'') == this.pathname.replace(/^\//,'')
+         && location.hostname == this.hostname) {
+          var target = $(this.hash);
+          target = target.length ? target : $('[name=' + this.hash.slice(1) +']');
+          if (target.length) {
+            $('html,body').animate({ scrollTop: target.offset().top }, 500);
+            return false;
+          }
+        }
+      });
+
+  });
+}(jQuery));
+</script>
+
+
+  </body>
+</html>
