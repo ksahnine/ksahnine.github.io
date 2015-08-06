@@ -10,7 +10,7 @@ description: > # this means to ignore newlines until "email:"
    Excursions technologiques, par Kadda SAHNINE
 
 email: ksahnine@gmail.com
-#blog logo
+# blog logo
 logo: "/assets/images/ks.png"
 # blog cover
 cover: "/assets/images/ZX81-closeup.jpg"
@@ -19,7 +19,7 @@ name: 'Kadda SAHNINE'
 author: 'Kadda SAHNINE'
 author_image: "/assets/images/kad.png"
 
-paginate:	5
+paginate:	8
 
 url: "http://ksahnine.github.io" # the base hostname & protocol for your site
 baseurl: ""

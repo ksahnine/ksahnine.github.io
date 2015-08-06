@@ -6,8 +6,8 @@
 </description>
     <link>http://ksahnine.github.io/</link>
     <atom:link href="http://ksahnine.github.io/feed.xml" rel="self" type="application/rss+xml" />
-    <pubDate>Thu, 06 Aug 2015 17:09:09 +0200</pubDate>
-    <lastBuildDate>Thu, 06 Aug 2015 17:09:09 +0200</lastBuildDate>
+    <pubDate>Thu, 06 Aug 2015 18:01:32 +0200</pubDate>
+    <lastBuildDate>Thu, 06 Aug 2015 18:01:32 +0200</lastBuildDate>
     <generator>Jekyll v2.5.3</generator>
     
       <item>
@@ -1350,6 +1350,161 @@ Hi! I&lt;span class=&quot;s1&quot;&gt;&amp;#39;m [svc1] service and my Docker co
         <category>consul</category>
         
         <category>microservice</category>
+        
+      </item>
+    
+      <item>
+        <title>De l&#39;intêret de Docker Compose (ex Fig) pour le développeur AngularJS</title>
+        <description>&lt;p&gt;Il y a plus de 5 ans (en janvier 2010), j’avais écrit un petit billet intitulé &lt;em&gt;L’inexorable migration du tiers Présentation&lt;/em&gt; pour marquer l’émergence des &lt;strong&gt;frameworks MV* côté client&lt;/strong&gt; et ce, à une époque où &lt;strong&gt;JSF&lt;/strong&gt; constituait encore un horizon indépassable au sein de nombreuses maîtrises d’oeuvre.&lt;br /&gt;
+Fort heureusement, les temps ont changé en particulier depuis la déferlante &lt;a href=&quot;https://angularjs.org/&quot;&gt;&lt;strong&gt;AngularJS&lt;/strong&gt;&lt;/a&gt;, à telle enseigne que ce type de solution est désormais sur le point de devenir &lt;em&gt;mainstream&lt;/em&gt;.&lt;/p&gt;
+
+&lt;p&gt;Dans la caisse à outil du développeur &lt;strong&gt;AngularJS&lt;/strong&gt; (entre autre), on trouvera naturellement le gestionnaire de paquets &lt;a href=&quot;https://www.npmjs.com/&quot;&gt;&lt;strong&gt;npm&lt;/strong&gt;&lt;/a&gt;, le gestionnaire de dépendances &lt;a href=&quot;http://bower.io/&quot;&gt;&lt;strong&gt;bower&lt;/strong&gt;&lt;/a&gt; et l’outil d’automatisation &lt;a href=&quot;http://gruntjs.com/&quot;&gt;&lt;strong&gt;grunt&lt;/strong&gt;&lt;/a&gt; (ou &lt;a href=&quot;http://gulpjs.com/&quot;&gt;&lt;strong&gt;gulp&lt;/strong&gt;&lt;/a&gt;), mais on verra surtout dans cet article combien &lt;a href=&quot;http://docs.docker.com/compose/&quot;&gt;&lt;strong&gt;Docker Compose&lt;/strong&gt;&lt;/a&gt; (anciennement &lt;a href=&quot;http://www.fig.sh/&quot;&gt;&lt;strong&gt;Fig&lt;/strong&gt;&lt;/a&gt;) a sa place dans le dispositif, en particulier pour construire un environnement d’exécution calibré pour un projet et de le rendre &lt;strong&gt;opérationnel sur un poste de développement en une seule commande&lt;/strong&gt; : &lt;code&gt;docker-compose up&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;En effet, dans un projet informatique impliquant plusieurs développeurs, la mise au point d’un environnement de développement s’avère être une tâche ardue et chronophage.&lt;br /&gt;
+Nous allons voir à travers l’étude d’un cas pratique comment &lt;strong&gt;Docker Compose&lt;/strong&gt; nous permettra de reconstituer un environnement d’exécution complet et autonome sur le poste du développeur par assemblage d’applications dockerisées.&lt;/p&gt;
+
+&lt;h2&gt;Etude de cas&lt;/h2&gt;
+
+&lt;p&gt;Dans le sillage de ma série d’articles traitant des architectures de microservices, en particulier celui consacré au développement d’une API RESTful avec &lt;strong&gt;Dropwizard&lt;/strong&gt;, j’ai mis à disposition une application &lt;em&gt;AngularJS&lt;/em&gt; permettant de consulter le trafic du métro parisien et dont le code source est &lt;a href=&quot;https://github.com/ksahnine/ratp-gui-angularjs&quot;&gt;disponible sur Github&lt;/a&gt; :&lt;/p&gt;
+
+&lt;p&gt;&lt;center&gt;&lt;img src=&quot;http://blog.inovia-conseil.fr/wp-content/uploads/2015/03/metro-gui.png&quot; alt=&quot;IHM AngularJS&quot;&gt;&lt;/center&gt;&lt;/p&gt;
+
+&lt;p&gt;Cette application servira de support à l’article.&lt;/p&gt;
+
+&lt;p&gt;Le schéma ci-dessous décrit l’architecture type de l’environnement d’exécution du poste de développement que nous allons mettre au point avec &lt;strong&gt;Docker Compose&lt;/strong&gt; :&lt;/p&gt;
+
+&lt;p&gt;&lt;center&gt;&lt;img src=&quot;http://blog.inovia-conseil.fr/wp-content/uploads/2015/03/archi-poste-dev.png&quot; alt=&quot;Architecture&quot;&gt;&lt;/center&gt;&lt;/p&gt;
+
+&lt;p&gt;Elle est constituée :&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;d’un frontend &lt;strong&gt;AngularJS&lt;/strong&gt; dont on a fait mention ci-dessus&lt;/li&gt;
+&lt;li&gt;d’un backend de services REST que j’ai développé avec &lt;strong&gt;Dropwizard&lt;/strong&gt;, et dont l’image Docker est &lt;a href=&quot;https://registry.hub.docker.com/u/ksahnine/ratp-rest-api/&quot;&gt;disponible dans mon repository&lt;/a&gt; public Docker Hub&lt;/li&gt;
+&lt;li&gt;d’une base NoSQL orientée document (&lt;strong&gt;CouchDB&lt;/strong&gt;)&lt;/li&gt;
+&lt;li&gt;d’un serveur web &lt;strong&gt;nginx&lt;/strong&gt; servant :
+
+&lt;ul&gt;
+&lt;li&gt;les ressources statiques de l’espace de travail du projet AngularJS (code JavaScript, template HTML, code CSS etc.)&lt;/li&gt;
+&lt;li&gt;les ressources dynamiques (JSON) exposées par le backend &lt;strong&gt;Dropwizard&lt;/strong&gt; et accessibles par convention via le préfixe &lt;code&gt;/api&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2&gt;Docker Compose, un orchestrateur de conteneurs Docker&lt;/h2&gt;
+
+&lt;p&gt;Développé par &lt;a href=&quot;https://www.orchardup.com/&quot;&gt;Orchard&lt;/a&gt;, une start-up de 2 personnes (!) rachetée par Docker en Juillet 2014, &lt;strong&gt;Fig&lt;/strong&gt; est devenu la solution standard d’orchestration de conteneurs Docker.
+&lt;strong&gt;Docker Compose&lt;/strong&gt; est le résultat de l’intégration de &lt;strong&gt;Fig&lt;/strong&gt; dans l’écosystème Docker.&lt;/p&gt;
+
+&lt;h3&gt;Installation&lt;/h3&gt;
+
+&lt;p&gt;&lt;em&gt;Docker Compose&lt;/em&gt; est disponible sous la forme d’un module Python installable via l’outil de gestion de paquets PIP.&lt;br /&gt;
+Le mode opératoire d’installation est des plus simples :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;sudo pip install -U docker-compose&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h3&gt;Utilisation&lt;/h3&gt;
+
+&lt;p&gt;La composition de notre infrastructure est décrite dans le fichier &lt;code&gt;docker-compose.yml&lt;/code&gt; au format YAML et dont voici le contenu :
+&lt;script src=&quot;https://gist.github.com/2cfd5a5b4b02265d4be9.js&quot;&gt; &lt;/script&gt;&lt;/p&gt;
+
+&lt;p&gt;Nous retrouvons les 3 composants dockerisés de notre architecture :&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;web&lt;/code&gt; : le conteneur nginx construit à partir de l’image &lt;code&gt;nginx:1.7.9&lt;/code&gt;.
+&lt;br /&gt;On notera en particulier l’usage du mapping des volumes pour :
+
+&lt;ul&gt;
+&lt;li&gt;redéfinir la racine du conteneur web afin de servir des ressources du système de fichier local issu de la construction du projet via &lt;strong&gt;grunt&lt;/strong&gt; : &lt;code&gt;~/dev/ratp-gui-angularjs/dist&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;utiliser un fichier de configuration &lt;em&gt;nginx&lt;/em&gt; calibré pour le projet et disponible localement : &lt;code&gt;~/dev/ratp-gui-angularjs/conf/nginx-dev.conf&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;ws&lt;/code&gt; : le backend de service REST construit à partir de l’image &lt;code&gt;ksahnine/ratp-rest-api:1.0&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;db&lt;/code&gt; : la base &lt;em&gt;NoSQL&lt;/em&gt; construite à partir de l’image &lt;code&gt;fedora/couchdb&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Récupérons le code source du projet &lt;strong&gt;AngularJS&lt;/strong&gt; contenant le fichier &lt;code&gt;docker-compose.yml&lt;/code&gt; à la racine :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;git clone https://github.com/ksahnine/ratp-gui-angularjs.git
+&lt;span class=&quot;nb&quot;&gt;cd &lt;/span&gt;ratp-gui-angularjs&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Pour construire le projet :&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;installer préalablement les dépendances :&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;npm install
+bower install&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;ul&gt;
+&lt;li&gt;construire l’application AngularJS via &lt;strong&gt;grunt&lt;/strong&gt; :&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;grunt all&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Pour créer et démarrer les conteneurs, il suffit de lancer la commande :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;docker-compose up&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Pour créer et démarrer les conteneurs en tâche de fond, rajouter l’option &lt;code&gt;-d&lt;/code&gt; :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;docker-compose up -d&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Pour afficher la sortie standard des conteneurs, utiliser la commande :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;docker-compose logs&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Pour arrêter les conteneurs, utiliser la commande :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;docker-compose stop&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Pour supprimer les conteneurs, utiliser la commande :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;docker-compose rm&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h2&gt;A l&amp;#39;attention des utilisateurs de Fig&lt;/h2&gt;
+
+&lt;p&gt;&lt;strong&gt;Fig&lt;/strong&gt; n’est plus maintenu depuis Décembre 2014, date de son remplacement officiel par &lt;strong&gt;Docker Compose&lt;/strong&gt;.&lt;br /&gt;
+Néanmoins au cas où vous l’utiliseriez, voici quelques-uns de mes retours d’expérience :&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;sous Mac OS X, j’ai rencontré l’erreur suivante à l’exécution de la commande &lt;code&gt;fig up&lt;/code&gt; :&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;SSL error: hostname ‘192.168.59.103′ doesn’t match ‘boot2docker’&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Le certificat est signé vis-à-vis du nom d’hôte (&lt;code&gt;boot2docker&lt;/code&gt;) et non de son adresse IP.
+&lt;br /&gt;On peut contourner le problème :&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;ul&gt;
+&lt;li&gt; en rajoutant une entrée dans le fichier &lt;code&gt;/etc/hosts&lt;/code&gt; :&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;192.168.59.103 boot2docker&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;ul&gt;
+&lt;li&gt;en modifiant et exportant la variable &lt;code&gt;DOCKER_HOST&lt;/code&gt; comme suit :&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;&lt;span class=&quot;nb&quot;&gt;export &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;DOCKER_HOST&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;tcp://boot2docker:2376&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;/blockquote&gt;
+
+&lt;ul&gt;
+&lt;li&gt;le fichier de composition &lt;code&gt;fig.yml&lt;/code&gt; est encore reconnu par Docker Compose (v 1.1.0) mais ce ne sera bientôt plus le cas.&lt;/li&gt;
+&lt;li&gt;enfin, &lt;strong&gt;Fig&lt;/strong&gt; contient un bug non résolu à ce jour (version 1.0.1 associée à Docker 1.4.0). La modification du paramétrage des volumes dans le fichier &lt;code&gt;fig.yml&lt;/code&gt; après un `fig up n’est jamais prise en compte (les volumes ne sont pas re-montés).&lt;br /&gt;On peut contourner le problème en forçant préalablement la suppression des conteneurs à l’arrêt via la commande :&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;fig rm –force&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+</description>
+        <pubDate>Mon, 02 Mar 2015 07:00:00 +0100</pubDate>
+        <link>http://ksahnine.github.io/docker/angularjs/2015/03/02/docker-compose-angularjs.html</link>
+        <guid isPermaLink="true">http://ksahnine.github.io/docker/angularjs/2015/03/02/docker-compose-angularjs.html</guid>
+        
+        <category>regular</category>
+        
+        
+        <category>docker</category>
+        
+        <category>angularjs</category>
         
       </item>
     
