@@ -1,0 +1,16 @@
+---
+layout: post
+title:  "Sample"
+date:   2015-01-21 06:00:00
+categories: sample
+tags: regular
+image: http://laboutiquedescadeaux.agence-presse.net/files/2010/04/tissu-nappe.jpg
+legend: Sample
+---
+
+{% highlight sh %}
+{% endhighlight %}
+
+[jekyll]:      http://jekyllrb.com
+[jekyll-gh]:   https://github.com/jekyll/jekyll
+[jekyll-help]: https://github.com/jekyll/jekyll-help

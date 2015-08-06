@@ -3,7 +3,7 @@ layout: post
 title:  "La science des données vue d'un unixien"
 date:   2015-07-21 06:00:00
 categories: datascience cloudcomputing bigdata
-tags: regular featured 
+tags: regular
 image: /assets/article_images/Dennis-Ritchie-Ken-Thompson-and-PDP11-UNIX-1972.jpg
 legend: Ken Thompson (assis) et Dennis Ritchie, créateurs du système UNIX
 ---
