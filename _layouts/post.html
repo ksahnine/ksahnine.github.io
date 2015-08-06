@@ -13,7 +13,7 @@
             Article Image
           </div>
           <div class="post-meta">
-            <h1 class="post-title">{{ page.title }}</h1>
+            <h1 class="post-title" {% if page.titleColor %}style="color: {{ page.titleColor }}"{% endif %}>{{ page.title }}</h1>
             <div class="cf post-meta-text">
               <div class="author-image" style="background-image: url({{ site.author_image }})">Blog Logo</div>
               <h4 class="author-name" itemprop="author" itemscope itemtype="http://schema.org/Person">{{ site.author }}</h4>
@@ -25,7 +25,7 @@
               <a href="#topofpage" class="topofpage"><i class="fa fa-angle-down"></i></a>
             </div>
           </div>
-          <div class="legend">{% if page.legend %}{{ page.legend }}{% endif %}</div>
+          <div class="legend" {% if page.titleColor %}style="color: {{ page.titleColor }}"{% endif %}>{% if page.legend %}{{ page.legend }}{% endif %}</div>
         </div>
         {% else %}
         <div class="noarticleimage">
