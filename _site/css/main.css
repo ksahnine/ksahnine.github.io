@@ -559,6 +559,10 @@ body {
       mpadding-left: 20px;
       mmargin-left: -26px;
       padding-bottom: 3px; }
+    .post .post-content blockquote ul li {
+      font-style: italic; }
+    .post .post-content blockquote code {
+      font-style: normal; }
   .post .post-content ul, .post .post-content ol {
     padding: 0 0 5px;
     margin: 0; }

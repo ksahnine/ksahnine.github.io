@@ -6,8 +6,8 @@
 </description>
     <link>http://ksahnine.github.io/</link>
     <atom:link href="http://ksahnine.github.io/feed.xml" rel="self" type="application/rss+xml" />
-    <pubDate>Wed, 05 Aug 2015 21:58:06 +0200</pubDate>
-    <lastBuildDate>Wed, 05 Aug 2015 21:58:06 +0200</lastBuildDate>
+    <pubDate>Thu, 06 Aug 2015 16:52:16 +0200</pubDate>
+    <lastBuildDate>Thu, 06 Aug 2015 16:52:16 +0200</lastBuildDate>
     <generator>Jekyll v2.5.3</generator>
     
       <item>
@@ -280,14 +280,1090 @@ Ambre 79 403 19,6
         
         <category>regular</category>
         
-        <category>featured</category>
-        
         
         <category>datascience</category>
         
         <category>cloudcomputing</category>
         
         <category>bigdata</category>
+        
+      </item>
+    
+      <item>
+        <title>Construire un réseau de conteneurs Docker avec Weave</title>
+        <description>&lt;p&gt;Dans un précédent billet, j’avais évoqué la difficulté de construire un &lt;strong&gt;réseau de conteneurs Docker&lt;/strong&gt; répartis sur plusieurs machines hôtes, l’interconnexion de 2 conteneurs n’étant possible qu’au sein d’un même hôte Docker.&lt;br /&gt;
+L’autre limitation est la &lt;strong&gt;difficulté d’accéder, via un port unique&lt;/strong&gt;, à 2 ou plusieurs conteneurs co-localisés dans le même hôte (par exemple, 2 serveurs web dockerisés dans le même hôte et écoutant tous deux sur le port 80).&lt;br /&gt;
+Ces lacunes sont comblées par des solutions diverses, en compétition les unes avec les autres, les plus connues étant :&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;http://weave.works/&quot;&gt;&lt;strong&gt;Weave&lt;/strong&gt;&lt;/a&gt;, objet de ce billet&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;SocketPlane&lt;/strong&gt;, racheté par Docker pour former le futur &lt;a href=&quot;http://blog.docker.com/2015/06/networking-receives-an-upgrade/&quot;&gt;&lt;strong&gt;Docker Network&lt;/strong&gt;&lt;/a&gt; (&lt;em&gt;libnetwork&lt;/em&gt;)&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;http://openvswitch.org/&quot;&gt;&lt;strong&gt;Open vSwitch&lt;/strong&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Note :&lt;/strong&gt; Avant d’entrer dans le vif du sujet, rappelons deux annonces importantes de l’édition DockerCon 2015, la conférence annuelle organisée par Docker :&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;http://blog.docker.com/2015/06/networking-receives-an-upgrade/&quot;&gt;&lt;strong&gt;Docker Network&lt;/strong&gt;&lt;/a&gt;, annoncée pour la version 1.7, est issu en partie de l’intégration de &lt;em&gt;SocketPlane&lt;/em&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;http://blog.docker.com/2015/06/extending-docker-with-plugins/&quot;&gt;&lt;strong&gt;Docker Plugin&lt;/strong&gt;&lt;/a&gt; est un mécanisme permettant d’étendre les fonctionnalités de &lt;em&gt;Docker Engine&lt;/em&gt; sous la forme de modules d’extension
+&lt;em&gt;Docker Network&lt;/em&gt; a été conçu selon le principe &lt;em&gt;&amp;quot;Batteries included, but removable&amp;quot;&lt;/em&gt; ouvrant la voie au développement de drivers réseau par des sociétés tierces sous la forme de plugins, ce qui est &lt;a href=&quot;https://github.com/weaveworks/docker-plugin/&quot;&gt;&lt;em&gt;déjà le cas de Weave&lt;/em&gt;&lt;/a&gt;.&lt;br /&gt;
+Avec &lt;em&gt;Docker Network&lt;/em&gt;, nous disposerons donc d’une &lt;strong&gt;interface standardisée de gestion d’un réseau de conteneurs&lt;/strong&gt;, à l’image de &lt;em&gt;Docker Machine&lt;/em&gt; pour le provisionnement d’hôtes Docker. J’y reviendrai dans un prochain billet. Fin de la longue parenthèse.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Dans ce billet, nous explorerons en détail le fonctionnement et la mise en oeuvre de Weave à travers un cas pratique.&lt;/p&gt;
+
+&lt;h2&gt;De l&amp;#39;intérêt de Weave&lt;/h2&gt;
+
+&lt;p&gt;&lt;strong&gt;Weave&lt;/strong&gt; permet d’interconnecter des conteneurs répartis sur plusieurs hôtes Docker, indépendamment de leur localisation physique, afin de constituer un &lt;strong&gt;réseau virtuel de conteneurs&lt;/strong&gt;.&lt;br /&gt;
+La disponibilité d’un mécanisme de &lt;strong&gt;découverte de service par DNS&lt;/strong&gt; parachève un dispositif adapté à la construction d’une &lt;strong&gt;architecture de microservices&lt;/strong&gt;.&lt;/p&gt;
+
+&lt;h2&gt;Fonctionnement&lt;/h2&gt;
+
+&lt;p&gt;Un réseau Weave est constitué de &lt;strong&gt;routeurs virtuels&lt;/strong&gt; installés sur chacun des hôtes Docker et connectés entre eux en pair à pair.&lt;br /&gt;
+Les routeurs sont en fait des conteneurs Docker maintenant entre eux une connexion TCP pour échanger des informations sur la topologie du réseau ainsi que des connexions UDP pour acheminer le trafic inter-conteneur.&lt;br /&gt;
+Lorsque qu’un conteneur rejoint le réseau Weave, il est relié au routeur à travers une interface réseau virtuelle (bridge &lt;code&gt;weave&lt;/code&gt;).&lt;/p&gt;
+
+&lt;h2&gt;Etude de cas&lt;/h2&gt;
+
+&lt;p&gt;Le schéma ci-dessous décrit l’architecture constituée de 2 serveurs hébergeant chacun un hôte Docker et un routeur Weave.
+&lt;center&gt;&lt;img src=&quot;http://blog.inovia-conseil.fr/wp-content/uploads/2015/06/weave-usecase.png&quot; alt=&quot;Architecture&quot;&gt;&lt;/center&gt;&lt;/p&gt;
+
+&lt;p&gt;Deux services dockerisés (&lt;code&gt;svc1&lt;/code&gt;, &lt;code&gt;svc2&lt;/code&gt;) sont déployés sur l’hôte &lt;code&gt;orion.local&lt;/code&gt; (sous Ubuntu), tandis que le service &lt;code&gt;svc3&lt;/code&gt; est déployé sur l’hôte &lt;code&gt;macbook.local&lt;/code&gt; (sous &lt;em&gt;Boot2Docker&lt;/em&gt;).&lt;br /&gt;
+Les services dockerisés sont issus de l’image &lt;code&gt;ksahnine/dummy-http&lt;/code&gt;, un service REST HTTP de test écoutant par défaut sur le port &lt;code&gt;8080&lt;/code&gt; et utilisable comme suit :&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;création du conteneur :
+&lt;pre&gt;
+$ docker run -td -p 8080:8080 ksahnine/dummy-http svcN
+&lt;/pre&gt;&lt;/li&gt;
+&lt;li&gt;appel du service dockerisé :
+&lt;pre&gt;
+$ curl http://host&lt;em&gt;ip:8080/
+Hi! I&amp;#39;m [svcN] service and my Docker container&amp;#39;s IP is [container&lt;/em&gt;ip]
+&lt;/pre&gt;
+Notez sur le schéma le &lt;strong&gt;plan d’adressage&lt;/strong&gt; des conteneurs dans le réseau weave (&lt;code&gt;10.0.1.x/24&lt;/code&gt;). Les adresses IP sont attribuées à la création des conteneurs.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2&gt;Installation&lt;/h2&gt;
+
+&lt;p&gt;Weave est distribué sous la forme d’images Docker, dont la disponibilité est évidemment un préalable.&lt;br /&gt;
+L’utilisation des composants dockerisés de Weave (routeur, DNS, proxy) est encapsulé par un script shell faisant office d’interface CLI (&lt;code&gt;weave&lt;/code&gt;) installé sur chaque hôte Docker.&lt;/p&gt;
+
+&lt;h3&gt;Sous Ubuntu / CentOS&lt;/h3&gt;
+
+&lt;p&gt;Le mode opératoire d’installation est le suivant :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;sudo wget -O /usr/local/bin/weave https://github.com/weaveworks/weave/releases/download/latest_release/weave
+sudo chmod a+x /usr/local/bin/weave&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h3&gt;Sous Boot2Docker (Windows / MacOS)&lt;/h3&gt;
+
+&lt;p&gt;Le mode opératoire d’installation est le suivant :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;wget https://github.com/weaveworks/weave/releases/download/latest_release/weave
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;boot2docker up
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;boot2docker ssh &lt;span class=&quot;s2&quot;&gt;&amp;quot;cat &amp;gt; /usr/local/bin/weave&amp;quot;&lt;/span&gt; &amp;lt; weave
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;boot2docker ssh &lt;span class=&quot;s2&quot;&gt;&amp;quot;chmod a+x /usr/local/bin/weave&amp;quot;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h2&gt;Démarrage des routeurs Weave&lt;/h2&gt;
+
+&lt;p&gt;Démarrer le routeur Weave sur chacun des noeuds (&lt;code&gt;orion.local&lt;/code&gt; et &lt;code&gt;macbook.local&lt;/code&gt;) via la commande &lt;code&gt;weave launch&lt;/code&gt; :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;sudo weave launch&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Pour relier les 2 routeurs, connectons-nous sur l’un des noeuds, par exemple &lt;code&gt;orion.local&lt;/code&gt;, et utilisons la commande &lt;code&gt;weave connect&lt;/code&gt; suivie de l’adresse IP publique (sur le réseau physique) du second noeud :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;orion.local:~&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;sudo weave connect 192.168.0.3&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Note :&lt;/strong&gt; La commande &lt;code&gt;weave status&lt;/code&gt; permet de connaître l’état du routeur.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h2&gt;Déploiement des services dockerisés sur le réseau Weave&lt;/h2&gt;
+
+&lt;p&gt;La commande &lt;code&gt;weave run&lt;/code&gt; permet de démarrer un conteneur et de le relier au réseau Weave. Elle est immédiatement suivie de l’adresse IP assignée sur le réseau virtuel :&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;sur &lt;code&gt;orion.local&lt;/code&gt; :
+&lt;pre&gt;
+orion.local:~$ sudo weave run 10.0.1.1/24 ksahnine/dummy-http svc1
+orion.local:~$ sudo weave run 10.0.1.2/24 ksahnine/dummy-http svc2
+&lt;/pre&gt;&lt;/li&gt;
+&lt;li&gt;sur &lt;code&gt;macbook.local&lt;/code&gt; :
+&lt;pre&gt;
+macbook.local:~$ sudo weave run 10.0.1.3/24 ksahnine/dummy-http svc3
+&lt;/pre&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Note :&lt;/strong&gt; La commande &lt;code&gt;weave run&lt;/code&gt; démarre le conteneur en mode détaché (en tâche de fond). Par ailleurs, les ports exposés par le conteneur sont par défaut accessibles à l’extérieur du conteneur.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h2&gt;Accéder aux services dockerisés&lt;/h2&gt;
+
+&lt;p&gt;A ce stade, le réseau de conteneurs est opérationnel. Voyons comment invoquer les services dockerisés de l’hôte &lt;code&gt;orion.local&lt;/code&gt; depuis un conteneur localisé sur &lt;code&gt;macbook.local&lt;/code&gt;.&lt;br /&gt;
+Pour la démonstration, créons un nouveau conteneur issu de l’image Docker &lt;code&gt;tutum/curl&lt;/code&gt; de l’hébergeur &lt;a href=&quot;https://www.tutum.co/&quot;&gt;Tutum&lt;/a&gt; sur &lt;code&gt;macbook.local&lt;/code&gt; et relié au réseau Weave :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;macbook.local:~&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;sudo weave run 10.0.1.4/24 -ti tutum/curl /bin/bash
+04d37c6f7781a7046c646999eae43a69d5d51c2114b2d87cf8e10ab033721e63&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Accédons à la console du conteneur :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;macbook.local:~&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;sudo docker attach 04d37c6f7781&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Note :&lt;/strong&gt; Penser à taper sur la touche &lt;code&gt;Enter&lt;/code&gt; pour avoir le prompt.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Appelons les 3 services via cURL :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;root@04d37c6f7781:/# curl 10.0.1.1:8080
+Hi! I&lt;span class=&quot;s1&quot;&gt;&amp;#39;m [svc1] service and my Docker container&amp;#39;&lt;/span&gt;s IP is &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;172.17.0.6&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt;
+root@04d37c6f7781:/# curl 10.0.1.2:8080
+Hi! I&lt;span class=&quot;s1&quot;&gt;&amp;#39;m [svc2] service and my Docker container&amp;#39;&lt;/span&gt;s IP is &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;172.17.0.7&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt;
+root@04d37c6f7781:/# curl 10.0.1.3:8080
+Hi! I&lt;span class=&quot;s1&quot;&gt;&amp;#39;m [svc3] service and my Docker container&amp;#39;&lt;/span&gt;s IP is &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;172.17.0.20&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Plusieurs remarques :&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;notez que les 2 services &lt;code&gt;svc1&lt;/code&gt; et &lt;code&gt;svc2&lt;/code&gt;, co-localisés sur le même hôte Docker, sont accessibles à travers le même port ! (&lt;code&gt;8080&lt;/code&gt;)&lt;/li&gt;
+&lt;li&gt;l’adresse IP retournée par le service (&lt;code&gt;172.17.0.x&lt;/code&gt;) est celle de l’interface veth reliée au bridge &lt;code&gt;docker0&lt;/code&gt;. Chaque conteneur a donc 2 interfaces réseaux :
+
+&lt;ul&gt;
+&lt;li&gt;l’une reliée au sous-réseau créé par Docker et partagé entre l’hôte et ses conteneurs&lt;/li&gt;
+&lt;li&gt;l’autre reliée au réseau virtuel Weave :&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;root@04d37c6f7781:/# ifconfig
+eth0      Link encap:Ethernet  HWaddr 02:42:ac:11:00:15
+          inet addr:172.17.0.21  Bcast:0.0.0.0  Mask:255.255.0.0
+          inet6 addr: fe80::42:acff:fe11:15/64 Scope:Link
+          UP BROADCAST RUNNING  MTU:1500  Metric:1
+          RX packets:8 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:8 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          RX bytes:648 &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;648.0 B&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;  TX bytes:648 &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;648.0 B&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+
+ethwe     Link encap:Ethernet  HWaddr 32:0f:05:02:d7:1e
+          inet addr:10.0.1.4  Bcast:0.0.0.0  Mask:255.255.255.0
+          inet6 addr: fe80::300f:5ff:fe02:d71e/64 Scope:Link
+          UP BROADCAST RUNNING MULTICAST  MTU:65535  Metric:1
+          RX packets:31 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:32 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000
+          RX bytes:2674 &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;2.6 KB&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;  TX bytes:2391 &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;2.3 KB&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;ul&gt;
+&lt;li&gt;il devrait être possible de remplacer le bridge &lt;code&gt;docker0&lt;/code&gt; par le bridge weave via l’option &lt;code&gt;--bridge&lt;/code&gt; du démon Docker, mais je n’ai pas encore testé. Voir la documentation de Docker : &lt;a href=&quot;https://docs.docker.com/articles/networking/#bridge-building&quot;&gt;Advanced networking&lt;/a&gt;.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2&gt;Simplifier le déploiement avec Weave Proxy&lt;/h2&gt;
+
+&lt;p&gt;&lt;strong&gt;Weave Proxy&lt;/strong&gt; est un conteneur Docker interceptant toutes les commandes émises par le client Docker vers le démon Docker.&lt;br /&gt;
+Il permet d’utiliser directement la commande &lt;code&gt;docker run&lt;/code&gt; pour &lt;strong&gt;enregistrer automatiquement&lt;/strong&gt; un conteneur sur le réseau Weave ou dans un DNS comme on le verra dans le paragraphe suivant.&lt;br /&gt;
+Sur chaque noeud :&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;lancer le routeur et le proxy Weave :
+&lt;pre&gt;
+# weave launch &amp;amp;&amp;amp; weave launch-proxy
+&lt;/pre&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Note :&lt;/strong&gt; le cas échéant, utiliser la commande &lt;code&gt;weave reset&lt;/code&gt; pour réinitialiser le routeur Weave.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;ul&gt;
+&lt;li&gt;configurer le client Docker pour le faire pointer vers Weave Proxy :
+&lt;pre&gt;
+# `weave proxy-env`
+&lt;/pre&gt;
+ce qui est équivalent à :
+&lt;pre&gt;
+# export DOCKER_HOST=tcp://127.0.0.1:12375
+&lt;/pre&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Créons un conteneur et assignons lui une adresse IP spécifique sur le réseau Weave :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;docker run --rm -e &lt;span class=&quot;nv&quot;&gt;WEAVE_CIDR&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;10.0.1.4/24 -ti tutum/curl /bin/bash&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Le support d’&lt;a href=&quot;https://en.wikipedia.org/wiki/IP_address_management&quot;&gt;IPAM&lt;/a&gt; permet d’assigner automatique d’une adresse IP au conteneur. Il suffit d’omettre la variable d’environnement &lt;code&gt;WEAVE_CIDR&lt;/code&gt;, soit :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;docker run --rm -ti tutum/curl /bin/bash&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;La plage d’adresse IP peut être redéfinie au lancement du routeur via l’option &lt;code&gt;-iprange&lt;/code&gt;, par ex: &lt;code&gt;weave launch -iprange 10.2.3.0/24&lt;/code&gt;.&lt;/p&gt;
+
+&lt;h2&gt;Découverte de services par DNS&lt;/h2&gt;
+
+&lt;p&gt;En combinant le routeur Weave, le proxy Weave et le DNS Weave, il est aisé de mettre en oeuvre une &lt;strong&gt;solution de découverte de service&lt;/strong&gt; totalement dynamique.&lt;br /&gt;
+Pour ce faire, il suffit d’activer les 3 composants Weave sur chaque noeud :&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;lancer le routeur, le DNS et le proxy Weave :
+&lt;pre&gt;
+# weave launch &amp;amp;&amp;amp; weave launch-dns &amp;amp;&amp;amp; weave launch-proxy
+&lt;/pre&gt;&lt;/li&gt;
+&lt;li&gt;configurer le client Docker pour le faire pointer vers le proxy Weave :
+&lt;pre&gt;
+# `weave proxy-env`
+&lt;/pre&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Déployons le service &lt;code&gt;svc1&lt;/code&gt; :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;orion.local:~# docker run -d --name svc1 ksahnine/dummy-http svc1&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Note :&lt;/strong&gt; le paramètre &lt;code&gt;--name&lt;/code&gt; est utilisé pour enregistrer le service dans le DNS. Ainsi, son nom pleinement qualifié sera &lt;code&gt;svc1.weave.local&lt;/code&gt;.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Créons un nouveau conteneur issu de l’image Docker &lt;code&gt;tutum/curl&lt;/code&gt; de l’hébergeur &lt;a href=&quot;https://www.tutum.co/&quot;&gt;Tutum&lt;/a&gt; sur &lt;code&gt;macbook.local&lt;/code&gt; et relié au réseau Weave :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;orion.local:~# docker run --rm -ti tutum/curl /bin/bash&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Enfin, vérifions que le service est accessible sous son nom pleinement qualifié (&lt;code&gt;svc1.weave.local&lt;/code&gt;) :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;root@8f73b6902ee2:/# curl svc1.weave.local:8080
+Hi! I&lt;span class=&quot;s1&quot;&gt;&amp;#39;m [svc1] service and my Docker container&amp;#39;&lt;/span&gt;s IP is &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;172.17.0.21&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Noter que l’architecture est &lt;strong&gt;scalable horizontalement&lt;/strong&gt; en déployant le service &lt;code&gt;svc1&lt;/code&gt; sur plusieurs hôtes Docker et ce, sans répartiteur de charge ou reverse-proxy.&lt;/p&gt;
+</description>
+        <pubDate>Thu, 25 Jun 2015 08:00:00 +0200</pubDate>
+        <link>http://ksahnine.github.io/docker/architecture/microservice/2015/06/25/reseau-docker-weave.html</link>
+        <guid isPermaLink="true">http://ksahnine.github.io/docker/architecture/microservice/2015/06/25/reseau-docker-weave.html</guid>
+        
+        <category>regular</category>
+        
+        
+        <category>docker</category>
+        
+        <category>architecture</category>
+        
+        <category>microservice</category>
+        
+      </item>
+    
+      <item>
+        <title>Docker Remote API : piloter un hôte Docker à distance</title>
+        <description>&lt;p&gt;Parmi toutes les fonctionnalités disponibles, il en est une qui explique pour beaucoup le dynamisme phénoménal de l’écosystème Docker. Il s’agit de &lt;a href=&quot;https://docs.docker.com/reference/api/docker_remote_api/&quot;&gt;&lt;strong&gt;Docker Remote API&lt;/strong&gt;&lt;/a&gt;, une &lt;strong&gt;API REST&lt;/strong&gt; extrêmement bien conçue exposant toutes les fonctionnalités du moteur Docker et permettant ainsi de piloter un hôte Docker depuis une machine ou une application distante.&lt;/p&gt;
+
+&lt;p&gt;Toutes les solutions d’orchestration de conteneurs Docker utilisent directement ou indirectement l’API Docker Remote, raison pour laquelle je vous propose d’y jeter un oeil attentif.&lt;/p&gt;
+
+&lt;p&gt;Dans cet article, nous verrons :&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;comment fonctionne l’interaction avec le &lt;strong&gt;démon Docker&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;comment activer &lt;strong&gt;Docker Remote API&lt;/strong&gt; avec et sans certificats TLS&lt;/li&gt;
+&lt;li&gt;comment utiliser &lt;strong&gt;Docker Machine&lt;/strong&gt; avec un hôte Docker déjà provisionné sur un réseau local d’entreprise&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2&gt;La communication avec le démon Docker&lt;/h2&gt;
+
+&lt;p&gt;Le schéma ci-dessous représente l’architecture type d’un serveur Linux (sous Ubuntu) hébergeant un hôte Docker. Le moteur Docker (serveur) est un démon écoutant par défaut sur un &lt;strong&gt;socket UNIX&lt;/strong&gt; (&lt;code&gt;/var/run/docker.sock&lt;/code&gt;).&lt;br /&gt;
+Pour mémoire, les sockets UNIX permettent à deux ou plusieurs processus d’échanger des données de façon bi-directionnelle.
+&lt;center&gt;&lt;img src=&quot;http://blog.inovia-conseil.fr/wp-content/uploads/2015/05/docker-engine.png&quot; alt=&quot;Hôte Docker&quot;&gt;&lt;/center&gt;&lt;/p&gt;
+
+&lt;p&gt;Ainsi, le client Docker &lt;strong&gt;installé localement&lt;/strong&gt; interagit avec le démon via le socket UNIX &lt;code&gt;/var/run/docker.sock&lt;/code&gt;. Sans surprise, le protocole d’échange utilisé par l’API Docker est de type &lt;strong&gt;REST&lt;/strong&gt; comme nous allons le voir ci-après.&lt;/p&gt;
+
+&lt;p&gt;Exécutons par exemple la commande &lt;code&gt;GET /info&lt;/code&gt;, permettant d’obtenir des informations système de l’hôte Docker.&lt;br /&gt;
+Pour ce faire, j’utilise l’utilitaire &lt;a href=&quot;http://netcat.sourceforge.net/&quot;&gt;Netcat&lt;/a&gt; (commande &lt;code&gt;nc&lt;/code&gt;) afin d’envoyer la requête au socket &lt;code&gt;/var/run/docker.sock&lt;/code&gt; :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;&lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; -e “GET /info HTTP/1.0rn” &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; sudo nc -U /var/run/docker.sock&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Voici un extrait de la réponse obtenue :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;HTTP/1.0 200 OK
+Content-Type: application/json
+Job-Name: info
+Date: Tue, 12 May 2015 19:56:14 GMT
+Content-Length: 889
+
+{”Containers”:118,[…]”Name”:”orion”,”OperatingSystem”:”Ubuntu 14.04.2 LTS”,”RegistryConfig”:
+{”IndexConfigs”:{”docker.io”:{”Mirrors”:null,”Name”:”docker.io”,”Official”:true,”Secure”:true}},
+“InsecureRegistryCIDRs”:[”127.0.0.0/8″]},”SwapLimit”:0,
+“SystemTime”:”2015-05-12T21:56:14.735623265+02:00″}&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;On remarquera que le corps de la réponse est au format &lt;strong&gt;JSON&lt;/strong&gt;.&lt;/p&gt;
+
+&lt;p&gt;Maintenant, voyons à quoi ressemblerait une combinaison associant :&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;un hôte Docker avec activation de &lt;em&gt;Docker Remote API&lt;/em&gt;&lt;/li&gt;
+&lt;li&gt;un client Docker localisé sur une machine distante
+&lt;center&gt;&lt;img src=&quot;http://blog.inovia-conseil.fr/wp-content/uploads/2015/05/docker-engine-remote.png&quot; alt=&quot;Hôte Docker distant&quot;&gt;&lt;/center&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Voyons comment activer et utiliser &lt;em&gt;Docker Remote API&lt;/em&gt; avec et sans certificats TLS.&lt;/p&gt;
+
+&lt;h2&gt;Activer Docker Remote API sans certificat TLS&lt;/h2&gt;
+
+&lt;p&gt;Cette configuration n’est pas recommandée en production car la communication entre client et hôte Docker est en clair. Elle est néanmoins fort utile à des fins de test. Voici comment la mettre en oeuvre :&lt;/p&gt;
+
+&lt;p&gt;Côté serveur (&lt;code&gt;orion.local&lt;/code&gt; sous Ubuntu) :&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;éditer le fichier &lt;code&gt;/etc/default/docker&lt;/code&gt; puis renseigner la variable d’environnement &lt;code&gt;DOCKER_OPTS&lt;/code&gt; comme suit :
+&lt;pre&gt;
+DOCKER_OPTS=&amp;quot;-H tcp://0.0.0.0:2375 -H unix:///var/run/docker.sock&amp;quot;
+&lt;/pre&gt;&lt;/li&gt;
+&lt;li&gt;redémarrer le démon docker :
+&lt;pre&gt;
+&lt;strong&gt;ksahnine@orion:~$&lt;/strong&gt; sudo service docker restart
+&lt;/pre&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;A ce stade, le démon écoute sur le port TCP &lt;code&gt;2375&lt;/code&gt; ainsi que sur le socket UNIX &lt;code&gt;/var/run/docker.sock&lt;/code&gt;.&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Note :&lt;/strong&gt; Le fichier &lt;code&gt;/etc/default/docker&lt;/code&gt; n’est présent que sous Ubuntu. A défaut, il faudra renseigner et exporter la variable d’environnement &lt;code&gt;DOCKER_OPTS&lt;/code&gt;.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Côté client (&lt;code&gt;laptop.local&lt;/code&gt;) :&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;pour interroger l’hôte Docker depuis une autre machine, utiliser la commande docker en renseignant l’option &lt;code&gt;-H&lt;/code&gt; avec l’adresse et le port d’écoute de l’hôte Docker distant.
+&lt;br /&gt;L’exemple ci-dessous permet d’afficher la liste des conteneurs actifs sur l’hôte Docker distant :
+&lt;pre&gt;
+ksahnine@laptop:~$ docker -H=192.168.0.29:2375 ps
+CONTAINER ID        IMAGE               COMMAND                CREATED             STATUS              PORTS               NAMES
+6faede9c46af        nginx:latest        “nginx -g ‘daemon of   12 minutes ago      Up 12 minutes       80/tcp, 443/tcp     sleepy_lalande
+&lt;/pre&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Note :&lt;/strong&gt; On peut aussi renseigner la variable d’environnement &lt;code&gt;DOCKER_HOST&lt;/code&gt; sur le poste client (&lt;code&gt;export DOCKER_HOST=192.168.0.29:2375&lt;/code&gt;) et lancer tout simplement la commande &lt;code&gt;docker ps&lt;/code&gt; sans l’option &lt;code&gt;-H&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;A l’aide de &lt;code&gt;tcpdump&lt;/code&gt;, interceptons les échanges entre le client Docker et l’hôte Docker distant :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;sudo tcpdump -c &lt;span class=&quot;m&quot;&gt;20&lt;/span&gt; -s &lt;span class=&quot;m&quot;&gt;0&lt;/span&gt; -i en1 -A host 192.168.0.29 and tcp port 2375&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;On remarquera que la requête issue de la commande &lt;code&gt;docker ps&lt;/code&gt; est la suivante :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;GET /v1.18/containers/json HTTP/1.1
+Host: 192.168.0.29:2375
+User-Agent: Docker-Client/1.6.0
+Accept-Encoding: gzip&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;On pourrait donc se passer du client Docker et utiliser directement l’utilitaire &lt;strong&gt;cURL&lt;/strong&gt;, dont la commande équivalente à &lt;code&gt;docker ps&lt;/code&gt; serait :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;curl -X GET http://192.168.0.29:2375/v1.18/containers/json&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h2&gt;Activer Docker Remote API avec certificat TLS&lt;/h2&gt;
+
+&lt;p&gt;Il nous faut tout d’abord produire 3 certificats :&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;le &lt;strong&gt;certificat racine&lt;/strong&gt; utilisé comme autorité de certification. Il sera utilisé pour signer les certificats client et serveur.&lt;/li&gt;
+&lt;li&gt;le &lt;strong&gt;certificat serveur&lt;/strong&gt; installé et utilisé par l’hôte Docker&lt;/li&gt;
+&lt;li&gt;le &lt;strong&gt;certificat client&lt;/strong&gt; installé et utilisé par le client Docker&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Je mets à disposition un &lt;a href=&quot;https://github.com/ksahnine/docker/blob/master/gen-docker-certs.sh&quot;&gt;script shell&lt;/a&gt; permettant de générer les certificats de test et dont voici le mode opératoire d’utilisation correspondant à notre cas :
+&lt;pre&gt;
+&lt;strong&gt;ksahnine@orion:~$&lt;/strong&gt; wget https://raw.githubusercontent.com/ksahnine/docker/master/gen-docker-certs.sh
+&lt;strong&gt;ksahnine@orion:~$&lt;/strong&gt; sh gen-docker-certs.sh
+- Nom de l’hôte Docker : orion
+- Adresse IP de l’hôte Docker : 192.168.0.29
+&lt;/pre&gt;
+Le script produit :&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;le certificat &lt;strong&gt;racine&lt;/strong&gt; (clé publique &lt;code&gt;ca.pem&lt;/code&gt;)&lt;/li&gt;
+&lt;li&gt;le certificat &lt;strong&gt;client&lt;/strong&gt; (clé publique &lt;code&gt;cert.pem&lt;/code&gt; / clé privée &lt;code&gt;key.pem&lt;/code&gt;)&lt;/li&gt;
+&lt;li&gt;le certificat &lt;strong&gt;serveur&lt;/strong&gt; (clé publique &lt;code&gt;server.pem&lt;/code&gt; / clé privée &lt;code&gt;server-key.pem&lt;/code&gt;)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Passons à la configuration du serveur et du client Docker.&lt;/p&gt;
+
+&lt;p&gt;Côté serveur (&lt;code&gt;orion.local&lt;/code&gt; sous Ubuntu) :&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;copier les fichier &lt;code&gt;ca.pem&lt;/code&gt;, &lt;code&gt;server.pem&lt;/code&gt; et &lt;code&gt;server-key.pem&lt;/code&gt; dans le répertoire &lt;code&gt;/root/.docker&lt;/code&gt; (ou tout autre répertoire sécurisé)&lt;/li&gt;
+&lt;li&gt;éditer le fichier &lt;code&gt;/etc/default/docker&lt;/code&gt; puis renseigner la variable d’environnement &lt;code&gt;DOCKER_OPTS&lt;/code&gt; comme suit :
+&lt;pre&gt;
+DOCKER_OPTS=&amp;quot;--tlsverify --tlscacert=/root/.docker/ca.pem --tlscert=/root/.docker/server.pem \
+ --tlskey=/root/.docker/server-key.pem -H=unix:///var/run/docker.sock -H=0.0.0.0:2376&amp;quot;
+&lt;/pre&gt;&lt;/li&gt;
+&lt;li&gt;redémarrer le démon docker :
+&lt;pre&gt;
+&lt;strong&gt;ksahnine@orion:~$&lt;/strong&gt; sudo service docker restart
+&lt;/pre&gt;
+A ce stade, le démon écoute sur le socket UNIX &lt;code&gt;/var/run/docker.sock&lt;/code&gt; ainsi que sur le port TCP &lt;code&gt;2376&lt;/code&gt;, port utilisé par convention pour les échanges sécurisés.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Côté client (&lt;code&gt;laptop.local&lt;/code&gt;) :&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;copier les fichiers &lt;code&gt;ca.pem&lt;/code&gt;, &lt;code&gt;cert.pem&lt;/code&gt; et &lt;code&gt;key.pem&lt;/code&gt; dans le répertoire &lt;code&gt;~/.docker&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;utiliser la commande &lt;code&gt;docker&lt;/code&gt; avec le flag &lt;code&gt;--tlsverify&lt;/code&gt; pour passer en mode TLS.
+&lt;br /&gt;L’exemple ci-dessous permet d’afficher la liste des conteneurs actifs sur l’hôte Docker distant :
+&lt;pre&gt;
+&lt;strong&gt;ksahnine@laptop:~$&lt;/strong&gt; docker –tlsverify -H=192.168.0.29:2376 ps
+CONTAINER ID        IMAGE               COMMAND                CREATED             STATUS              PORTS               NAMES
+6faede9c46af        nginx:latest        “nginx -g ‘daemon of   12 minutes ago      Up 12 minutes       80/tcp, 443/tcp     sleepy_lalande
+&lt;/pre&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Note :&lt;/strong&gt; Vous avez noté que je n’ai pas passé explicitement les clés dans la ligne de commande. Par défaut, le client docker s’attend à trouver le certificat racine sous &lt;code&gt;~/.docker/ca.pem&lt;/code&gt;, le certificat client sous &lt;code&gt;~/.docker/cert.pem&lt;/code&gt; et la clé privée sous &lt;code&gt;~/.docker/key.pem&lt;/code&gt;.
+Si les noms des clés diffèrent ou s’ils sont localisés dans un autre répertoire, il faudra utiliser respectivement les options &lt;code&gt;--tlscacert&lt;/code&gt;, &lt;code&gt;--tlscert&lt;/code&gt; et &lt;code&gt;--tlskey&lt;/code&gt;.
+Le flag &lt;code&gt;--tlsverify&lt;/code&gt; peut être omis si la variable d’environnement &lt;code&gt;DOCKER_TLS_VERIFY&lt;/code&gt; est valorisée à &lt;code&gt;1&lt;/code&gt;.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h2&gt;Utilisation avec Docker Machine&lt;/h2&gt;
+
+&lt;p&gt;Si vous gérez plusieurs hôtes Docker répartis sur un LAN et/ou dans un cloud public, il est beaucoup plus pratique de travailler avec &lt;a href=&quot;https://docs.docker.com/machine/&quot;&gt;&lt;strong&gt;Docker Machine&lt;/strong&gt;&lt;/a&gt; depuis un simple ordinateur portable.&lt;br /&gt;
+Dans le cas de cet article, un hôte Docker est déjà provisionné sur le serveur Linux &lt;code&gt;orion.local&lt;/code&gt; (&lt;code&gt;192.168.0.29&lt;/code&gt;).&lt;br /&gt;
+Rajoutons l’hôte sous le nom &lt;code&gt;orionbox&lt;/code&gt; :
+&lt;pre&gt;
+&lt;strong&gt;ksahnine@laptop:~$&lt;/strong&gt; docker-machine create –driver none –url=tcp://192.168.0.29:2376 orionbox
+&lt;/pre&gt;&lt;/p&gt;
+
+&lt;p&gt;La commande &lt;code&gt;docker-machine ls&lt;/code&gt; le confirme :
+&lt;pre&gt;
+&lt;strong&gt;ksahnine@laptop:~$&lt;/strong&gt; docker-machine ls
+NAME       ACTIVE   DRIVER   STATE   URL                       SWARM
+orionbox   *        none             tcp://192.168.0.29:2376
+&lt;/pre&gt;&lt;/p&gt;
+
+&lt;p&gt;Copier les certificats client, serveur et racine précédemment générés (fichiers &lt;code&gt;ca.pem&lt;/code&gt;, &lt;code&gt;cert.pem&lt;/code&gt;, &lt;code&gt;key.pem&lt;/code&gt;, &lt;code&gt;server.pem&lt;/code&gt; et &lt;code&gt;server-key.pem&lt;/code&gt;) dans le répertoire &lt;code&gt;~/.docker/machine/machines/orionbox&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;La commande &lt;code&gt;docker-machine env&lt;/code&gt; affiche les variables d’environnement à positionner pour forcer le client docker à interagir avec une machine particulière, &lt;code&gt;orionbox&lt;/code&gt; dans notre cas :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;ksahnine@laptop:~&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;docker-machine env orionbox
+Bad port ‘0′
+ERRO&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;0002&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt; Error running SSH &lt;span class=&quot;nb&quot;&gt;command &lt;/span&gt;to get /etc/os-release: &lt;span class=&quot;nb&quot;&gt;exit &lt;/span&gt;status 255
+&lt;span class=&quot;nb&quot;&gt;export &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;DOCKER_TLS_VERIFY&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;1
+&lt;span class=&quot;nb&quot;&gt;export &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;DOCKER_CERT_PATH&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;”/Users/ksahnine/.docker/machine/machines/orionbox”
+&lt;span class=&quot;nb&quot;&gt;export &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;DOCKER_HOST&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;tcp://192.168.0.29:2376&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Note :&lt;/strong&gt; Remarquez l’erreur d’exécution obtenue en sortie. A ma connaissance, l’utilisation de l’option &lt;code&gt;--driver none&lt;/code&gt; ne permet pas de configurer d’authentification par clés SSH afin que Docker Machine puisse exécuter des commandes à distance.
+A ce jour, Docker Machine est encore en version bêta (v 0.20). Sauf erreur de ma part, il faudra attendre la publication du driver generic actuellement &lt;a href=&quot;https://github.com/docker/machine/tree/master/drivers/generic&quot;&gt;en cours de développement&lt;/a&gt;. Il devrait permettre de provisionner un hôte Docker sur n’importe quel serveur existant accessible par SSH, un peu à la manière &lt;a href=&quot;http://blog.inovia-conseil.fr/blog.inovia-conseil.fr/?p=180&quot;&gt;d’Ansible&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Mise à jour 29/06/2015&lt;/strong&gt; : Le driver &lt;code&gt;generic&lt;/code&gt; est désormais disponible depuis la &lt;a href=&quot;https://github.com/docker/machine/releases/tag/v0.3.0&quot;&gt;version 0.3 de Docker Machine&lt;/a&gt;.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Passons outre le message d’erreur et positionnons les variables d’environnements comme suit :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;&lt;span class=&quot;nb&quot;&gt;export &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;DOCKER_TLS_VERIFY&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;1
+&lt;span class=&quot;nb&quot;&gt;export &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;DOCKER_CERT_PATH&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;/Users/ksahnine/.docker/machine/machines/orionbox&amp;quot;&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;export &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;DOCKER_HOST&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;tcp://192.168.0.29:2376&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;ou plus simplement :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;&lt;span class=&quot;nb&quot;&gt;eval&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;$(&lt;/span&gt;docker-machine env orionbox&lt;span class=&quot;k&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;C’est terminé. Notre client Docker est configuré pour interagir avec l’hôte docker distant.&lt;/p&gt;
+</description>
+        <pubDate>Sat, 16 May 2015 08:00:00 +0200</pubDate>
+        <link>http://ksahnine.github.io/docker/architecture/2015/05/16/docker-remote-api.html</link>
+        <guid isPermaLink="true">http://ksahnine.github.io/docker/architecture/2015/05/16/docker-remote-api.html</guid>
+        
+        <category>regular</category>
+        
+        
+        <category>docker</category>
+        
+        <category>architecture</category>
+        
+      </item>
+    
+      <item>
+        <title>Démystifier CORS</title>
+        <description>&lt;p&gt;J’ai eu souvent l’occasion d’écrire ici que les grands acteurs du Web sont plus que jamais les &lt;strong&gt;nouveaux prescripteurs de solutions&lt;/strong&gt; pour le SI.&lt;/p&gt;
+
+&lt;p&gt;Même si l’organisme &lt;strong&gt;W3C&lt;/strong&gt; agit comme une puissance normative, seules les spécifications validées par l’expérience des grands carrefours d’audience bâtis par &lt;em&gt;Google&lt;/em&gt;, &lt;em&gt;Amazon&lt;/em&gt;, &lt;em&gt;Facebook&lt;/em&gt; ou &lt;em&gt;Twitter&lt;/em&gt; deviennent des normes effectives. Le feu de l’expérience fait office de contreseing, préalable à l’adoption dans les Systèmes d’Information d’Entreprise.&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://www.w3.org/TR/cors/&quot;&gt;&lt;strong&gt;CORS&lt;/strong&gt;&lt;/a&gt; (pour Cross-Origin Resource Sharing) fait partie de ces spécifications largement supportées par les grands du Web et appelées à se généraliser au gré du déploiement grandissant des navigateurs de dernière génération.&lt;/p&gt;
+
+&lt;h2&gt;Le futur de JSONP&lt;/h2&gt;
+
+&lt;p&gt;Depuis des années, les navigateurs restreignent l’accès à des ressources n’appartenant pas au domaine depuis lequel un document a été chargé (règle dite de &lt;a href=&quot;http://en.wikipedia.org/wiki/Same-origin_policy&quot;&gt;&lt;strong&gt;Same-Origin Policy&lt;/strong&gt;&lt;/a&gt;).&lt;br /&gt;
+Le fait que la balise &lt;code&gt;&amp;lt;script /&amp;gt;&lt;/code&gt; ne soit pas concernée par cette restriction a ouvert la voie à la technique &lt;a href=&quot;http://en.wikipedia.org/wiki/JSONP&quot;&gt;&lt;strong&gt;JSONP&lt;/strong&gt;&lt;/a&gt; (&lt;em&gt;JSON with padding&lt;/em&gt;), permettant d’émettre des requêtes AJAX cross-domain retournant des données JSON encapsulées dans une &lt;em&gt;callback&lt;/em&gt; JavaScript. Il faut admettre cependant que cette technique, bien qu’encore très utilisée, relève surtout de l’astuce.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;CORS&lt;/strong&gt; est un mécanisme robuste et &lt;a href=&quot;http://www.w3.org/TR/cors/&quot;&gt;normalisé par le W3C&lt;/a&gt; permettant à tout navigateur compatible d’effectuer des &lt;strong&gt;requêtes HTTP cross-domain&lt;/strong&gt;. Il a valeur de standard industriel et étend le champ des possibilités bien au delà de ce qui est actuellement permis par JSONP.&lt;/p&gt;
+
+&lt;p&gt;JSONP est très pratique pour partager des données publiques (comprendre non sensibles).&lt;br /&gt;
+Néanmoins, cette technique ne supporte pas les méthodes &lt;code&gt;POST&lt;/code&gt;, &lt;code&gt;PUT&lt;/code&gt;, &lt;code&gt;DELETE&lt;/code&gt; (seule la méthode &lt;code&gt;GET&lt;/code&gt; est supportée). Elle n’est donc à priori pas adaptée pour exposer une API JSON sauf à mettre en place des solutions de contournement (méthode HTTP transmise via un paramètre de requête, contrôles d’accès, etc.).&lt;/p&gt;
+
+&lt;h2&gt;Une affaire d&amp;#39;entêtes HTTP&lt;/h2&gt;
+
+&lt;p&gt;En pratique, le mécanisme CORS est fondé sur l’utilisation d’&lt;strong&gt;entêtes HTTP personnalisés&lt;/strong&gt; définis par la &lt;a href=&quot;http://www.w3.org/TR/cors/&quot;&gt;spécification&lt;/a&gt; :&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;http://www.w3.org/TR/cors/#origin-request-header&quot;&gt;entêtes de requête&lt;/a&gt; :
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;Origin&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Access-Control-Request-Method&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Access-Control-Request-Headers&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;http://www.w3.org/TR/cors/#access-control-allow-origin-response-header&quot;&gt;entêtes de réponse&lt;/a&gt; :
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;Access-Control-Allow-Origin&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Access-Control-Allow-Credentials&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Access-Control-Expose-Headers&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Access-Control-Max-Age&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Access-Control-Allow-Methods&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Access-Control-Allow-Headers&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Ils permettent au navigateur et au serveur d’en savoir suffisamment l’un sur l’autre afin de déterminer si la requête ou la réponse &lt;em&gt;cross-domain&lt;/em&gt; doit réussir ou échouer.&lt;/p&gt;
+
+&lt;p&gt;Pour fonctionner, le mécanisme nécessite :&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;un navigateur supportant cette technologie :
+
+&lt;ul&gt;
+&lt;li&gt;Internet Explorer 10+&lt;/li&gt;
+&lt;li&gt;Firefox 3.5+&lt;/li&gt;
+&lt;li&gt;Chrome 3+&lt;/li&gt;
+&lt;li&gt;Safari 4+ &lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;une partie serveur capable de produire le ou les entêtes HTTP idoines&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Note :&lt;/strong&gt; IE 8 et 9 ont un support partiel de CORS. Retenir en particulier que :&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;les méthodes HTTP &lt;code&gt;PUT&lt;/code&gt; et &lt;code&gt;DELETE&lt;/code&gt; ne sont pas supportées&lt;/li&gt;
+&lt;li&gt;les requêtes à entête HTTP &lt;code&gt;Content-Type&lt;/code&gt; ne peuvent contenir que la valeur &lt;code&gt;text/plain&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;les requêtes émises ne peuvent pas contenir de cookies&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/blockquote&gt;
+
+&lt;h2&gt;Exemple&lt;/h2&gt;
+
+&lt;p&gt;Le code ci-dessous permet d’afficher les vignettes des 25 vidéos Youtube les plus populaires :
+&lt;script src=&quot;https://gist.github.com/9cfca5492994fbf924bd.js&quot;&gt; &lt;/script&gt;&lt;/p&gt;
+
+&lt;p&gt;La page HTML est servie par le serveur &lt;code&gt;inoviabook.local&lt;/code&gt;, tandis que les données sont issues du serveur &lt;code&gt;gdata.youtube.com&lt;/code&gt; :
+&lt;center&gt;&lt;img src=&quot;http://blog.inovia-conseil.fr/wp-content/uploads/2015/04/arch-cors.png&quot; alt=&quot;CORS&quot;&gt;&lt;/center&gt;&lt;/p&gt;
+
+&lt;p&gt;La requête AJAX échouerait si le navigateur ne supportait pas CORS. Comment la magie opère-t-elle ? Le mystère se dissipe en analysant la requête / réponse AJAX vers les serveurs de Youtube :&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://blog.inovia-conseil.fr/wp-content/uploads/2015/04/req-1.png&quot; alt=&quot;Entête de la requête CORS&quot;&gt;&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;Le &lt;em&gt;navigateur&lt;/em&gt; ajoute l’entête &lt;code&gt;Origin&lt;/code&gt; avant d’émettre la requête cross-domain. Il contient le schéma HTTP, le serveur et le port de provenance (&lt;code&gt;http://inoviabook.local:8000&lt;/code&gt;) de la page (&lt;code&gt;youtube.html&lt;/code&gt;) à l’initiative de l’appel CORS.
+Pour des raisons de sécurité, seul le navigateur est responsable de la valorisation de cet entête HTTP.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://blog.inovia-conseil.fr/wp-content/uploads/2015/04/resp-1.png&quot; alt=&quot;Entête de la réponse CORS&quot;&gt;&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;La réponse du &lt;strong&gt;serveur&lt;/strong&gt; contient l’entête &lt;code&gt;Access-Control-Allow-Origin&lt;/code&gt; permettant d’indiquer au client qu’il est bien habilité à obtenir une réponse valide. La requête échouerait si l’entête n’était pas présent ou s’il contenait une valeur &lt;strong&gt;ne concordant pas&lt;/strong&gt; avec la valeur de l’entête &lt;code&gt;Origin&lt;/code&gt;.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Quelques observations :&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Le moyen de plus simple d’avoir un serveur avec support CORS unilatéral serait d’ajouter l’entête &lt;code&gt;Access-Control-Allow-Origin: *&lt;/code&gt; dans toutes les réponses HTTP.&lt;/li&gt;
+&lt;li&gt;La requête de l’exemple ci-dessus échouerait si &lt;code&gt;Access-Control-Allow-Origin&lt;/code&gt; valait &lt;code&gt;http://inoviabook.local:80&lt;/code&gt; car le numéro de port ne concorderait pas avec celui de l’entête &lt;code&gt;Origin&lt;/code&gt; (&lt;code&gt;8000&lt;/code&gt;).&lt;/li&gt;
+&lt;li&gt;La requête de l’exemple ci-dessus échouerait si &lt;code&gt;Access-Control-Allow-Origin&lt;/code&gt; valait &lt;code&gt;https://inoviabook.local:8000&lt;/code&gt; car le schéma HTTPS ne concorderait pas avec celui de l’entête &lt;code&gt;Origin&lt;/code&gt; (&lt;code&gt;http&lt;/code&gt;).&lt;/li&gt;
+&lt;li&gt;La requête fonctionnerait si &lt;code&gt;Access-Control-Allow-Origin&lt;/code&gt; valait &lt;code&gt;http://*.local:8000&lt;/code&gt;
+car la valeur concorderait avec l’entête &lt;code&gt;Origin&lt;/code&gt; (&lt;code&gt;http://inoviabook.local:8000&lt;/code&gt;).&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2&gt;Les requêtes de contrôle préliminaires (preflight requests)&lt;/h2&gt;
+
+&lt;p&gt;Un navigateur supportant CORS peut, dans certaines conditions explicitées ci-après, envoyer une &lt;strong&gt;requête de contrôle préliminaire&lt;/strong&gt; (&lt;em&gt;preflight request&lt;/em&gt;) afin de demander la permission au serveur d’envoyer la requête réelle. Si le serveur ne répond pas correctement à la requête préliminaire, le navigateur n’enverra pas la requête réelle et l’objet &lt;code&gt;XMLHttpRequest&lt;/code&gt; remontera une erreur.&lt;/p&gt;
+
+&lt;p&gt;Une requête préliminaire est automatiquement émise par le navigateur dans les 2 cas de figure suivants :&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;la requête utilise une méthode HTTP différente de &lt;code&gt;GET&lt;/code&gt;, &lt;code&gt;POST&lt;/code&gt; ou &lt;code&gt;HEAD&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;la requête contient un entête HTTP &lt;code&gt;Content-Type&lt;/code&gt; dont la valeur est différente de :
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;text/plain&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;multipart/form-data&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;application/x-www-form-urlencoded&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Si nous modifions légèrement le code de notre exemple en renseignant l’entête &lt;code&gt;Content-Type&lt;/code&gt; à &lt;code&gt;application/json&lt;/code&gt; (rajouter &lt;code&gt;contentType: &amp;#39;application/json&amp;#39;&lt;/code&gt; aux settings de la fonction &lt;code&gt;$.ajax()&lt;/code&gt;), le navigateur envoie la requête préliminaire suivante :
+&lt;pre&gt;
+&lt;strong&gt;OPTIONS&lt;/strong&gt; /feeds/api/standardfeeds/most_popular?v=2&amp;amp;alt=json HTTP/1.1
+Host: gdata.youtube.com
+origin: http://inoviabook.local:8000
+&lt;strong&gt;access-control-request-method:&lt;/strong&gt; GET
+&lt;strong&gt;access-control-request-headers:&lt;/strong&gt; accept, content-type
+…
+&lt;/pre&gt;&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;On notera qu’une requête préliminaire utilise la méthode HTTP &lt;code&gt;OPTIONS&lt;/code&gt;.
+Remarquez l’utilisation des entêtes de requête &lt;code&gt;access-control-request-method&lt;/code&gt; et &lt;code&gt;access-control-request-headers&lt;/code&gt;. Par ce biais, le navigateur demande la permission au serveur s’il est bien autorisé à utiliser respectivement la méthode HTTP &lt;code&gt;GET&lt;/code&gt; et les requêtes HTTP &lt;code&gt;Accept&lt;/code&gt; et &lt;code&gt;Content-Type&lt;/code&gt; contenus dans la requête réelle.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;La réponse (correcte) du serveur est la suivante :
+&lt;pre&gt;
+HTTP/1.1 200 OK
+X-GData-User-Country: FR
+Access-Control-Allow-Origin: http://inoviabook.local:8000
+&lt;strong&gt;Access-Control-Allow-Headers:&lt;/strong&gt; accept,content-type
+&lt;strong&gt;Access-Control-Allow-Methods:&lt;/strong&gt; DELETE,GET,HEAD,PATCH,POST,PUT
+Content-Type: text/plain
+…
+&lt;/pre&gt;&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;On remarquera la présence des entêtes &lt;code&gt;Access-Control-Allow-Headers&lt;/code&gt; et &lt;code&gt;Access-Control-Allow-Methods&lt;/code&gt; contenant respectivement la liste des entêtes et méthodes HTTP permises par le serveur.
+Leurs valeurs concordent avec celles des entêtes de requête &lt;code&gt;Access-Control-Request-Method&lt;/code&gt; et &lt;code&gt;Access-Control-Request-Headers&lt;/code&gt;. La réponse vaut donc autorisation pour le navigateur d’émettre la requête réelle, celle retournant la liste des 25 vidéos Youtube les plus populaires.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;&lt;center&gt;&lt;img src=&quot;http://blog.inovia-conseil.fr/wp-content/uploads/2015/04/cors-preflight.png&quot; alt=&quot;Requête CORS avec requête préliminaire&quot;&gt;&lt;/center&gt;&lt;/p&gt;
+
+&lt;p&gt;Les requêtes de contrôle peuvent poser des &lt;strong&gt;problèmes de performance&lt;/strong&gt; car elles ont pour conséquence de doubler le nombre de &lt;em&gt;hits&lt;/em&gt; vers le serveur. &lt;br /&gt;
+Pour limiter le nombre de requêtes préliminaires, le serveur peut forcer le navigateur à mettre en cache la requête en rajoutant l’entête HTTP &lt;code&gt;Access-Control-Max-Age&lt;/code&gt; dans la réponse.&lt;br /&gt;
+Voici un exemple pour une mise en cache pendant 1 heure :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;Access-Control-Max-Age: 3600&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h2&gt;Cookies et authentification&lt;/h2&gt;
+
+&lt;p&gt;Par défaut, les requêtes cross-domain interdisent la propagation de cookies, de vecteurs d’accréditation ou de certificats SSL client.&lt;br /&gt;
+Pour lever cette interdiction, il faut opérer quelques modifications côté client et serveur.&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;em&gt;côté client&lt;/em&gt; : renseigner la propriété &lt;code&gt;withCredentials&lt;/code&gt; de l’objet &lt;code&gt;XMLHttpRequest&lt;/code&gt; à &lt;code&gt;true&lt;/code&gt;.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;Sous jQuery, modifier les settings de la fonction &lt;code&gt;$.ajax()&lt;/code&gt; en modifiant la propriété &lt;code&gt;xhrFields&lt;/code&gt; :&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-json&quot; data-lang=&quot;json&quot;&gt;&lt;span class=&quot;err&quot;&gt;xhrFields:&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;err&quot;&gt;withCredentials:&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;true&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;em&gt;côté serveur&lt;/em&gt; : renseigner l’entête HTTP &lt;code&gt;Access-Control-Allow-Credentials&lt;/code&gt; à &lt;code&gt;true&lt;/code&gt; :&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;Access-Control-Allow-Credentials: &lt;span class=&quot;nb&quot;&gt;true&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h2&gt;Exposer les entêtes personnalisées des réponses&lt;/h2&gt;
+
+&lt;p&gt;CORS est assez rigide dans l’utilisation des entêtes HTTP personnalisées.&lt;br /&gt;
+Imaginons que votre API soit conçue pour retourner le numéro de version détaillée d’un service (ou tout autre méta-donnée utile fonctionnellement) dans l’entête personnalisées &lt;code&gt;X-App-Version&lt;/code&gt;. &lt;br /&gt;
+Sachez que le contenu de l’entête &lt;strong&gt;ne pourra pas être lue par le client sans une autorisation explicite du serveur&lt;/strong&gt;.&lt;br /&gt;
+Concrètement, le serveur doit préciser dans chaque réponse la liste des entêtes personnalisées exposées au client via l’entête &lt;code&gt;Access-Control-Expose-Headers&lt;/code&gt;.&lt;br /&gt;
+Dans notre cas de figure, le serveur devra retourner :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;Access-Control-Expose-Headers: X-App-Version&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+</description>
+        <pubDate>Sun, 19 Apr 2015 08:00:00 +0200</pubDate>
+        <link>http://ksahnine.github.io/architecture/rest/cors/2015/04/19/demystifier-cors.html</link>
+        <guid isPermaLink="true">http://ksahnine.github.io/architecture/rest/cors/2015/04/19/demystifier-cors.html</guid>
+        
+        <category>regular</category>
+        
+        
+        <category>architecture</category>
+        
+        <category>rest</category>
+        
+        <category>cors</category>
+        
+      </item>
+    
+      <item>
+        <title>Système de découverte de services par DNS : Docker et Consul - 2/2</title>
+        <description>&lt;p&gt;Dans mon &lt;a href=&quot;/docker/consul/microservice/2015/03/30/dns-docker-consul-part-1.html&quot;&gt;article précédent&lt;/a&gt;, dont la lecture est un préalable, j’avais décrit les principes de la &lt;strong&gt;découverte de services par DNS&lt;/strong&gt; comme technique de communication entre conteneurs Docker et ce, indépendamment de leur localisation physique sur un serveur hôte.&lt;br /&gt;
+Lors de sa &lt;a href=&quot;/docker/consul/microservice/2015/03/30/dns-docker-consul-part-1.html&quot;&gt;mise en oeuvre pratique&lt;/a&gt; avec un registre &lt;strong&gt;Consul&lt;/strong&gt;, nous avions vu en particulier que l’enregistrement manuel des services via l’&lt;a href=&quot;https://www.consul.io/docs/agent/http/agent.html#agent_service_register&quot;&gt;&lt;strong&gt;API Agent&lt;/strong&gt;&lt;/a&gt; pouvait être fastidieuse.&lt;/p&gt;
+
+&lt;p&gt;Dans ce second volet de la série, nous mettrons l’accent sur une technique d’enregistrement à chaud de services dockerisés grâce à &lt;a href=&quot;https://github.com/gliderlabs/registrator&quot;&gt;&lt;strong&gt;Registrator&lt;/strong&gt;&lt;/a&gt;, développé par &lt;a href=&quot;http://progrium.com/blog/&quot;&gt;Jeff Lindsay&lt;/a&gt; et disponible &lt;a href=&quot;https://registry.hub.docker.com/u/gliderlabs/registrator/&quot;&gt;sous la fome d’une image Docker&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h2&gt;Etude de cas&lt;/h2&gt;
+
+&lt;p&gt;Le schéma ci-dessous décrit l’architecture d’un cluster constitué de 3 noeuds hébergeant chacun un &lt;strong&gt;agent Consul&lt;/strong&gt; et un &lt;strong&gt;hôte Docker&lt;/strong&gt;. &lt;br /&gt;
+Sur chacun des hôtes Docker sont déployés :&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;un conteneur &lt;strong&gt;Registrator&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;un conteneur hébergeant un &lt;strong&gt;web service&lt;/strong&gt; HTTP (respectivement &lt;code&gt;svc1&lt;/code&gt;, &lt;code&gt;svc2&lt;/code&gt; et &lt;code&gt;svc3&lt;/code&gt;)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://blog.inovia-conseil.fr/wp-content/uploads/2015/04/consul-cluster-registrator.png&quot; alt=&quot;Architecture Docker/Consul/Registrator&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;Pour accompagner la lecture de cet article, le cluster décrit ci-dessus est provisionnable localement via une configuration &lt;strong&gt;Vagrant&lt;/strong&gt; que je mets à disposition sur &lt;em&gt;Github&lt;/em&gt;, et dont la mise en oeuvre est des plus simples :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;git clone https://github.com/ksahnine/vagrant-config.git
+&lt;span class=&quot;nb&quot;&gt;cd &lt;/span&gt;vagrant-config/consul-cluster-registrator
+vagrant up&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Repartez de cette configuration si vous souhaitez reproduire les exemples de l’article.&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Note :&lt;/strong&gt; Le temps de construction et de démarrage du cluster en partant de zéro est long. Compter plusieurs (longues) minutes.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h2&gt;Fonctionnement&lt;/h2&gt;
+
+&lt;p&gt;Lors de l’initialisation du cluster, chaque noeud démarre :&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;un agent &lt;em&gt;Consul&lt;/em&gt; (en mode serveur sur &lt;code&gt;node1&lt;/code&gt;) : l’&lt;strong&gt;API HTTP Agent&lt;/strong&gt; est alors accessible sur le port &lt;code&gt;8500&lt;/code&gt; de chaque agent&lt;/li&gt;
+&lt;li&gt;un conteneur &lt;em&gt;Registrator&lt;/em&gt; :
+
+&lt;ul&gt;
+&lt;li&gt;à l’écoute des évènements Docker &lt;code&gt;start&lt;/code&gt;, &lt;code&gt;die&lt;/code&gt;, &lt;code&gt;stop&lt;/code&gt; et &lt;code&gt;kill&lt;/code&gt; des conteneurs co-localisés&lt;/li&gt;
+&lt;li&gt;connecté à l’agent &lt;em&gt;Consul&lt;/em&gt; de l’hôte Docker sur lequel il est déployé
+&lt;br /&gt;Ainsi, le démarrage du conteneur &lt;em&gt;Registrator&lt;/em&gt; sur &lt;code&gt;node1&lt;/code&gt; (adresse IP &lt;code&gt;172.20.20.10&lt;/code&gt;) s’effectue comme suit :&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;docker run -d -v /var/run/docker.sock:/tmp/docker.sock -h node1 gliderlabs/registrator consul://172.20.20.10:8500&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;A ce stade, &lt;em&gt;Registrator&lt;/em&gt; est prêt à intercepter les évènements de tout conteneur susceptible d’être créé ou détruit, à l’issue de quoi il met à jour en conséquence le registre &lt;em&gt;Consul&lt;/em&gt;.&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Note :&lt;/strong&gt; le fonctionnement d’un cluster Consul est décrit dans la &lt;a href=&quot;/docker/consul/microservice/2015/03/30/dns-docker-consul-part-1.html&quot;&gt;première partie de cet article&lt;/a&gt;.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h2&gt;Un cas pratique d&amp;#39;enregistrement de service à chaud&lt;/h2&gt;
+
+&lt;p&gt;Le cluster étant opérationnel, commençons par déployer le service &lt;code&gt;svc4&lt;/code&gt; sur le serveur &lt;code&gt;node3&lt;/code&gt; :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;vagrant ssh node3
+vagrant@node3:~&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;docker run -td -e &lt;span class=&quot;s2&quot;&gt;&amp;quot;SERVICE_NAME=svc4&amp;quot;&lt;/span&gt; -p 8084:8080 --name svc4 ksahnine/dummy-http svc4&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;On notera que :&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;la &lt;strong&gt;variable d’environnement&lt;/strong&gt; &lt;code&gt;SERVICE_NAME=svc4&lt;/code&gt; permet d’attribuer explicitement le nom du service dans le registre. Dans notre exemple, le service dockerisé sera accessible via le FQDN &lt;code&gt;svc4.service.consul&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;em&gt;Registrator&lt;/em&gt; enregistre le service à l’interception de l’évènement &lt;code&gt;start&lt;/code&gt; via l’API &lt;a href=&quot;https://www.consul.io/docs/agent/http/agent.html#agent_service_register&quot;&gt;&lt;code&gt;/v1/agent/service/register&lt;/code&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;em&gt;Registrator&lt;/em&gt; désenregistre le service à l’interception des évènements &lt;code&gt;stop&lt;/code&gt;, &lt;code&gt;kill&lt;/code&gt; et &lt;code&gt;die&lt;/code&gt;, via l’API &lt;a href=&quot;https://www.consul.io/docs/agent/http/agent.html#agent_service_deregister&quot;&gt;&lt;code&gt;/v1/agent/service/deregister&lt;/code&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;En interrogeant Consul via l’API DNS, on constate que le nouveau service est correctement enregistré et déployé sur le noeud 3 :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;vagrant@node2:~&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;dig @172.20.20.10 svc4.service.consul SRV
+
+&lt;span class=&quot;p&quot;&gt;;;&lt;/span&gt; QUESTION SECTION:
+&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;svc4.service.consul.        IN  SRV
+
+&lt;span class=&quot;p&quot;&gt;;;&lt;/span&gt; ANSWER SECTION:
+svc4.service.consul.    0   IN  SRV &lt;span class=&quot;m&quot;&gt;1&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;1&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;8084&lt;/span&gt; node3.node.dc1.consul.
+
+&lt;span class=&quot;p&quot;&gt;;;&lt;/span&gt; ADDITIONAL SECTION:
+node3.node.dc1.consul.  0   IN  A   172.20.20.30&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Enfin, appelons ce service depuis un conteneur Docker issu de l’image &lt;code&gt;tutum/curl&lt;/code&gt; déployé sur le serveur &lt;code&gt;node2&lt;/code&gt; :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;vagrant ssh node2
+vagrant@node2:~&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;docker run -ti --dns 172.20.20.10 --dns-search service.consul tutum/curl
+root@afc268967ce9:/# curl http://svc4:8084/
+Hi! I&lt;span class=&quot;s1&quot;&gt;&amp;#39;m [svc4] service and my Docker container&amp;#39;&lt;/span&gt;s IP is &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;172.17.0.4&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Arrêtons le conteneur &lt;code&gt;svc4&lt;/code&gt; :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;vagrant ssh node3
+vagrant@node3:~&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;docker &lt;span class=&quot;nb&quot;&gt;kill &lt;/span&gt;svc4&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;On constate que le service &lt;code&gt;svc4.service.consul&lt;/code&gt; a été désenregistré à chaud :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;vagrant@node3:~&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;dig +short @172.20.20.10 svc4.service.consul
+vagrant@node3:~&lt;span class=&quot;err&quot;&gt;$&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Voilà. Le registre &lt;em&gt;Consul&lt;/em&gt; est mis à jour dynamiquement et reflète parfaitement le plan de déploiement des services dockerisés, ce qui est éminemment utile dans une &lt;strong&gt;architecture de microservices&lt;/strong&gt;.&lt;/p&gt;
+</description>
+        <pubDate>Wed, 08 Apr 2015 08:00:00 +0200</pubDate>
+        <link>http://ksahnine.github.io/docker/consul/microservice/2015/04/08/dns-docker-consul-part-2.html</link>
+        <guid isPermaLink="true">http://ksahnine.github.io/docker/consul/microservice/2015/04/08/dns-docker-consul-part-2.html</guid>
+        
+        <category>regular</category>
+        
+        
+        <category>docker</category>
+        
+        <category>consul</category>
+        
+        <category>microservice</category>
+        
+      </item>
+    
+      <item>
+        <title>Système de découverte de services par DNS : Docker et Consul - 1/2</title>
+        <description>&lt;p&gt;Comme je l’évoquais dans un précédent billet, il y a tout lieu de penser que les &lt;strong&gt;architectures de microservices&lt;/strong&gt; et &lt;strong&gt;polyglottes&lt;/strong&gt; constituent un horizon proche des Systèmes d’Information d’Entreprise, quand ce n’est pas déjà une réalité pour de grands acteurs du web (&lt;em&gt;Netflix&lt;/em&gt;, &lt;em&gt;Airbnb&lt;/em&gt;).&lt;br /&gt;
+Dans ce contexte, &lt;strong&gt;Docker&lt;/strong&gt; apparait comme une véritable bénédiction tant ses qualités sont en symbiose parfaite avec ce nouveau paradigme. Il répond remarquablement aux besoins :&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;d’&lt;strong&gt;isolation&lt;/strong&gt; de l’environnement d’exécution d’un service&lt;/li&gt;
+&lt;li&gt;de déploiement &lt;strong&gt;rapide&lt;/strong&gt; et sans couture&lt;/li&gt;
+&lt;li&gt;de &lt;strong&gt;portabilité&lt;/strong&gt; et de &lt;strong&gt;scalabilité&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;de compatibilité avec des solutions d’hébergement dans un &lt;strong&gt;Cloud&lt;/strong&gt; privé, public ou hybride&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Cependant, la communication entre conteneurs Docker répartis sur plusieurs machines hôtes n’est vraiment pas triviale à mettre en oeuvre.&lt;br /&gt;
+Dans le cas d’une architecture constituée d’un très grand nombre de microservices dockerisés, la difficulté peut conduire au &lt;a href=&quot;http://fr.wikipedia.org/wiki/Le_Radeau_de_La_M%C3%A9duse&quot;&gt;naufrage&lt;/a&gt;…&lt;br /&gt;
+Il existe deux approches pour traiter ce problème complexe :&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;le &lt;strong&gt;paradigme&lt;/strong&gt; &lt;a href=&quot;https://fr.wikipedia.org/wiki/Software_Defined_Networking&quot;&gt;&lt;strong&gt;SDN&lt;/strong&gt;&lt;/a&gt; (Software-Defined Networking), notamment mis en oeuvre par &lt;a href=&quot;&quot;&gt;&lt;strong&gt;Weave&lt;/strong&gt;&lt;/a&gt;, &lt;a href=&quot;http://openvswitch.org/&quot;&gt;&lt;strong&gt;Open vSwitch&lt;/strong&gt;&lt;/a&gt; ou &lt;a href=&quot;https://github.com/socketplane/socketplane&quot;&gt;&lt;strong&gt;Socketplane&lt;/strong&gt;&lt;/a&gt;, permet de construire un &lt;strong&gt;réseau virtuel de conteneurs&lt;/strong&gt; répartis sur plusieurs hôtes Docker. A ce propos, &lt;a href=&quot;https://blog.docker.com/2015/03/socketplane-excited-to-be-joining-docker-to-collaborate-with-networking-ecosystem/&quot;&gt;l’acquisition récente de Socketplane&lt;/a&gt; par &lt;em&gt;Docker Inc&lt;/em&gt; semble annoncer l’apparition prochaine d’une sorte “d’API réseau” standardisée dans l’écosystème Docker.&lt;/li&gt;
+&lt;li&gt;la &lt;strong&gt;découverte de service&lt;/strong&gt; est une technique permettant de trouver une ressource (application, service) sur un réseau. Cette technique n’est pas spécifique au monde Docker bien sûr (songez au DNS) mais elle a fait ses preuves dans cet écosystème grâce à l’adoption grandissante de &lt;a href=&quot;https://consul.io/&quot;&gt;&lt;strong&gt;Consul&lt;/strong&gt;&lt;/a&gt; et &lt;a href=&quot;https://github.com/skynetservices/skydns/&quot;&gt;&lt;strong&gt;SkyDNS2&lt;/strong&gt;&lt;/a&gt; / &lt;a href=&quot;https://coreos.com/docs/distributed-configuration/getting-started-with-etcd/&quot;&gt;&lt;strong&gt;etcd&lt;/strong&gt;&lt;/a&gt;, des solutions de découverte de service, distribuées et hautement disponibles. On ne résout pas l’intégralité des problèmes de communication inter-conteneurs, mais disons que ce modèle est suffisant dans la plupart des cas d’utilisation.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;C’est cette dernière approche que je vous propose d’étudier car elle a le mérite d’être peu intrusive et plus simple à mettre en oeuvre qu’un SDN.&lt;br /&gt;
+En pratique, nous verrons comment :&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;installer et configurer un cluster Consul (sur un environnement provisionnable localement avec &lt;strong&gt;Vagrant&lt;/strong&gt;)&lt;/li&gt;
+&lt;li&gt;enregistrer des services dockerisés&lt;/li&gt;
+&lt;li&gt;communiquer avec un service depuis un conteneur Docker, sans connaitre sa localisation physique (adresse IP ou FQDN)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2&gt;Consul : présentation&lt;/h2&gt;
+
+&lt;p&gt;&lt;strong&gt;Consul&lt;/strong&gt; est une solution de découverte de service, distribuée et hautement disponible, développée par la société &lt;a href=&quot;https://www.hashicorp.com/&quot;&gt;Hashicorp&lt;/a&gt; (dont le fondateur est le créateur de &lt;a href=&quot;https://www.vagrantup.com/&quot;&gt;Vagrant&lt;/a&gt;).&lt;br /&gt;
+Par ailleurs, &lt;strong&gt;Consul&lt;/strong&gt; est également :&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;un datastore distribué de type clé/valeur pour le stockage d’éléments de configuration&lt;/li&gt;
+&lt;li&gt;un système de supervision de services (bilan de santé, détection de pannes)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;em&gt;Consul&lt;/em&gt; est disponible sous &lt;a href=&quot;https://consul.io/downloads.html&quot;&gt;Linux, Windows et Mac OS&lt;/a&gt; mais seule l’utilisation sous Linux est recommandée en production.&lt;br /&gt;
+Le schéma ci-dessous décrit l’architecture d’un cluster constitué de 3 noeuds hébergeant chacun un &lt;strong&gt;agent Consul&lt;/strong&gt; et un &lt;strong&gt;hôte Docker&lt;/strong&gt;. J’ai également représentés sur ce schéma les &lt;strong&gt;services dockerisés&lt;/strong&gt; déployés (&lt;code&gt;svc1&lt;/code&gt;, &lt;code&gt;svc2&lt;/code&gt; et &lt;code&gt;svc3&lt;/code&gt;), dont certains sont redondants (&lt;code&gt;svc1&lt;/code&gt; et &lt;code&gt;svc2&lt;/code&gt;) :&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://blog.inovia-conseil.fr/wp-content/uploads/2015/03/consul-cluster.png&quot; alt=&quot;Architecture Docker/Consul&quot;&gt;&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Note :&lt;/strong&gt; Je mets à disposition &lt;a href=&quot;https://github.com/ksahnine/vagrant-config&quot;&gt;deux configurations Vagrant&lt;/a&gt; pour provisionner localement ce cluster et expérimenter vous même les exemples illustrant cet article. Pour les impatients, consultez directement le paragraphe &lt;a href=&quot;#1&quot;&gt;suivant&lt;/a&gt;.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Un &lt;strong&gt;agent&lt;/strong&gt; Consul est un composant essentiel chargé d’enregistrer les services, répondre aux requêtes, collecter des informations du cluster etc.&lt;br /&gt;
+S’exécutant sur chaque noeud du cluster, il peut fonctionner en mode &lt;strong&gt;client&lt;/strong&gt; ou &lt;strong&gt;serveur&lt;/strong&gt;. Le cluster doit disposer d’au moins un agent serveur. Au delà, un mécanisme d’élection du &lt;strong&gt;leader&lt;/strong&gt; du cluster permet d’attribuer ce rôle à un des agents serveur. En production, il est recommandé d’avoir de 3 à 5 agents serveur par cluster pour éviter toute perte de données en cas de panne d’un des serveurs.&lt;/p&gt;
+
+&lt;p&gt;Chaque agent supporte 3 protocoles de communication :&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;RPC (port par défaut &lt;code&gt;8400&lt;/code&gt;)&lt;/li&gt;
+&lt;li&gt;HTTP (port par défaut &lt;code&gt;8500&lt;/code&gt;) : une &lt;a href=&quot;https://www.consul.io/docs/agent/http.html&quot;&gt;API RESTful est exposée&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;DNS (port par défaut `8600)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Les ports &lt;code&gt;8300&lt;/code&gt;, &lt;code&gt;8301&lt;/code&gt; et &lt;code&gt;8302&lt;/code&gt; sont des ports internes réservés à la communication entre agents.&lt;/p&gt;
+
+&lt;h2&gt;&lt;a name=&quot;1&quot;&gt;&lt;/a&gt;Configuration Vagrant&lt;/h2&gt;
+
+&lt;p&gt;Pour accompagner la lecture de cet article, deux configurations du cluster sont provisionnables localement via &lt;strong&gt;Vagrant&lt;/strong&gt; :&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Configuration &lt;strong&gt;partielle&lt;/strong&gt; : services Dockers &lt;code&gt;svc1&lt;/code&gt;, &lt;code&gt;svc2&lt;/code&gt; et &lt;code&gt;svc3&lt;/code&gt; provisionnés mais pas de cluster Consul :&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;git clone https://github.com/ksahnine/vagrant-config.git
+&lt;span class=&quot;nb&quot;&gt;cd &lt;/span&gt;vagrant-config/consul-cluster-blank
+vagrant up&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;br /&gt;Repartez de cette configuration si vous souhaiter reproduire les exemples de l’article.
+- Configuration complète : services Dockers &lt;code&gt;svc1&lt;/code&gt;, &lt;code&gt;svc2&lt;/code&gt; et &lt;code&gt;svc3&lt;/code&gt; provisionnés, cluster Consul configuré et provisionné :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;git clone https://github.com/ksahnine/vagrant-config.git
+&lt;span class=&quot;nb&quot;&gt;cd &lt;/span&gt;vagrant-config/consul-cluster-services
+vagrant up&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Note :&lt;/strong&gt; Le temps de construction et de démarrage du cluster en partant de zéro est long. Compter plusieurs minutes.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h2&gt;Mise en oeuvre du cluster&lt;/h2&gt;
+
+&lt;p&gt;Commençons par démarrer l’agent du premier noeud en mode serveur sur &lt;code&gt;node1&lt;/code&gt; dont l’IP privée est &lt;code&gt;172.20.20.10&lt;/code&gt; :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;vagrant ssh node1
+vagrant@node1:~&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;consul agent -node node1 -server -bootstrap-expect &lt;span class=&quot;m&quot;&gt;1&lt;/span&gt; -data-dir /tmp/consul &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+                              -client 172.20.20.10  -advertise 172.20.20.10 &lt;span class=&quot;p&quot;&gt;&amp;amp;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;L’agent revendique le rôle de leader du cluster :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;2015/03/29 13:58:13 [INFO] raft: Node at 172.20.20.10:8300 [Candidate] entering Candidate state
+2015/03/29 13:58:13 [INFO] raft: Election won. Tally: 1
+2015/03/29 13:58:13 [INFO] raft: Node at 172.20.20.10:8300 [Leader] entering Leader state&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;On notera que :&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;le flag &lt;code&gt;-node&lt;/code&gt; permet d’attribuer un nom à l’agent (&lt;code&gt;node1&lt;/code&gt; dans le cas présent)&lt;/li&gt;
+&lt;li&gt;le flag &lt;code&gt;-server&lt;/code&gt; permet de configurer l’agent en mode serveur&lt;/li&gt;
+&lt;li&gt;le flag &lt;code&gt;-bootstrap-expect 1&lt;/code&gt; est suivi du nombre d’agent serveur devant être actifs avant que le cluster ne soit opérationnel. Dans notre cas, on aurait pu utiliser le flag &lt;code&gt;-bootstrap&lt;/code&gt; car il n’y a qu’un agent serveur.&lt;/li&gt;
+&lt;li&gt;le flag &lt;code&gt;-client&lt;/code&gt; définit l’&lt;strong&gt;adresse client&lt;/strong&gt; de l’agent exposant les interfaces DNS, HTTP et RPC.&lt;/li&gt;
+&lt;li&gt;le flag &lt;code&gt;-advertise&lt;/code&gt; définit l’&lt;strong&gt;adresse cluster&lt;/strong&gt; de l’agent, c’est-à-dire l’adresse IP atteignable par les autres agents du cluster.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Note :&lt;/strong&gt; On peut également externaliser les paramètres de l’agent dans un fichier de configuration au format JSON et activer l’agent via la commande &lt;code&gt;consul agent -config-file conf/node1.json&lt;/code&gt; :
+&lt;script src=&quot;https://gist.github.com/e3e6d1fa27c7c08a1ea4.js&quot;&gt; &lt;/script&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Sur le &lt;strong&gt;deuxième noeud&lt;/strong&gt; (&lt;code&gt;node2&lt;/code&gt; dont l’IP privée est &lt;code&gt;172.20.20.20&lt;/code&gt;), démarrons l’agent consul en mode client :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;vagrant ssh node2
+vagrant@node2:~&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;consul agent -node node2 -data-dir /tmp/consul &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+         -client 172.20.20.20 -advertise 172.20.20.20 &lt;span class=&quot;p&quot;&gt;&amp;amp;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;A ce stade, le deuxième agent n’a toujours pas rejoint le cluster. Pour ce faire, utiliser la commande &lt;code&gt;consul join&lt;/code&gt; suivie de l’adresse IP du leader (&lt;code&gt;node1&lt;/code&gt;) :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;vagrant@node2:~&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;consul join -rpc-addr 172.20.20.20:8400 172.20.20.10&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Procédons de même sur le &lt;strong&gt;troisième noeud&lt;/strong&gt; (&lt;code&gt;node3.local&lt;/code&gt; dont l’IP privée est &lt;code&gt;10.10.0.3&lt;/code&gt;) mais en une seule commande grâce au flag &lt;code&gt;-join&lt;/code&gt; :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;vagrant ssh node3
+vagrant@node3:~&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;consul agent -node node3 -data-dir /tmp/consul &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+          -client 172.20.20.30 -advertise 172.20.20.30 -join 172.20.20.10 &lt;span class=&quot;p&quot;&gt;&amp;amp;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Pour connaître l’état du cluster Consul, utiliser la commande &lt;code&gt;consul members&lt;/code&gt; sur n’importe quel noeud :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;vagrant@node3:~&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;consul members -rpc-addr 172.20.20.30:8400
+Node   Address             Status  Type    Build  Protocol
+node3  172.20.20.30:8301   alive   client  0.5.0  2
+node2  172.20.20.20:8301   alive   client  0.5.0  2
+node1  172.20.20.10:8301   alive   server  0.5.0  2&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Note :&lt;/strong&gt; si un des agents client venait à tomber, son statut passerait de &lt;code&gt;alive&lt;/code&gt; à &lt;code&gt;left&lt;/code&gt;.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Voilà. Le cluster est maintenant opérationnel.&lt;/p&gt;
+
+&lt;h2&gt;Enregistrement, désenregistrement et découverte de services par DNS&lt;/h2&gt;
+
+&lt;p&gt;Chaque agent expose une &lt;strong&gt;API HTTP&lt;/strong&gt; permettant d’enregistrer, désenregistrer ou consulter les services qu’il administre.&lt;br /&gt;
+On peut consulter la définition d’un service (nom, adresse IP, port) via l’API HTTP ou l’API DNS (rappelons que chaque agent fait aussi office de resolver DNS).&lt;/p&gt;
+
+&lt;h3&gt;Enregistrement&lt;/h3&gt;
+
+&lt;p&gt;Enregistrons les 2 instances du service &lt;code&gt;svc1&lt;/code&gt; des noeuds &lt;code&gt;node1&lt;/code&gt; et &lt;code&gt;node2&lt;/code&gt; (port &lt;code&gt;8081&lt;/code&gt;) :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;node1@vagrant:~&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;curl -XPUT 172.20.20.10:8500/v1/agent/service/register -d &lt;span class=&quot;s1&quot;&gt;&amp;#39;{&lt;/span&gt;
+&lt;span class=&quot;s1&quot;&gt;  &amp;quot;id&amp;quot;:&amp;quot;svc1_instance_1&amp;quot;,&lt;/span&gt;
+&lt;span class=&quot;s1&quot;&gt;  &amp;quot;name&amp;quot;: &amp;quot;svc1&amp;quot;,&lt;/span&gt;
+&lt;span class=&quot;s1&quot;&gt;  &amp;quot;address&amp;quot;: &amp;quot;172.20.20.10&amp;quot;,&lt;/span&gt;
+&lt;span class=&quot;s1&quot;&gt;  &amp;quot;port&amp;quot;: 8081,&lt;/span&gt;
+&lt;span class=&quot;s1&quot;&gt;  &amp;quot;tags&amp;quot;: [&amp;quot;api&amp;quot;] }&amp;#39;&lt;/span&gt;
+
+node1@vagrant:~&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;curl -XPUT 172.20.20.20:8500/v1/agent/service/register -d &lt;span class=&quot;s1&quot;&gt;&amp;#39;{&lt;/span&gt;
+&lt;span class=&quot;s1&quot;&gt;  &amp;quot;id&amp;quot;:&amp;quot;svc1_instance_2&amp;quot;,&lt;/span&gt;
+&lt;span class=&quot;s1&quot;&gt;  &amp;quot;name&amp;quot;: &amp;quot;svc1&amp;quot;,&lt;/span&gt;
+&lt;span class=&quot;s1&quot;&gt;  &amp;quot;address&amp;quot;: &amp;quot;172.20.20.20&amp;quot;,&lt;/span&gt;
+&lt;span class=&quot;s1&quot;&gt;  &amp;quot;port&amp;quot;: 8081,&lt;/span&gt;
+&lt;span class=&quot;s1&quot;&gt;  &amp;quot;tags&amp;quot;: [&amp;quot;api&amp;quot;] }&amp;#39;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;La déclaration manuelle des services peut sembler fastidieuse à bien des égards.&lt;br /&gt;
+Dans le prochain article de la série, nous mettrons en place une solution &lt;em&gt;&amp;quot;plug and play&amp;quot;&lt;/em&gt; permettant d’enregistrer automatiquement un service dockerisé au démarrage du conteneur et de désenregistrement de celui-ci lorsque qu’il s’arrête.&lt;/p&gt;
+
+&lt;h3&gt;Découverte par DNS&lt;/h3&gt;
+
+&lt;p&gt;Un service est déclaré dans le DNS Consul sous la forme d’un &lt;strong&gt;enregistrement&lt;/strong&gt; &lt;a href=&quot;http://fr.wikipedia.org/wiki/Enregistrement_de_service&quot;&gt;&lt;strong&gt;SRV&lt;/strong&gt;&lt;/a&gt; (ou enregistrement de service) suffixé par &lt;code&gt;.service.consul&lt;/code&gt;.&lt;br /&gt;
+Ainsi, les noms pleinement qualifiés des 3 services dockerisés seront :&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;srv1.service.consul&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;srv2.service.consul&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;srv3.service.consul&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Interrogeons le DNS Consul, via l’agent sur &lt;code&gt;node1&lt;/code&gt;/&lt;code&gt;172.20.20.10&lt;/code&gt;, pour localiser le service &lt;code&gt;svc1.service.consul&lt;/code&gt; :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;vagrant ssh node2
+vagrant@node2:~&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;dig @172.20.20.10 -p &lt;span class=&quot;m&quot;&gt;8600&lt;/span&gt; svc1.service.consul SRV&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;On observe que le service est bien déclaré sur &lt;code&gt;172.20.20.10:8081&lt;/code&gt; et &lt;code&gt;172.20.20.20:8081&lt;/code&gt; :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;;; ANSWER SECTION:
+svc1.service.consul.    0   IN  SRV 1 1 8081 node2.node.dc1.consul.
+svc1.service.consul.    0   IN  SRV 1 1 8081 node1.node.dc1.consul.
+
+;; ADDITIONAL SECTION:
+node2.node.dc1.consul.  0   IN  A   172.20.20.20
+node1.node.dc1.consul.  0   IN  A   172.20.20.10&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;On remarquera que l’ordre d’apparition des adresses IP lors de la résolution du nom de service est &lt;strong&gt;aléatoire&lt;/strong&gt; :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;vagrant@node2:~&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;dig +short @172.20.20.10 -p &lt;span class=&quot;m&quot;&gt;8600&lt;/span&gt; svc1.service.consul
+172.20.20.20
+172.20.20.10&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;En requêtant une fraction de seconde plus tard, l’ordre a changé :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;vagrant@node2:~&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;dig +short @172.20.20.10 -p &lt;span class=&quot;m&quot;&gt;8600&lt;/span&gt; svc1.service.consul
+172.20.20.10
+172.20.20.20&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Il est ainsi possible de répartir aléatoirement la charge sur l’une ou l’autre instance du service, ouvrant la voie à une API RESTful &lt;strong&gt;scalable horizontalement&lt;/strong&gt;.&lt;/p&gt;
+
+&lt;h3&gt;Désenregistrement&lt;/h3&gt;
+
+&lt;p&gt;Le point de terminaison &lt;code&gt;/v1/agent/service/deregister/&lt;/code&gt; exposé par l’API HTTP de l’agent permet de désenregistrer un service dont il a la charge :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;vagrant@node1:~&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;curl -XGET 172.20.20.10:8500/v1/agent/service/deregister/svc1_instance_1
+vagrant@node1:~&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;curl -XGET 172.20.20.20:8500/v1/agent/service/deregister/svc1_instance_2&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h2&gt;Communiquer avec un service depuis un conteneur Docker&lt;/h2&gt;
+
+&lt;p&gt;Voyons comment appeler le service dockerisé &lt;code&gt;svc1.service.consul&lt;/code&gt; déployé sur &lt;code&gt;node1&lt;/code&gt; et &lt;code&gt;node2&lt;/code&gt; depuis un conteneur Docker situé sur &lt;code&gt;node3&lt;/code&gt;.&lt;br /&gt;
+Nous utiliserons l’image Docker &lt;code&gt;tutum/curl&lt;/code&gt; de l’hébergeur &lt;a href=&quot;https://www.tutum.co/&quot;&gt;Tutum&lt;/a&gt; pour la démonstration :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;vagrant ssh node3
+vagrant@node3:~&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;docker run -ti --dns 172.20.20.10 --dns-search service.consul tutum/curl
+root@200b369020f6:/# curl http://svc1:8081/
+Hi! I&lt;span class=&quot;s1&quot;&gt;&amp;#39;m [svc1] service and my Docker container&amp;#39;&lt;/span&gt;s IP is &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;172.17.0.2&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt;
+root@200b369020f6:/# curl http://svc1:8081/
+Hi! I&lt;span class=&quot;s1&quot;&gt;&amp;#39;m [svc1] service and my Docker container&amp;#39;&lt;/span&gt;s IP is &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;172.17.0.3&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Le flag &lt;code&gt;--dns&lt;/code&gt; est suivi de l’adresse IP de l’agent Consul du noeud 1 utilisé comme resolver DNS.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;Cela ne fonctionne que si l’agent est configuré pour écouter les requêtes DNS sur le port 53 (le port DNS Consul par défaut étant 8600).&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Le flag &lt;code&gt;--dns-search&lt;/code&gt; permet de forcer les recherches DNS sur le domaine passé en paramètre.&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+        <pubDate>Mon, 30 Mar 2015 08:00:00 +0200</pubDate>
+        <link>http://ksahnine.github.io/docker/consul/microservice/2015/03/30/dns-docker-consul-part-1.html</link>
+        <guid isPermaLink="true">http://ksahnine.github.io/docker/consul/microservice/2015/03/30/dns-docker-consul-part-1.html</guid>
+        
+        <category>regular</category>
+        
+        
+        <category>docker</category>
+        
+        <category>consul</category>
+        
+        <category>microservice</category>
+        
+      </item>
+    
+      <item>
+        <title>Sample</title>
+        <description></description>
+        <pubDate>Wed, 21 Jan 2015 07:00:00 +0100</pubDate>
+        <link>http://ksahnine.github.io/sample/2015/01/21/sample.html</link>
+        <guid isPermaLink="true">http://ksahnine.github.io/sample/2015/01/21/sample.html</guid>
+        
+        <category>regular</category>
+        
+        
+        <category>sample</category>
         
       </item>
     
