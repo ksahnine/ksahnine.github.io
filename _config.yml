@@ -19,7 +19,7 @@ name: 'Kadda SAHNINE'
 author: 'Kadda SAHNINE'
 author_image: "/assets/images/kad.png"
 
-paginate:	8
+paginate: 8
 
 url: "http://ksahnine.github.io" # the base hostname & protocol for your site
 baseurl: ""

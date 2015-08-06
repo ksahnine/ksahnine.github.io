@@ -6,8 +6,8 @@
 </description>
     <link>http://ksahnine.github.io/</link>
     <atom:link href="http://ksahnine.github.io/feed.xml" rel="self" type="application/rss+xml" />
-    <pubDate>Thu, 06 Aug 2015 18:01:32 +0200</pubDate>
-    <lastBuildDate>Thu, 06 Aug 2015 18:01:32 +0200</lastBuildDate>
+    <pubDate>Thu, 06 Aug 2015 19:39:41 +0200</pubDate>
+    <lastBuildDate>Thu, 06 Aug 2015 19:39:41 +0200</lastBuildDate>
     <generator>Jekyll v2.5.3</generator>
     
       <item>
@@ -1505,6 +1505,182 @@ Néanmoins au cas où vous l’utiliseriez, voici quelques-uns de mes retours d�
         <category>docker</category>
         
         <category>angularjs</category>
+        
+      </item>
+    
+      <item>
+        <title>Provisionner des microservices avec Ansible et Docker</title>
+        <description>&lt;p&gt;C’est bien connu, la fainéantise est la plus grande qualité d’un administrateur système.&lt;br /&gt;
+Si ce dernier est en outre un inconditionnel de &lt;a href=&quot;http://puppetlabs.com/&quot;&gt;&lt;strong&gt;Puppet&lt;/strong&gt;&lt;/a&gt;, &lt;a href=&quot;https://www.chef.io/chef/&quot;&gt;&lt;strong&gt;Chef&lt;/strong&gt;&lt;/a&gt; ou &lt;a href=&quot;http://www.ansible.com/&quot;&gt;&lt;strong&gt;Ansible&lt;/strong&gt;&lt;/a&gt;, c’est qu’il élève l’indolence au rang de valeur cardinale.&lt;br /&gt;
+C’est dans cet état d’esprit que nous allons voir comment provisionner depuis un ordinateur portable et avec très peu d’efforts, une plateforme d’hébergement de microservices à l’aide de &lt;strong&gt;Docker&lt;/strong&gt; et &lt;strong&gt;Ansible&lt;/strong&gt;.&lt;/p&gt;
+
+&lt;h2&gt;Ansible : présentation et fonctionnement&lt;/h2&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://www.ansible.com/&quot;&gt;&lt;strong&gt;Ansible&lt;/strong&gt;&lt;/a&gt; est un outil automatisant la configuration et la gestion d’un parc de machines.&lt;br /&gt;
+Ecrit en Python et doté de &lt;a href=&quot;http://docs.ansible.com/modules_by_category.html&quot;&gt;nombreux modules&lt;/a&gt; extensibles, il permet de réaliser à distance des tâches aussi diverses que l’installation et la configuration d’une application, le montage d’un système de fichiers ou le déploiement sur le cloud EC2 d’Amazon.&lt;br /&gt;
+&lt;strong&gt;Aucun agent n’est installé sur les machines à administrer&lt;/strong&gt;, les seuls pré-requis étant la disponibilité de &lt;strong&gt;SSH&lt;/strong&gt; et &lt;strong&gt;Python&lt;/strong&gt;.&lt;/p&gt;
+
+&lt;p&gt;Un &lt;strong&gt;module Ansible&lt;/strong&gt; est une unité de traitement réutilisable écrite en Python et effectuant une tâche précise. Par exemple, le module &lt;a href=&quot;http://docs.ansible.com/shell_module.html&quot;&gt;&lt;code&gt;shell&lt;/code&gt;&lt;/a&gt; permet d’exécuter une commande quelconque sur une machine distante.&lt;br /&gt;
+Lorsque qu’une tâche Ansible est lancée depuis le poste de contrôle, Ansible :&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;transfère via SSH le ou les modules dans le répertoire temporaire &lt;code&gt;~/.ansible/tmp&lt;/code&gt; du serveur distant&lt;/li&gt;
+&lt;li&gt;exécute via SSH le ou les modules sur le serveur distant&lt;/li&gt;
+&lt;li&gt;analyse la sortie standard du module (au format JSON)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Si, comme on le verra dans notre cas d’utilisation, les clés publiques SSH sont déployées sur les serveurs distants, Ansible peut ouvrir une connexion SSH sans avoir besoin de mot de passe.&lt;/p&gt;
+
+&lt;h2&gt;Exercice pratique&lt;/h2&gt;
+
+&lt;p&gt;Dans de précédents articles d’&lt;em&gt;Inovia Blog&lt;/em&gt;, nous avions d’une part développé un service REST de consultation des horaires du métro avec &lt;em&gt;Dropwizard&lt;/em&gt; et d’autre part dockerisé celui-ci (l’image &lt;code&gt;ksahnine/ratp-rest-api:1.0&lt;/code&gt; est &lt;a href=&quot;https://registry.hub.docker.com/u/ksahnine/ratp-rest-api/&quot;&gt;disponible sur mon repository public sur &lt;em&gt;Docker Hub&lt;/em&gt;&lt;/a&gt;).&lt;br /&gt;
+Nous allons repartir de cet exemple pour construire l’infrastructure hébergeant ce service.&lt;br /&gt;
+Toutes les tâches de construction et de configuration de l’infrastructure, décrite dans le schéma ci-dessous, sont coordonnées par Ansible et exécutées depuis un ordinateur portable (&lt;code&gt;laptop.local&lt;/code&gt;).&lt;/p&gt;
+
+&lt;p&gt;&lt;center&gt;&lt;img src=&quot;http://blog.inovia-conseil.fr/wp-content/uploads/2015/01/ansible-docker-architecture.png&quot; alt=&quot;Architecture&quot;&gt;&lt;/center&gt;&lt;/p&gt;
+
+&lt;p&gt;L’infrastructure technique est constituées de 2 serveurs Linux :&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;pegase.loca&lt;/code&gt;l : un serveur sous &lt;em&gt;Arch Linux&lt;/em&gt; hébergeant un répartiteur de charge (&lt;em&gt;nginx&lt;/em&gt; configuré en loadbalancer)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;orion.local&lt;/code&gt; : un serveur sous &lt;em&gt;Debian&lt;/em&gt; hébergeant 2 instances du service dockerisé sur 2 ports différents (&lt;code&gt;8080&lt;/code&gt; et &lt;code&gt;8081&lt;/code&gt;).&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Voici les tâches à réaliser sur chacun des noeuds :&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;côté front (&lt;code&gt;pegase.local&lt;/code&gt;) :
+
+&lt;ul&gt;
+&lt;li&gt;installation de &lt;em&gt;nginx&lt;/em&gt; via le gestionnaire de paquets &lt;code&gt;pacman&lt;/code&gt; (on est sur un serveur &lt;em&gt;Arch Linux&lt;/em&gt;). &lt;br /&gt;Noter que &lt;em&gt;nginx&lt;/em&gt; aurait très bien pu être déployé dans un conteneur Docker.&lt;/li&gt;
+&lt;li&gt;déploiement de la configuration &lt;em&gt;nginx&lt;/em&gt; pour répartir la charge sur les 2 instances du service&lt;/li&gt;
+&lt;li&gt;redémarrage du serveur &lt;em&gt;nginx&lt;/em&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;côté back (&lt;code&gt;orion.local&lt;/code&gt;) :
+
+&lt;ul&gt;
+&lt;li&gt;installation de Docker, via le gestionnaire de paquets aptitude (&lt;code&gt;apt-get&lt;/code&gt;)&lt;/li&gt;
+&lt;li&gt;provisionnement de 2 conteneurs Docker avec l’image du service de consultation des horaires du métro (image &lt;code&gt;ksahnine/ratp-rest-api:1.0&lt;/code&gt; disponible sur &lt;em&gt;Docker Hub&lt;/em&gt;)&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Réaliser toutes ces tâches manuellement serait fastidieux et potentiellement source d’erreur. Avec Ansible, &lt;strong&gt;toutes ces tâches peuvent être réalisées en une seule commande&lt;/strong&gt; et sans risque d’erreur.&lt;br /&gt;
+Toutes les opérations qui vont suivre sont à réaliser sur la machine de contrôle, un simple portable dans notre cas (&lt;code&gt;laptop.local&lt;/code&gt;).&lt;/p&gt;
+
+&lt;h2&gt;Mise en oeuvre&lt;/h2&gt;
+
+&lt;h3&gt;Installation de Ansible&lt;/h3&gt;
+
+&lt;p&gt;Le mode opératoire d’installation le plus simple s’effectue via &lt;code&gt;brew&lt;/code&gt; (sous OS X) :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;brew install ansible&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;ou &lt;code&gt;pip&lt;/code&gt; :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;sudo pip install ansible&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h3&gt;Création et déploiement des clés SSH&lt;/h3&gt;
+
+&lt;p&gt;Pour permettre à Ansible d’ouvrir une connexion SSH sans utiliser de mot de passe, nous allons mettre en oeuvre une &lt;strong&gt;authentification par clé SSH&lt;/strong&gt;.&lt;br /&gt;
+Commençons par générer une paire de clés RSA2 sans &lt;em&gt;passphrase&lt;/em&gt; à l’aide de la commande &lt;code&gt;ssh-keygen&lt;/code&gt; :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;ssh-keygen -t rsa -f ~/.ssh/id_rsa_galaxy -N &lt;span class=&quot;s2&quot;&gt;&amp;quot;&amp;quot;&lt;/span&gt; -C &lt;span class=&quot;s2&quot;&gt;&amp;quot;Galaxy&amp;quot;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;La clé privée (fichier &lt;code&gt;~/.ssh/id_rsa_galaxy&lt;/code&gt;) reste évidemment sur le poste client (&lt;code&gt;laptop.local&lt;/code&gt;) et sera utilisée par Ansible.&lt;br /&gt;
+En revanche, la clé publique (fichier &lt;code&gt;~/.ssh/id_rsa_galaxy.pub&lt;/code&gt;) doit être copiée sur les 2 serveurs à administrer (&lt;code&gt;orion.local&lt;/code&gt; et &lt;code&gt;pegase.local&lt;/code&gt;).&lt;br /&gt;
+L’utilitaire &lt;code&gt;ssh-copy-id&lt;/code&gt; permet de copier une clé publique dans le fichier &lt;code&gt;~/.ssh/authorized_keys&lt;/code&gt; des comptes d’exécution des serveurs distants :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;ssh-copy-id -i ~/.ssh/id_galaxy.pub markab@pegase.local
+ssh-copy-id -i ~/.ssh/id_galaxy.pub betelgeuse@orion.local&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Sous OSX, vous pouvez installer l’utilitaire &lt;code&gt;ssh-copy-id&lt;/code&gt; comme suit :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;curl -L https://raw.githubusercontent.com/beautifulcode/ssh-copy-id-for-OSX/master/install.sh &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; sh&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h3&gt;Le fichier d’inventaire&lt;/h3&gt;
+
+&lt;p&gt;Ce fichier au &lt;a href=&quot;http://fr.wikipedia.org/wiki/Fichier_INI&quot;&gt;format INI&lt;/a&gt; contient l’inventaire des machines orchestrées par Ansible (fichier &lt;code&gt;/etc/ansible/hosts&lt;/code&gt; par défaut), avec 2 serveurs dans notre cas :
+&lt;script src=&quot;https://gist.github.com/15527b36a4470dde98ce.js&quot;&gt; &lt;/script&gt;&lt;/p&gt;
+
+&lt;p&gt;Les comptes d’exécution des serveurs distants sont définis dans la variable Ansible &lt;code&gt;ansible_ssh_user&lt;/code&gt;.&lt;br /&gt;
+Par ailleurs, la localisation de la clé privée utilisée pour l’ouverture des connexions SSH est définie dans la variable Ansible &lt;code&gt;ansible_ssh_private_key_file&lt;/code&gt;.&lt;br /&gt;
+Enfin, on remarquera l’utilisation d’une variable personnalisée &lt;code&gt;env&lt;/code&gt; que l’on exploitera plus loin.&lt;/p&gt;
+
+&lt;h3&gt;Le fichier Playbook : un Makefile de l’infrastructure&lt;/h3&gt;
+
+&lt;p&gt;Les tâches de construction et de configuration de l’infrastructure sont décrites dans un langage très simple utilisant le format &lt;strong&gt;YAML&lt;/strong&gt; : le &lt;strong&gt;playbook&lt;/strong&gt;.&lt;br /&gt;
+D’une certaine façon, &lt;strong&gt;le playbook est le Makefile de construction d’une infrastructure IT&lt;/strong&gt;. On pourrait également dire que le &lt;em&gt;playbook&lt;/em&gt; est à Ansible ce que le &lt;em&gt;Dockerfile&lt;/em&gt; est à Docker, mais au fond la paternité de cette idée revient au bon vieux &lt;em&gt;Makefile&lt;/em&gt; !&lt;br /&gt;
+Le fichier &lt;code&gt;infra_services_playbook.yml&lt;/code&gt; ci-dessous décrit l’ensemble des tâches à réaliser pour notre environnement :
+&lt;script src=&quot;https://gist.github.com/bb0872a005e25b675774.js&quot;&gt; &lt;/script&gt;&lt;/p&gt;
+
+&lt;p&gt;Quelques observations sur la façon dont nous configurons &lt;em&gt;nginx&lt;/em&gt; dans le fichier &lt;em&gt;playbook&lt;/em&gt; :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;- name: Configuration loadbalancer
+  template: src=conf/loadbalancer-nginx-.conf dest=/etc/nginx/nginx.conf&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;On remarquera que :&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;le fichier de configuration &lt;em&gt;Nginx&lt;/em&gt; à déployer (&lt;code&gt;conf/loadbalancer-nginx-prod.conf&lt;/code&gt; dont le contenu figure ci-après) est stocké sur le poste de contrôle (&lt;code&gt;laptop.local&lt;/code&gt;).
+&lt;script src=&quot;https://gist.github.com/b7e947a8f6e73d51a3d0.js&quot;&gt; &lt;/script&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Le fichier de destination (&lt;code&gt;/etc/nginx/nginx.conf&lt;/code&gt;) correspond au système de fichier du serveur distant (&lt;code&gt;pegase.local&lt;/code&gt;).&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;le nom du fichier source est variabilisé dans le &lt;em&gt;playbook&lt;/em&gt; (variable &lt;code&gt;env&lt;/code&gt; déréférencée &lt;code&gt;{\{ env }}&lt;/code&gt;)&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;la variable &lt;code&gt;env&lt;/code&gt; est renseignée dans le fichier d’inventaire &lt;code&gt;hosts.ini&lt;/code&gt; (&lt;code&gt;env=prod&lt;/code&gt;)&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3&gt;Construction de l’infrastructure&lt;/h3&gt;
+
+&lt;p&gt;La commande &lt;code&gt;ansible-playbook&lt;/code&gt; permet d’exécuter un &lt;em&gt;playbook&lt;/em&gt;, et donc l’ensemble des tâches de construction de l’infrastructure. Il prend en paramètre le fichier d’inventaire (&lt;code&gt;-i hosts.ini&lt;/code&gt;) ainsi que le fichier &lt;em&gt;playbook&lt;/em&gt; &lt;code&gt;infra_services_playbook.yml&lt;/code&gt; décrit plus haut :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;ansible-playbook -i hosts.ini infra_services_playbook.yml&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Voici le compte-rendu d’exécution du playbook affiché sur la sortie standard :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;PLAY &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;** Frontend **&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt; *********************************************************
+
+TASK: &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;Installation nginx&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt; ****************************************************
+changed: &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;pegase.local&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt;
+
+TASK: &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;Configuration loadbalancer&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt; ********************************************
+changed: &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;pegase.local&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt;
+
+TASK: &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;Redemarrage nginx&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt; *****************************************************
+changed: &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;pegase.local&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt;
+
+PLAY &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;** Backend **&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt; **********************************************************
+
+TASK: &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;Installation Docker&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt; **************************************************
+changed: &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;orion.local&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt;
+
+TASK: &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;Arret des containers&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt; **************************************************
+changed: &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;orion.local&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt;
+
+TASK: &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;Provisionnement du service &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;instance 1&lt;span class=&quot;o&quot;&gt;)]&lt;/span&gt; *******************************
+changed: &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;orion.local&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt;
+
+TASK: &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;Provisionnement du service &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;instance 2&lt;span class=&quot;o&quot;&gt;)]&lt;/span&gt; *******************************
+changed: &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;orion.local&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt;
+
+PLAY RECAP ********************************************************************
+orion.local                : &lt;span class=&quot;nv&quot;&gt;ok&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;4&lt;/span&gt;    &lt;span class=&quot;nv&quot;&gt;changed&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;4&lt;/span&gt;    &lt;span class=&quot;nv&quot;&gt;unreachable&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;0&lt;/span&gt;    &lt;span class=&quot;nv&quot;&gt;failed&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;0
+pegase.local               : &lt;span class=&quot;nv&quot;&gt;ok&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;3&lt;/span&gt;    &lt;span class=&quot;nv&quot;&gt;changed&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;3&lt;/span&gt;    &lt;span class=&quot;nv&quot;&gt;unreachable&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;0&lt;/span&gt;    &lt;span class=&quot;nv&quot;&gt;failed&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;0&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Et voilà !&lt;/p&gt;
+
+&lt;p&gt;A noter que l’on pourrait élégamment utiliser le &lt;a href=&quot;http://docs.ansible.com/docker_module.html&quot;&gt;module Ansible docker&lt;/a&gt;, en installant préalablement le module Python &lt;a href=&quot;https://github.com/docker/docker-py&quot;&gt;&lt;em&gt;docker-py&lt;/em&gt;&lt;/a&gt; dont il dépend.&lt;/p&gt;
+</description>
+        <pubDate>Sun, 01 Feb 2015 07:00:00 +0100</pubDate>
+        <link>http://ksahnine.github.io/microservice/ansible/docker/2015/02/01/ansible-docker.html</link>
+        <guid isPermaLink="true">http://ksahnine.github.io/microservice/ansible/docker/2015/02/01/ansible-docker.html</guid>
+        
+        <category>regular</category>
+        
+        
+        <category>microservice</category>
+        
+        <category>ansible</category>
+        
+        <category>docker</category>
         
       </item>
     
