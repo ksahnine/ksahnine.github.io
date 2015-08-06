@@ -7,7 +7,7 @@ gems:
 # Site settings
 title: "Inovia Blog"
 description: > # this means to ignore newlines until "email:"
-   Excursions technologiques par Kadda SAHNINE
+   Excursions technologiques, par Kadda SAHNINE
 
 email: ksahnine@gmail.com
 #blog logo
