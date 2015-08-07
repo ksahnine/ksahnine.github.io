@@ -6,8 +6,8 @@
 </description>
     <link>http://ksahnine.github.io/</link>
     <atom:link href="http://ksahnine.github.io/feed.xml" rel="self" type="application/rss+xml" />
-    <pubDate>Fri, 07 Aug 2015 10:31:03 +0200</pubDate>
-    <lastBuildDate>Fri, 07 Aug 2015 10:31:03 +0200</lastBuildDate>
+    <pubDate>Fri, 07 Aug 2015 11:23:29 +0200</pubDate>
+    <lastBuildDate>Fri, 07 Aug 2015 11:23:29 +0200</lastBuildDate>
     <generator>Jekyll v2.5.3</generator>
     
       <item>
@@ -1685,20 +1685,6 @@ pegase.local               : &lt;span class=&quot;nv&quot;&gt;ok&lt;/span&gt;&lt
       </item>
     
       <item>
-        <title>Sample</title>
-        <description></description>
-        <pubDate>Wed, 21 Jan 2015 07:00:00 +0100</pubDate>
-        <link>http://ksahnine.github.io/sample/2015/01/21/sample.html</link>
-        <guid isPermaLink="true">http://ksahnine.github.io/sample/2015/01/21/sample.html</guid>
-        
-        <category>regular</category>
-        
-        
-        <category>sample</category>
-        
-      </item>
-    
-      <item>
         <title>Dockeriser un microservice (Dropwizard + Docker)</title>
         <description>&lt;p&gt;L’association de &lt;strong&gt;Dropwizard&lt;/strong&gt; et &lt;strong&gt;Docker&lt;/strong&gt; constitue une solution fort intéressante pour une architecture orientée microservices.&lt;br /&gt;
 En effet, elle répond remarquablement aux besoins :&lt;/p&gt;
@@ -1715,7 +1701,7 @@ En effet, elle répond remarquablement aux besoins :&lt;/p&gt;
 &lt;p&gt;En pratique, nous verrons comment :&lt;/p&gt;
 
 &lt;ul&gt;
-&lt;li&gt;&lt;strong&gt;dockeriser&lt;/strong&gt; le service de consultation des horaires du métro parisien, une application &lt;em&gt;Dropwizard&lt;/em&gt; qui a fait l’objet du précédent billet de la série (sa lecture préalable est recommandée) et dont le &lt;a href=&quot;https://github.com/ksahnine/trafic-ratp-dropwizard&quot;&gt;code source est disponible&lt;/a&gt; sur GitHub&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;dockeriser&lt;/strong&gt; le service de consultation des horaires du métro parisien, une application &lt;em&gt;Dropwizard&lt;/em&gt; qui a fait l’objet du &lt;a href=&quot;/architecture/microservice/dropwizard/2015/01/19/developpement-microservice-dropwizard.html&quot;&gt;précédent billet de la série&lt;/a&gt; (sa lecture préalable est recommandée) et dont le &lt;a href=&quot;https://github.com/ksahnine/trafic-ratp-dropwizard&quot;&gt;code source est disponible&lt;/a&gt; sur GitHub&lt;/li&gt;
 &lt;li&gt;&lt;strong&gt;créer des environnements d’exécution cloisonnés&lt;/strong&gt; en mappant un volume de données du conteneur sur le système de fichier local&lt;/li&gt;
 &lt;li&gt;&lt;strong&gt;publier&lt;/strong&gt; l’image dans un dépôt privé (situé dans un réseau local) mais également dans le dépôt en ligne &lt;em&gt;Docker Hub&lt;/em&gt;&lt;/li&gt;
 &lt;/ul&gt;
@@ -1888,6 +1874,157 @@ docker push ksahnine/ratp-rest-api:1.0&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
         <category>microservice</category>
         
         <category>docker</category>
+        
+        <category>dropwizard</category>
+        
+      </item>
+    
+      <item>
+        <title>Le développement de microservices avec Dropwizard</title>
+        <description>&lt;p&gt;Après avoir présenté &lt;strong&gt;Dropwizard&lt;/strong&gt; dans le précédent billet de la série, dont la lecture est un préalable, place aux travaux pratiques.&lt;/p&gt;
+
+&lt;p&gt;Cet article est consacré au développement d’un service de consultation temps-réel des horaires du métro parisien avec &lt;strong&gt;Dropwizard&lt;/strong&gt;.&lt;/p&gt;
+
+&lt;p&gt;L’ensemble du projet est &lt;a href=&quot;https://github.com/ksahnine/trafic-ratp-dropwizard&quot;&gt;disponible sur GitHub&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;L’interface &lt;em&gt;RESTful&lt;/em&gt; du service est la suivante :&lt;br /&gt;
+&lt;u&gt;&lt;em&gt;Requête&lt;/em&gt; :&lt;/u&gt;
+&lt;pre&gt;
+GET /trafic-ratp/metro/&lt;strong&gt;:numero_ligne&lt;/strong&gt;/&lt;strong&gt;:nom_station&lt;/strong&gt;/&lt;strong&gt;:sens&lt;/strong&gt;
+&lt;/pre&gt;
+où :&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;numero_ligne&lt;/code&gt; est le numéro de la ligne du métro&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;nom_station&lt;/code&gt; est le nom de la station de métro pour laquelle on souhaite connaître les prochains passages&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;sens&lt;/code&gt; a 2 valeurs possibles : &lt;code&gt;A&lt;/code&gt; pour &lt;em&gt;Aller&lt;/em&gt; ou &lt;code&gt;R&lt;/code&gt; pour &lt;em&gt;Retour&lt;/em&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;A titre d’exemple, la requête &lt;code&gt;GET /trafic-ratp/metro/14/pyramides/A&lt;/code&gt; restitue la liste des prochains passages de rames de métro de la station &lt;em&gt;Pyramides&lt;/em&gt;, sur la ligne &lt;em&gt;14&lt;/em&gt; en direction de &lt;em&gt;Saint-Lazare&lt;/em&gt;.&lt;/p&gt;
+
+&lt;p&gt;&lt;u&gt;&lt;em&gt;Réponse&lt;/em&gt; :&lt;/u&gt;&lt;br /&gt;
+Le format de la réponse, au format &lt;strong&gt;JSON&lt;/strong&gt;, contient une liste des prochains passages d’une rame dont voici un exemple :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-json&quot; data-lang=&quot;json&quot;&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;quot;direction&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;Saint-Lazare&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;quot;attente&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;1 mn&amp;quot;&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;},&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;quot;direction&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;Saint-Lazare&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;quot;attente&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;4 mn&amp;quot;&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;},&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;quot;direction&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;Saint-Lazare&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;quot;attente&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;7 mn&amp;quot;&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h2&gt;Structure de l&amp;#39;application&lt;/h2&gt;
+
+&lt;h3&gt;Architecture&lt;/h3&gt;
+
+&lt;p&gt;Les différents composants constituant l’application sont représentés dans le schéma ci-dessous :&lt;/p&gt;
+
+&lt;p&gt;&lt;center&gt;&lt;img src=&quot;http://blog.inovia-conseil.fr/wp-content/uploads/2015/01/architecture-app.png&quot; alt=&quot;Architecture applicative&quot;&gt;&lt;/center&gt;&lt;/p&gt;
+
+&lt;h3&gt;Configuration de l’application&lt;/h3&gt;
+
+&lt;p&gt;Le fichier de configuration de l’application &lt;code&gt;trafic-ratp.yml&lt;/code&gt; est décrit au format &lt;strong&gt;YAML&lt;/strong&gt;. On externalise en particulier le paramètre applicatif &lt;code&gt;urlRatp&lt;/code&gt;, l’URL du portail de la RATP.
+&lt;script src=&quot;https://gist.github.com/a96a3f5a44e39b9c34c7.js&quot;&gt; &lt;/script&gt;&lt;/p&gt;
+
+&lt;p&gt;Le fichier de configuration pourrait être réduit au minimum. Il est évidemment possible de surcharger la &lt;a href=&quot;https://dropwizard.github.io/dropwizard/manual/configuration.html&quot;&gt;centaine de paramètres&lt;/a&gt; par défaut, dont le port d’écoute du conteneur &lt;em&gt;Jetty&lt;/em&gt; par exemple (port &lt;code&gt;8080&lt;/code&gt; par défaut).&lt;/p&gt;
+
+&lt;p&gt;La classe &lt;code&gt;TraficRatpConfiguration&lt;/code&gt; est le gestionnaire de configuration de l’application. C’est par ce biais que l’on accède aux paramètres applicatifs.
+&lt;script src=&quot;https://gist.github.com/1b478e5ccf87453fc8dd.js&quot;&gt; &lt;/script&gt;&lt;/p&gt;
+
+&lt;h3&gt;Objet métier &lt;code&gt;Rame&lt;/code&gt;&lt;/h3&gt;
+
+&lt;p&gt;L’objet métier &lt;code&gt;Rame.java&lt;/code&gt; modélise l’état du passage d’une rame de métro. Il possède deux propriétés : la direction et la durée d’attente.
+&lt;script src=&quot;https://gist.github.com/372c92038462887b47e4.js&quot;&gt; &lt;/script&gt;&lt;/p&gt;
+
+&lt;h3&gt;Ressource &lt;code&gt;TraficRatpResource&lt;/code&gt;&lt;/h3&gt;
+
+&lt;p&gt;La ressource (au sens REST du terme) implémente le point de terminaison du service JAX-RS. La récupération des informations sur le trafic consiste à interroger le portail &lt;a href=&quot;http://www.ratp.fr/&quot;&gt;ratp.fr&lt;/a&gt; puis à extraire les informations utiles en utilisant la technique du &lt;a href=&quot;http://fr.wikipedia.org/wiki/Web_scraping&quot;&gt;&lt;em&gt;web scraping&lt;/em&gt;&lt;/a&gt;. La librairie &lt;a href=&quot;http://jsoup.org/&quot;&gt;&lt;strong&gt;jsoup&lt;/strong&gt;&lt;/a&gt; est utilisée à cet effet.
+&lt;script src=&quot;https://gist.github.com/1f9f2c0839a46d19026b.js&quot;&gt; &lt;/script&gt;&lt;/p&gt;
+
+&lt;p&gt;On récupère les 3 paramètres &lt;code&gt;ligne&lt;/code&gt;, &lt;code&gt;station&lt;/code&gt; et &lt;code&gt;sens&lt;/code&gt; dans le nom de la ressource.&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-java&quot; data-lang=&quot;java&quot;&gt;&lt;span class=&quot;nd&quot;&gt;@Path&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;/metro/{ligne: [0-9]{1,2}[b]{0,1}}/{station}/{sens: [A|R]}&amp;quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Noter que l’on a choisit de poser des contraintes en utilisant des expressions régulières au niveau de l’annotation &lt;code&gt;@Path&lt;/code&gt;. Le paramètre &lt;code&gt;sens&lt;/code&gt; par exemple n’a que 2 valeurs possibles : &lt;code&gt;A&lt;/code&gt; ou &lt;code&gt;R&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;Si l’expression régulière est fausse, le code statut &lt;code&gt;HTTP 404&lt;/code&gt; est retourné, ce qui est logique puisqu’on considère que la ressource n’existerait pas dans ce cas.&lt;/p&gt;
+
+&lt;p&gt;Malheureusement, la validation des paramètres de méthode par annotation (&lt;code&gt;@Valid&lt;/code&gt;) ne fonctionne pas avec &lt;em&gt;Dropwizard&lt;/em&gt; 0.7.x (qui intègre &lt;em&gt;Jersey&lt;/em&gt; 1.x). Il faudra attendre une version compatible avec &lt;em&gt;Jersey&lt;/em&gt; 2.x).&lt;/p&gt;
+
+&lt;h3&gt;Exception mapper &lt;code&gt;IOExceptionMapper&lt;/code&gt;&lt;/h3&gt;
+
+&lt;p&gt;Cette classe permet de traiter l’exception &lt;code&gt;IOException&lt;/code&gt;, lorsqu’elle est levée pendant l’interrogation du portail &lt;a href=&quot;http://www.ratp.fr/&quot;&gt;ratp.fr&lt;/a&gt;, sous la forme d’une réponse &lt;code&gt;HTTP 500&lt;/code&gt; avec une charge utile au format &lt;strong&gt;JSON&lt;/strong&gt; contenant le message d’erreur technique.
+&lt;script src=&quot;https://gist.github.com/28a8a7a423ca8990365d.js&quot;&gt; &lt;/script&gt;&lt;/p&gt;
+
+&lt;h3&gt;Health checker &lt;code&gt;RatpHealthChecker&lt;/code&gt;&lt;/h3&gt;
+
+&lt;p&gt;Le test de disponibilité d’une ressource vitale de l’application consiste à s’assurer de la disponibilité du portail RATP (le test, basique, n’a qu’une valeur pédagogique).
+&lt;script src=&quot;https://gist.github.com/b36f6a56c78f162d0113.js&quot;&gt; &lt;/script&gt;&lt;/p&gt;
+
+&lt;p&gt;Le &lt;em&gt;&amp;quot;bilan de santé&amp;quot;&lt;/em&gt; de l’application est consultable par simple interrogation de la ressource &lt;code&gt;GET /healthcheck?pretty=true&lt;/code&gt; dont voici la réponse lorsque le système est opérationnel :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-json&quot; data-lang=&quot;json&quot;&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;nt&quot;&gt;&amp;quot;Dispo site RATP&amp;quot;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;quot;healthy&amp;quot;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;true&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;},&lt;/span&gt;
+  &lt;span class=&quot;nt&quot;&gt;&amp;quot;deadlocks&amp;quot;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;quot;healthy&amp;quot;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;true&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h3&gt;Classe application &lt;code&gt;TraficRatpApplication&lt;/code&gt;&lt;/h3&gt;
+
+&lt;p&gt;Il s’agit de la classe &lt;code&gt;main&lt;/code&gt; assemblant le tout, responsable du démarrage de l’application (enregistrement des &lt;em&gt;ressources&lt;/em&gt;, &lt;em&gt;exception mappers&lt;/em&gt;, &lt;em&gt;configuration&lt;/em&gt;, &lt;em&gt;health checkers&lt;/em&gt;).
+&lt;script src=&quot;https://gist.github.com/c380ea1236e8b89db73e.js&quot;&gt; &lt;/script&gt;&lt;/p&gt;
+
+&lt;h2&gt;Construction et exécution&lt;/h2&gt;
+
+&lt;p&gt;Récupérer le &lt;a href=&quot;https://github.com/ksahnine/trafic-ratp-dropwizard&quot;&gt;code source du projet&lt;/a&gt; sur GitHub :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;git clone https://github.com/ksahnine/trafic-ratp-dropwizard.git&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;puis construire le projet &lt;em&gt;Maven&lt;/em&gt; (fabrique l’unité de déploiement &lt;code&gt;trafic-ratp-1.0.0-SNAPSHOT.jar&lt;/code&gt;) :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;&lt;span class=&quot;nb&quot;&gt;cd &lt;/span&gt;trafic-ratp-dropwizard
+mvn package&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Pour démarrer le service, exécuter la commande :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;java -jar target/trafic-ratp-1.0.0-SNAPSHOT.jar server trafic-ratp.yml&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;On utilisera &lt;a href=&quot;http://curl.haxx.se/&quot;&gt;&lt;strong&gt;cURL&lt;/strong&gt;&lt;/a&gt; en association avec l’utilitaire &lt;a href=&quot;http://stedolan.github.io/jq/&quot;&gt;&lt;code&gt;jq&lt;/code&gt;&lt;/a&gt; pour requêter le service et formater la sortie standard.&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;prochains passages du métro ligne &lt;em&gt;14&lt;/em&gt; / Station &lt;em&gt;Pyramides&lt;/em&gt; / Direction &lt;em&gt;Saint-Lazare&lt;/em&gt; :&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;curl -s http://localhost:8080/trafic-ratp/metro/14/pyramides/A &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; jq &lt;span class=&quot;s2&quot;&gt;&amp;quot;.&amp;quot;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;ul&gt;
+&lt;li&gt;prochains passages du métro ligne &lt;em&gt;14&lt;/em&gt; / Station &lt;em&gt;Pyramides&lt;/em&gt; / Direction &lt;em&gt;Olympiades&lt;/em&gt; :&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;curl -s http://localhost:8080/trafic-ratp/metro/14/pyramides/R &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; jq &lt;span class=&quot;s2&quot;&gt;&amp;quot;.&amp;quot;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Le &lt;a href=&quot;/microservice/docker/dropwizard/2015/01/21/dockeriser-microservice.html&quot;&gt;prochain billet&lt;/a&gt; de la série sera consacré au déploiement d’un microservice Dropwizard via &lt;a href=&quot;https://www.docker.com/&quot;&gt;&lt;strong&gt;Docker&lt;/strong&gt;&lt;/a&gt;.&lt;/p&gt;
+</description>
+        <pubDate>Mon, 19 Jan 2015 07:00:00 +0100</pubDate>
+        <link>http://ksahnine.github.io/architecture/microservice/dropwizard/2015/01/19/developpement-microservice-dropwizard.html</link>
+        <guid isPermaLink="true">http://ksahnine.github.io/architecture/microservice/dropwizard/2015/01/19/developpement-microservice-dropwizard.html</guid>
+        
+        <category>regular</category>
+        
+        
+        <category>architecture</category>
+        
+        <category>microservice</category>
         
         <category>dropwizard</category>
         

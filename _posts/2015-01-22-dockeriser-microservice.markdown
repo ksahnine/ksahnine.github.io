@@ -19,7 +19,7 @@ Accessoirement, une application *Dropwizard* est packagée sous la forme d’un 
 
 En pratique, nous verrons comment :
 
-- **dockeriser** le service de consultation des horaires du métro parisien, une application *Dropwizard* qui a fait l’objet du précédent billet de la série (sa lecture préalable est recommandée) et dont le [code source est disponible](https://github.com/ksahnine/trafic-ratp-dropwizard) sur GitHub
+- **dockeriser** le service de consultation des horaires du métro parisien, une application *Dropwizard* qui a fait l’objet du [précédent billet de la série](/architecture/microservice/dropwizard/2015/01/19/developpement-microservice-dropwizard.html) (sa lecture préalable est recommandée) et dont le [code source est disponible](https://github.com/ksahnine/trafic-ratp-dropwizard) sur GitHub
 - **créer des environnements d’exécution cloisonnés** en mappant un volume de données du conteneur sur le système de fichier local
 - **publier** l’image dans un dépôt privé (situé dans un réseau local) mais également dans le dépôt en ligne *Docker Hub*
 
