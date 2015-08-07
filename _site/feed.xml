@@ -6,8 +6,8 @@
 </description>
     <link>http://ksahnine.github.io/</link>
     <atom:link href="http://ksahnine.github.io/feed.xml" rel="self" type="application/rss+xml" />
-    <pubDate>Thu, 06 Aug 2015 19:39:41 +0200</pubDate>
-    <lastBuildDate>Thu, 06 Aug 2015 19:39:41 +0200</lastBuildDate>
+    <pubDate>Fri, 07 Aug 2015 10:31:03 +0200</pubDate>
+    <lastBuildDate>Fri, 07 Aug 2015 10:31:03 +0200</lastBuildDate>
     <generator>Jekyll v2.5.3</generator>
     
       <item>
@@ -1695,6 +1695,201 @@ pegase.local               : &lt;span class=&quot;nv&quot;&gt;ok&lt;/span&gt;&lt
         
         
         <category>sample</category>
+        
+      </item>
+    
+      <item>
+        <title>Dockeriser un microservice (Dropwizard + Docker)</title>
+        <description>&lt;p&gt;L’association de &lt;strong&gt;Dropwizard&lt;/strong&gt; et &lt;strong&gt;Docker&lt;/strong&gt; constitue une solution fort intéressante pour une architecture orientée microservices.&lt;br /&gt;
+En effet, elle répond remarquablement aux besoins :&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;d’&lt;strong&gt;isolation&lt;/strong&gt; de l’environnement d’exécution d’un service&lt;/li&gt;
+&lt;li&gt;de déploiement &lt;strong&gt;rapide&lt;/strong&gt; et sans couture&lt;/li&gt;
+&lt;li&gt;de &lt;strong&gt;portabilité&lt;/strong&gt; et de &lt;strong&gt;scalabilité&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;de compatibilité avec des solutions d’hébergement dans un &lt;strong&gt;Cloud&lt;/strong&gt; privé, public ou hybride&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Accessoirement, une application &lt;em&gt;Dropwizard&lt;/em&gt; est packagée sous la forme d’un fichier &lt;em&gt;jar&lt;/em&gt; &lt;strong&gt;unique&lt;/strong&gt; et &lt;strong&gt;autonome&lt;/strong&gt; ce qui rendra d’autant plus simple la fabrication d’une image Docker comme on le verra dans cet article.&lt;/p&gt;
+
+&lt;p&gt;En pratique, nous verrons comment :&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;dockeriser&lt;/strong&gt; le service de consultation des horaires du métro parisien, une application &lt;em&gt;Dropwizard&lt;/em&gt; qui a fait l’objet du précédent billet de la série (sa lecture préalable est recommandée) et dont le &lt;a href=&quot;https://github.com/ksahnine/trafic-ratp-dropwizard&quot;&gt;code source est disponible&lt;/a&gt; sur GitHub&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;créer des environnements d’exécution cloisonnés&lt;/strong&gt; en mappant un volume de données du conteneur sur le système de fichier local&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;publier&lt;/strong&gt; l’image dans un dépôt privé (situé dans un réseau local) mais également dans le dépôt en ligne &lt;em&gt;Docker Hub&lt;/em&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2&gt;Construction de l&amp;#39;image Docker&lt;/h2&gt;
+
+&lt;p&gt;J’ai choisi une recette simple en construisant séparément :&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;l’application &lt;em&gt;Dropwizard&lt;/em&gt; matérialisée par le fichier &lt;em&gt;jar&lt;/em&gt; &lt;code&gt;trafic-ratp-1.0.0-SNAPSHOT.jar&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;une image Docker dérivée de l’image publique d’OpenJDK 7 (&lt;code&gt;FROM dockerfile/java:openjdk-7-jdk&lt;/code&gt;) à laquelle on intègre le &lt;em&gt;jar&lt;/em&gt; de l’application précédemment fabriqué ainsi que son fichier de configuration (`trafic-ratp.yml)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Le fichier &lt;code&gt;Dockerfile&lt;/code&gt; résultant est le suivant :
+&lt;script src=&quot;https://gist.github.com/9f0f24f1d3073d2ceff6.js&quot;&gt; &lt;/script&gt;&lt;/p&gt;
+
+&lt;p&gt;Quelques observations :&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;le premier paramètre de l’instruction &lt;code&gt;ADD&lt;/code&gt; correspond au fichier source à copier dans le conteneur (&lt;code&gt;target/trafic-ratp-1.0.0-SNAPSHOT.jar&lt;/code&gt;). &lt;br /&gt;Le chemin est relatif au répertoire contenant le fichier &lt;code&gt;Dockerfile&lt;/code&gt; (répertoire racine). Il n’est pas possible d’ajouter un fichier situé à l’extérieur du répertoire racine ou de ses sous-répertoires (par ex. &lt;code&gt;../dist/20150204/trafic-ratp-1.0.0-SNAPSHOT.jar&lt;/code&gt;)&lt;/li&gt;
+&lt;li&gt;le second paramètre de l’instruction &lt;code&gt;ADD&lt;/code&gt; correspond au fichier de destination dans le système de fichiers du conteneur (&lt;code&gt;/app/trafic-ratp-1.0.0-SNAPSHOT.jar&lt;/code&gt;)&lt;/li&gt;
+&lt;li&gt;le service est exposé par le conteneur sur le port &lt;code&gt;8080&lt;/code&gt; (instruction &lt;code&gt;EXPOSE&lt;/code&gt;)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;La séquence complète de construction de l’image en repartant du code source sur GitHub se résume aux commandes suivantes :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;git clone https://github.com/ksahnine/trafic-ratp-dropwizard.git
+&lt;span class=&quot;nb&quot;&gt;cd &lt;/span&gt;trafic-ratp-dropwizard
+mvn package
+docker build -t ksahnine:trafic-ratp-dropwizard .&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Si l’on ne dispose pas d’environnement de développement, on pourrait tout à fait &lt;em&gt;dockeriser&lt;/em&gt; l’étape de construction du microservice :&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;en partant de l’image de base d’une &lt;em&gt;Debian&lt;/em&gt; (&lt;code&gt;FROM debian:wheezy&lt;/code&gt;)&lt;/li&gt;
+&lt;li&gt;sur laquelle on installerait &lt;em&gt;OpenJDK&lt;/em&gt; (&lt;code&gt;RUN apt-get install -y openjdk-7-jdk&lt;/code&gt;), &lt;em&gt;git&lt;/em&gt; (&lt;code&gt;RUN apt-get install -y git&lt;/code&gt;) et &lt;em&gt;Maven&lt;/em&gt; (&lt;code&gt;RUN apt-get install -y maven&lt;/code&gt;)&lt;/li&gt;
+&lt;li&gt;suivie de la construction de l’application (récupération du code source et compilation)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2&gt;Démarrage du conteneur&lt;/h2&gt;
+
+&lt;p&gt;Il n’existe pas d’hôte Docker natif pour les systèmes d’exploitation autres que Linux. Sous Windows ou Mac OS X, vous devez installer la VM ultra légère &lt;a href=&quot;http://boot2docker.io/&quot;&gt;Boot2docker&lt;/a&gt;, basée sur &lt;em&gt;Virtual Box&lt;/em&gt; et la distribution &lt;a href=&quot;http://tinycorelinux.net/&quot;&gt;&lt;em&gt;Tiny Core Linux&lt;/em&gt;&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;&lt;center&gt;&lt;img src=&quot;http://blog.inovia-conseil.fr/wp-content/uploads/2015/01/b2d.png&quot; alt=&quot;Hôte Docker&quot;&gt;&lt;/center&gt;&lt;/p&gt;
+
+&lt;p&gt;Dans cette situation, les conteneurs Docker ne s’exécutent pas directement au dessus de l’OS mais &lt;strong&gt;au sein de la machine virtuelle&lt;/strong&gt; &lt;em&gt;Boot2docker&lt;/em&gt;.&lt;/p&gt;
+
+&lt;p&gt;La commande &lt;code&gt;docker run&lt;/code&gt; permet de lancer un conteneur à partir de l’image précédemment construite :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;docker run -td -p 8080:8080 ksahnine:trafic-ratp-dropwizard&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;L’application embarquée dans le conteneur ne sera accessible qu’à travers l’adresse IP et le port &lt;strong&gt;de la VM&lt;/strong&gt; (et non &lt;code&gt;localhost&lt;/code&gt;).&lt;br /&gt;
+La commande &lt;code&gt;boot2docker ip&lt;/code&gt; permet de connaître l’adresse IP de la VM :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;ksahnine@inoviabook:~&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;boot2docker ip
+192.168.59.103&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Le service &lt;em&gt;dockerisé&lt;/em&gt; est donc interrogeable via &lt;strong&gt;cURL&lt;/strong&gt; comme suit :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;curl -s http://192.168.59.103:8080/trafic-ratp/metro/14/pyramides/A&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h2&gt;Créer des environnements cloisonnés en mappant les volumes&lt;/h2&gt;
+
+&lt;p&gt;Pour créer 2 environnements d’exécution distincts (appelons les &lt;em&gt;dev&lt;/em&gt; et &lt;em&gt;recette&lt;/em&gt;) à partir de la même image, il suffit de mapper le volume &lt;code&gt;/conf&lt;/code&gt; du conteneur vers le répertoire du système de fichier local contenant le fichier de configuration idoine :&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;configuration de &lt;em&gt;dev&lt;/em&gt; : &lt;code&gt;~/conf/dev/trafic-ratp-dropwizard.yml&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;configuration de &lt;em&gt;recette&lt;/em&gt; : &lt;code&gt;~/conf/rec/trafic-ratp-dropwizard.yml&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Le fichier &lt;code&gt;Dockerfile&lt;/code&gt; initial a été très légèrement modifié de sorte à ne pas ajouter le fichier de configuration dans l’image :
+&lt;script src=&quot;https://gist.github.com/43478d2d052622554361.js&quot;&gt; &lt;/script&gt;&lt;/p&gt;
+
+&lt;p&gt;Ainsi, le démarrage des instances de &lt;em&gt;dev&lt;/em&gt; et &lt;em&gt;recette&lt;/em&gt; (ports &lt;code&gt;9010&lt;/code&gt; et &lt;code&gt;9020&lt;/code&gt;) s’effectue avec les commandes &lt;code&gt;docker run&lt;/code&gt; suivantes :&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;em&gt;dev&lt;/em&gt; : &lt;code&gt;docker run -t -p 9010:8080 -v ~/conf/dev:/conf --name svc-metro-dev ksahnine:trafic-ratp-dropwizard&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;em&gt;recette&lt;/em&gt; : &lt;code&gt;docker run -t -p 9020:8080 -v ~/conf/rec:/conf --name svc-metro-rec ksahnine:trafic-ratp-dropwizard&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;L’option &lt;code&gt;-v rep_local:rep_conteneur&lt;/code&gt; rend accessible le contenu d’un répertoire local (&lt;code&gt;rep_local&lt;/code&gt;) depuis le conteneur (&lt;code&gt;rep_conteneur&lt;/code&gt;).&lt;br /&gt;
+Si vous travaillez sous Mac OS X, le point de montage du conteneur accède en réalité à la VM &lt;em&gt;boot2docker&lt;/em&gt; et non au système de fichier du Mac.&lt;br /&gt;
+&lt;a href=&quot;https://blog.docker.com/2014/10/docker-1-3-signed-images-process-injection-security-options-mac-shared-directories/&quot;&gt;Depuis la version 1.3 de Docker&lt;/a&gt;, le montage de volume s’effectue sans couture mais est &lt;strong&gt;limité uniquement aux sous-répertoires contenus dans le répertoire&lt;/strong&gt; &lt;code&gt;/Users&lt;/code&gt;.&lt;br /&gt;
+Pour les versions antérieures de Docker il est nécessaire d’installer une version modifiée de &lt;em&gt;boot2docker&lt;/em&gt; (lire cet &lt;a href=&quot;https://medium.com/boot2docker-lightweight-linux-for-docker/boot2docker-together-with-virtualbox-guest-additions-da1e3ab2465c&quot;&gt;excellent article&lt;/a&gt;).&lt;/p&gt;
+
+&lt;h2&gt;Distribuer une image Docker&lt;/h2&gt;
+
+&lt;h3&gt;Publier dans un index privé d’images&lt;/h3&gt;
+
+&lt;p&gt;Il suffit d’une machine sur le réseau local (&lt;code&gt;192.168.0.29&lt;/code&gt; dans l’exemple ci-après) sur laquelle est installée Docker, puis d’installer et démarrer le registry en exécutant la commande suivante :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;docker run -d -p 5000:5000 registry&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;La commande &lt;code&gt;docker push&lt;/code&gt; permet d’ajouter l’image de notre microservice dockerisé :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;docker tag ksahnine:trafic-ratp-dropwizard 192.168.0.29:5000/ksahnine:trafic-ratp-dropwizard
+docker push 192.168.0.29:5000/ksahnine:trafic-ratp-dropwizard&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;L’accès à un index non sécurisé (HTTP) doit être explicitement autorisé au démarrage du démon docker (option &lt;code&gt;--insecure-registry&lt;/code&gt;), sous peine de rencontrer l’erreur suivante :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;Error response from daemon: Invalid registry endpoint https://192.168.0.29:5000/v1/[...]&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Avec &lt;code&gt;boot2docker&lt;/code&gt;, l’option peut être passée via la variable &lt;code&gt;EXTRA_ARGS&lt;/code&gt; :&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;accéder à la VM en mode &lt;em&gt;shell&lt;/em&gt; :&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;boot2docker ssh&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;ul&gt;
+&lt;li&gt;puis renseigner la variable &lt;code&gt;EXTRA_ARGS&lt;/code&gt; dans le fichier &lt;code&gt;/var/lib/boot2docker/profile&lt;/code&gt; :&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;&lt;span class=&quot;nv&quot;&gt;EXTRA_ARGS&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;–insecure-registry 192.168.0.29:5000&amp;quot;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;ul&gt;
+&lt;li&gt;enfin sortir du &lt;em&gt;shell&lt;/em&gt; :&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;&lt;span class=&quot;nb&quot;&gt;exit&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;A noter que le client &lt;code&gt;boot2docker&lt;/code&gt; sera à relativement court terme remplacé par la commande &lt;code&gt;docker machine&lt;/code&gt; toujours en &lt;a href=&quot;https://github.com/docker/machine&quot;&gt;cours de développement&lt;/a&gt; à ce jour.&lt;/p&gt;
+
+&lt;p&gt;Une simple interrogation de l’index via &lt;strong&gt;cURL&lt;/strong&gt; confirme que l’image a bien été publiée :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;ksahnine@inoviabook:~&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;curl -s http://192.168.0.29:5000/v1/repositories/ksahnine/tags &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; jq &lt;span class=&quot;s2&quot;&gt;&amp;quot;.&amp;quot;&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;s2&quot;&gt;&amp;quot;trafic-ratp-dropwizard&amp;quot;&lt;/span&gt;: &lt;span class=&quot;s2&quot;&gt;&amp;quot;c1454f0f800331644e43971e56c1e391bf06625a13600fc52160fc1c927e6fa4&amp;quot;&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Elle peut ensuite être récupérée via la commande &lt;code&gt;docker pull&lt;/code&gt; :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;docker pull 192.168.0.29:5000/ksahnine:trafic-ratp-dropwizard&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;et enfin exécutée :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;docker run -td -p 8080:8080 192.168.0.29:5000/ksahnine:trafic-ratp-dropwizard&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h3&gt;Publier sur Docker Hub&lt;/h3&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://hub.docker.com/account/signup/&quot;&gt;Docker Hub&lt;/a&gt; est le dépôt central des repositories hébergés chez Docker. L’hébergement d’index publics est gratuit tout comme le premier index privé (&lt;a href=&quot;https://registry.hub.docker.com/plans/&quot;&gt;payant au delà&lt;/a&gt;).&lt;br /&gt;
+Mon repository public &lt;a href=&quot;https://registry.hub.docker.com/u/ksahnine/ratp-rest-api/&quot;&gt;&lt;code&gt;ksahnine/ratp-rest-api&lt;/code&gt;&lt;/a&gt; contient l’image de notre service dockerisé.&lt;br /&gt;
+La publication de l’image dans le repository s’effectue comme suit :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;docker tag ksahnine:trafic-ratp-dropwizard ksahnine/ratp-rest-api:1.0
+docker push ksahnine/ratp-rest-api:1.0&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;La récupération de l’image suivie de la création du conteneur et du démarrage du service depuis le hub s’effectue par cette simple commande :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;docker run -td -p 8080:8080 ksahnine/ratp-rest-api:1.0&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h3&gt;Sauvegarder et restaurer une image&lt;/h3&gt;
+
+&lt;p&gt;Plus rustique, la commande &lt;code&gt;docker save&lt;/code&gt; permet d’exporter une image dans un fichier de &lt;em&gt;dump&lt;/em&gt; :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;docker save ksahnine:trafic-ratp-dropwizard &amp;gt; trafic-ratp-img.tar&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Réciproquement, la commande &lt;code&gt;docker load&lt;/code&gt; permet de restaurer une image à partir d’un &lt;em&gt;dump&lt;/em&gt; :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;docker load ksahnine:trafic-ratp-dropwizard &amp;lt; trafic-ratp-img.tar&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+</description>
+        <pubDate>Wed, 21 Jan 2015 07:00:00 +0100</pubDate>
+        <link>http://ksahnine.github.io/microservice/docker/dropwizard/2015/01/21/dockeriser-microservice.html</link>
+        <guid isPermaLink="true">http://ksahnine.github.io/microservice/docker/dropwizard/2015/01/21/dockeriser-microservice.html</guid>
+        
+        <category>regular</category>
+        
+        
+        <category>microservice</category>
+        
+        <category>docker</category>
+        
+        <category>dropwizard</category>
         
       </item>
     
