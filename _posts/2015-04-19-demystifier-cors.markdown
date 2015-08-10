@@ -15,7 +15,7 @@ Même si l’organisme **W3C** agit comme une puissance normative, seules les sp
 
 ## Le futur de JSONP
 Depuis des années, les navigateurs restreignent l’accès à des ressources n’appartenant pas au domaine depuis lequel un document a été chargé (règle dite de [**Same-Origin Policy**](http://en.wikipedia.org/wiki/Same-origin_policy)).<br />
-Le fait que la balise `<script />` ne soit pas concernée par cette restriction a ouvert la voie à la technique [**JSONP**](http://en.wikipedia.org/wiki/JSONP) (*JSON with padding*), permettant d’émettre des requêtes AJAX cross-domain retournant des données JSON encapsulées dans une *callback* JavaScript. Il faut admettre cependant que cette technique, bien qu’encore très utilisée, relève surtout de l’astuce.
+Le fait que la balise `<script />` ne soit pas concernée par cette restriction a ouvert la voie à la technique [**JSONP**](http://en.wikipedia.org/wiki/JSONP) (*JSON with padding*), permettant d’émettre des requêtes AJAX cross-domain retournant des données JSON encapsulées dans une fonction de rappel (*callback*) en JavaScript. Il faut admettre cependant que cette technique, bien qu’encore très utilisée, relève surtout de l’astuce.
 
 **CORS** est un mécanisme robuste et [normalisé par le W3C](http://www.w3.org/TR/cors/) permettant à tout navigateur compatible d’effectuer des **requêtes HTTP cross-domain**. Il a valeur de standard industriel et étend le champ des possibilités bien au delà de ce qui est actuellement permis par JSONP.
 
