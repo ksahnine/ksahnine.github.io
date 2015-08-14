@@ -65,7 +65,7 @@ Il est aisé de produire en une commande la série temporelle du nombre de tweet
 ~$ cat *.json | jq ".created_at" | xargs -I ? date -j -f "%a %h %d %H:%M:%S %z %Y" "?" "+%Y-%m-%d_%H:00:00" | sort | uniq -c | sed -e 's/^ *//;s/ /,/' | awk -F"," '{ print $2 "," $1}' > data.csv
 {% endhighlight %}
 La représentation graphique est réalisée avec **GNU Plot** :
-![Timeseries du hashtag #TelAvivSurSeine](/assets/article_images/TelAv_timeseries.png)
+[![Timeseries du hashtag #TelAvivSurSeine](/assets/article_images/TelAv_timeseries.png)](/assets/article_images/TelAv_timeseries.png)
 Ce qui interpelle de prime abord, c'est le **pic brutal** du *10 Août* vers *19h*.<br />
 
 On peut mesurer l'influence d'un compte en comptabilisant le nombre de retweets.<br />
@@ -139,11 +139,11 @@ Sur la seule journée du *08*, les retweets de ces 10 comptes représentent **pr
 ### Courbe des tweets et RT par canal
 Nous avions vu plus haut que les principaux supports utilisés sont en moyenne, par ordre d'utilisation, l'*iPhone*, un terminal *Android* et un *navigateur web* non mobile.
 La distribution des tweets par canal est intéressante :
-![Courbe des tweets via iPhone](/assets/article_images/iphone.png)
+[![Courbe des tweets via iPhone](/assets/article_images/iphone.png)](/assets/article_images/iphone.png)
 
-![Courbe des tweets via Android](/assets/article_images/android.png)
+[![Courbe des tweets via Android](/assets/article_images/android.png)](/assets/article_images/android.png)
 
-![Courbe des tweets via un navigateur Web](/assets/article_images/web.png)
+[![Courbe des tweets via un navigateur Web](/assets/article_images/web.png)](/assets/article_images/web.png)
 
 Les profils d'activité pour les canaux *iPhone*, *Android* et *web* sont assez semblables.<br />
 En superposant les courbes, l'activité *web* est toujours substantiellement en deçà des supports *iPhone* et *Android* **sauf durant le pic du *10 Août* vers 19h00**.
