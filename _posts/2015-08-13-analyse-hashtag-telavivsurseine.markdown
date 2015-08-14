@@ -145,7 +145,7 @@ La distribution des tweets par canal est intéressante :
 
 ![Courbe des tweets via un navigateur Web](/assets/article_images/web.png)
 
-Les profils d'activité pour les canaux *iPhone*, *Android* et *web* sont assez proches.<br />
+Les profils d'activité pour les canaux *iPhone*, *Android* et *web* sont assez semblables.<br />
 En superposant les courbes, l'activité *web* est toujours substantiellement en deçà des supports *iPhone* et *Android* **sauf durant le pic du *10 Août* vers 19h00**.
 
 Cette sur-activité sur ce canal est peut-être induite par des comptes fictifs, mais il n'y a pas de certitude.
