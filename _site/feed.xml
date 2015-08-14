@@ -6,9 +6,326 @@
 </description>
     <link>http://ksahnine.github.io/</link>
     <atom:link href="http://ksahnine.github.io/feed.xml" rel="self" type="application/rss+xml" />
-    <pubDate>Mon, 10 Aug 2015 16:02:29 +0200</pubDate>
-    <lastBuildDate>Mon, 10 Aug 2015 16:02:29 +0200</lastBuildDate>
+    <pubDate>Fri, 14 Aug 2015 22:41:11 +0200</pubDate>
+    <lastBuildDate>Fri, 14 Aug 2015 22:41:11 +0200</lastBuildDate>
     <generator>Jekyll v2.5.3</generator>
+    
+      <item>
+        <title>Analyse du hashtag #TelAvivSurSeine</title>
+        <description>&lt;p&gt;L&amp;#39;organisation de l&amp;#39;opération &lt;em&gt;&amp;quot;Tel Aviv Sur Seine&amp;quot;&lt;/em&gt; a suscité une &lt;a href=&quot;http://www.lemonde.fr/societe/article/2015/08/09/tel-aviv-sur-seine-la-mairie-de-paris-ne-renonce-pas-malgre-la-polemique_4718346_3224.html&quot;&gt;importante polémique&lt;/a&gt; née d&amp;#39;abord au sein des &lt;strong&gt;réseaux sociaux&lt;/strong&gt; (&lt;em&gt;Twitter&lt;/em&gt; en particulier) avant de prendre une tournure &lt;strong&gt;politique&lt;/strong&gt; puis &lt;strong&gt;médiatique&lt;/strong&gt;.&lt;/p&gt;
+
+&lt;p&gt;Le souflet est déjà retombé, mais cette polémique est une leçon pour l&amp;#39;avenir car elle révèle la puissance des réseaux sociaux comme moyen de &lt;strong&gt;peser sur l&amp;#39;agenda médiatique&lt;/strong&gt; et l&amp;#39;incapacité des médias traditionnels à &lt;strong&gt;distinguer un mouvement spontané d&amp;#39;une opération militante&lt;/strong&gt;.&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://twitter.com/nico_vanderb&quot;&gt;Nicolas Vanderbiest&lt;/a&gt;, assistant universitaire à l’université catholique de Louvain et spécialiste des réseaux sociaux, est l&amp;#39;auteur &lt;a href=&quot;http://rue89.nouvelobs.com/2015/08/11/telavivsurseine-dun-tweet-a-bfmtv-lastroturfing-mode-demploi-260700&quot;&gt;d&amp;#39;un article&lt;/a&gt; fort instructif décrivant l&amp;#39;exploitation du hashtag &lt;code&gt;#TelAvivSurSeine&lt;/code&gt; par un nombre restreint de militants très engagés, et le manque de clairvoyance des médias face à l&amp;#39;&lt;a href=&quot;https://fr.wikipedia.org/wiki/Astroturfing&quot;&gt;&lt;strong&gt;astroturfing&lt;/strong&gt;&lt;/a&gt;, une technique de manipulation de l&amp;#39;opinion.&lt;/p&gt;
+
+&lt;p&gt;La démonstration de Nicolas souffre néanmoins d&amp;#39;un petit défaut, celui de s&amp;#39;appuyer sur des outils propriétaires et payants (&lt;a href=&quot;http://www.visibrain.com/fr/&quot;&gt;&lt;em&gt;Visibrain Focus&lt;/em&gt;&lt;/a&gt;).&lt;/p&gt;
+
+&lt;p&gt;Je n&amp;#39;ai évidemment pas la prétention de faire aussi bien que &lt;em&gt;Visibrain&lt;/em&gt; mais il est possible de s&amp;#39;adonner soi-même à l&amp;#39;&lt;strong&gt;exploration de données&lt;/strong&gt; en étant suffisamment habile sous &lt;strong&gt;UNIX&lt;/strong&gt; et relativement à l&amp;#39;aise avec le langage &lt;strong&gt;Python&lt;/strong&gt;.&lt;br /&gt;
+Je me suis prêté à cet exercice par &lt;strong&gt;simple curiosité intellectuelle&lt;/strong&gt;, et certainement pas pour des considérations politiques ou militantes.&lt;/p&gt;
+
+&lt;p&gt;J&amp;#39;en ai tiré les faits suivants :&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;la mobilisation sur &lt;em&gt;Twitter&lt;/em&gt; contre l&amp;#39;évènement &lt;code&gt;#TelAvivSurSeine&lt;/code&gt; n&amp;#39;est pas assis sur un mouvement massif, spontané et populaire&lt;/li&gt;
+&lt;li&gt;elle est d&amp;#39;abord le fait d&amp;#39;une poignée de comptes militants jouissant d&amp;#39;une certaine audience et liés les uns aux autres par des affinités politiques ou identitaires&lt;/li&gt;
+&lt;li&gt;le compte du &lt;em&gt;Parti de Gauche&lt;/em&gt; et de militants adhérents à ce parti a joué un rôle important dans la médiatisation de la polémique, à l&amp;#39;instar de comptes de personnalités connues et pro évènement&lt;/li&gt;
+&lt;li&gt;la campagne BDS du &lt;em&gt;10 Août 2015&lt;/em&gt; contre l&amp;#39;évènement a été efficace et coordonnée&lt;/li&gt;
+&lt;li&gt;sur toutes les périodes étudiées, les clients Twitter les plus utilisés sont, dans l&amp;#39;ordre, le client &lt;em&gt;iPhone&lt;/em&gt;, le client &lt;em&gt;Android&lt;/em&gt; puis le client &lt;em&gt;Web&lt;/em&gt; &lt;strong&gt;sauf&lt;/strong&gt; le &lt;em&gt;10 Août 2015&lt;/em&gt; autour de 19h où c&amp;#39;est le client &lt;em&gt;Web&lt;/em&gt; (navigateur) qui arrive en tête. Cette anormalité pourrait s&amp;#39;expliquer par une utilisation de comptes fictifs durant cette période, et destinés à &lt;em&gt;faire du bruit&lt;/em&gt;.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Je présenterai dans cet article les résultats obtenus en évitant les digressions techniques car l&amp;#39;article serait trop long.&lt;br /&gt;
+Dans mon prochain billet, j&amp;#39;aborderai à nouveau ce sujet mais sous un angle beaucoup plus technique, à l&amp;#39;occasion duquel je publierai sur &lt;a href=&quot;https://github.com/ksahnine&quot;&gt;mon compte &lt;em&gt;GitHub&lt;/em&gt;&lt;/a&gt; l&amp;#39;ensemble du code source m&amp;#39;ayant permis d&amp;#39;obtenir ces résultats.&lt;/p&gt;
+
+&lt;h3&gt;Collecte des données&lt;/h3&gt;
+
+&lt;p&gt;Le script de collecte consiste à rechercher l&amp;#39;ensemble des tweets portant le hashtag &lt;code&gt;#TelAvivSurSeine&lt;/code&gt;. Il s&amp;#39;appuie sur &lt;code&gt;tweepy&lt;/code&gt;, un excellent client de l&amp;#39;API Twitter pour l&amp;#39;écosystème Python.&lt;br /&gt;
+J&amp;#39;ai pu collecter &lt;code&gt;76 698&lt;/code&gt; tweets au format &lt;strong&gt;JSON&lt;/strong&gt; sur une période allant du &lt;em&gt;03 Août 2015 10h49&lt;/em&gt; au &lt;em&gt;12 Août 2015 08h03&lt;/em&gt;, stockés dans des fichiers horodatés (&lt;code&gt;2015-08-*DD*_tweets.json&lt;/code&gt;) et représantant plus de 800 Mo de données brutes.&lt;br /&gt;
+Chaque tweet collecté au format JSON contient une masse très importante d&amp;#39;informations que nous exploiterons avec l&amp;#39;utilitaire &lt;code&gt;jq&lt;/code&gt;, l&amp;#39;équivalent de la commande &lt;code&gt;grep&lt;/code&gt; adaptée au format JSON.&lt;br /&gt;
+La structure d&amp;#39;un tweet est décrite sur le &lt;a href=&quot;https://dev.twitter.com/overview/api/tweets&quot;&gt;portail de dev de Twitter&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h3&gt;Eléments statistiques sur l&amp;#39;ensemble de la période&lt;/h3&gt;
+
+&lt;p&gt;Commençons par comptabiliser le nombre total de tweets ainsi que les comptes ayant tweeté :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;~&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;wc -l *.json
+   &lt;span class=&quot;m&quot;&gt;76698&lt;/span&gt; total
+~&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;jq &lt;span class=&quot;s1&quot;&gt;&amp;#39;.user.screen_name&amp;#39;&lt;/span&gt; *.json &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; sort -u &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; wc -l
+   16666&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;En 2 commandes on établit qu&amp;#39;il y a eu &lt;code&gt;76 698&lt;/code&gt; tweets pour &lt;code&gt;16 666&lt;/code&gt; comptes, soit une moyenne de &lt;strong&gt;4,6 tweets par compte&lt;/strong&gt;. C&amp;#39;est un premier signe suggérant l&amp;#39;utilisation d&amp;#39;une technique de manipulation d&amp;#39;opinion, l&amp;#39;&lt;a href=&quot;https://fr.wikipedia.org/wiki/Astroturfing&quot;&gt;astroturfing&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;Voyons comment sont répartis les tweets par type de support :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;cat *.json &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; jq &lt;span class=&quot;s2&quot;&gt;&amp;quot;.source&amp;quot;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; sed &lt;span class=&quot;s1&quot;&gt;&amp;#39;s/&amp;quot;\(&amp;lt;.*&amp;gt;\)\(.*\)\(&amp;lt;.*&amp;gt;\)&amp;quot;/\2/&amp;#39;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; sort &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; uniq -c &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; sort -rn &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; head -3
+&lt;span class=&quot;m&quot;&gt;23210&lt;/span&gt; Twitter &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; iPhone
+&lt;span class=&quot;m&quot;&gt;21341&lt;/span&gt; Twitter &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; Android
+&lt;span class=&quot;m&quot;&gt;19954&lt;/span&gt; Twitter Web Client&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Nous en aurons besoin plus tard. Relevons au passage que l&amp;#39;activité est majoritairement mobile.&lt;/p&gt;
+
+&lt;h3&gt;Courbe des tweets et RT&lt;/h3&gt;
+
+&lt;p&gt;Il est aisé de produire en une commande la série temporelle du nombre de tweets par tranche horaire. La seule petite difficulté consiste à convertir l&amp;#39;heure UTC du tweet en heure locale :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;~&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;cat *.json &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; jq &lt;span class=&quot;s2&quot;&gt;&amp;quot;.created_at&amp;quot;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; xargs -I ? date -j -f &lt;span class=&quot;s2&quot;&gt;&amp;quot;%a %h %d %H:%M:%S %z %Y&amp;quot;&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;?&amp;quot;&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;+%Y-%m-%d_%H:00:00&amp;quot;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; sort &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; uniq -c &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; sed -e &lt;span class=&quot;s1&quot;&gt;&amp;#39;s/^ *//;s/ /,/&amp;#39;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; awk -F&lt;span class=&quot;s2&quot;&gt;&amp;quot;,&amp;quot;&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&amp;#39;{ print $2 &amp;quot;,&amp;quot; $1}&amp;#39;&lt;/span&gt; &amp;gt; data.csv&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;La représentation graphique est réalisée avec &lt;strong&gt;GNU Plot&lt;/strong&gt; :
+&lt;img src=&quot;/assets/article_images/TelAv_timeseries.png&quot; alt=&quot;Timeseries du hashtag #TelAvivSurSeine&quot;&gt;
+Ce qui interpelle de prime abord, c&amp;#39;est le &lt;strong&gt;pic brutal&lt;/strong&gt; du &lt;em&gt;10 Août&lt;/em&gt; vers &lt;em&gt;19h&lt;/em&gt;.&lt;br /&gt;&lt;/p&gt;
+
+&lt;p&gt;On peut mesurer l&amp;#39;influence d&amp;#39;un compte en comptabilisant le nombre de retweets.&lt;br /&gt;
+Etablissons le classement des comptes les plus retweetés le &lt;em&gt;10 Août&lt;/em&gt; entre &lt;em&gt;18h00&lt;/em&gt; et &lt;em&gt;19h59&lt;/em&gt; (heure locale) :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;~&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;cat 2015-08-10_tweets.json &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; jq &lt;span class=&quot;s1&quot;&gt;&amp;#39;.|select(.created_at|match(&amp;quot;Mon Aug 10 1[6-7].*&amp;quot;))|.retweeted_status.user.screen_name&amp;#39;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; grep -v &lt;span class=&quot;s2&quot;&gt;&amp;quot;null&amp;quot;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; sort &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; uniq -c &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; sort -rn &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; head -3
+ &lt;span class=&quot;m&quot;&gt;337&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;Campagnebds&amp;quot;&lt;/span&gt;
+ &lt;span class=&quot;m&quot;&gt;114&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;LePG&amp;quot;&lt;/span&gt;
+ &lt;span class=&quot;m&quot;&gt;100&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;Thalwen&amp;quot;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;On constate que le compte &lt;code&gt;@Campagnebds&lt;/code&gt; ressort très largement en tête.&lt;br /&gt;
+Ce pic peut donc être parfaitement corrélé avec l&amp;#39;annonce d&amp;#39;un &lt;a href=&quot;https://twitter.com/Campagnebds/status/630378884563906560&quot;&gt;&lt;em&gt;tweet storm&lt;/em&gt;&lt;/a&gt; sur le compte de la campagne &lt;a href=&quot;https://fr.wikipedia.org/wiki/Boycott,_d%C3%A9sinvestissement_et_sanctions&quot;&gt;BDS (&lt;em&gt;Boycott, Désinvestissement et Sanctions&lt;/em&gt;)&lt;/a&gt; :
+&lt;center&gt;&lt;blockquote class=&quot;twitter-tweet&quot;&gt;&lt;p lang=&quot;fr&quot; dir=&quot;ltr&quot;&gt;Cher-e-s abonné-e-s, nous organisons une tweetstorm contre &lt;a href=&quot;https://twitter.com/hashtag/TelAvivSurSeine?src=hash&quot;&gt;#TelAvivSurSeine&lt;/a&gt; DEMAIN lundi 10 Août à 19h ! &lt;a href=&quot;https://twitter.com/hashtag/StayTuned?src=hash&quot;&gt;#StayTuned&lt;/a&gt; &lt;a href=&quot;http://t.co/3hezXnHJWE&quot;&gt;pic.twitter.com/3hezXnHJWE&lt;/a&gt;&lt;/p&gt;&amp;mdash; BDS France (@Campagnebds) &lt;a href=&quot;https://twitter.com/Campagnebds/status/630378884563906560&quot;&gt;August 9, 2015&lt;/a&gt;&lt;/blockquote&gt;
+&lt;script async src=&quot;//platform.twitter.com/widgets.js&quot; charset=&quot;utf-8&quot;&gt;&lt;/script&gt;&lt;/center&gt;&lt;/p&gt;
+
+&lt;p&gt;A noter la présence en seconde position du compte du &lt;em&gt;Parti de Gauche&lt;/em&gt; : la polémique prend largement une &lt;strong&gt;tournure politique&lt;/strong&gt;. On ne reverra plus jamais le compte du PdG à une telle position dans le classement des RT.&lt;/p&gt;
+
+&lt;p&gt;Revenons au graphique. On ne constate pas de mouvement significatif entre le &lt;em&gt;03 Août&lt;/em&gt;, date du premier tweet, et le &lt;em&gt;08 Août&lt;/em&gt; peu avant midi.&lt;br /&gt;
+L&amp;#39;emballement commence le &lt;em&gt;08 Août&lt;/em&gt; à partir de midi avec une pointe vers &lt;em&gt;14h&lt;/em&gt; heure locale.&lt;br /&gt;&lt;/p&gt;
+
+&lt;p&gt;De la même façon, identifions les 5 comptes les plus retweeté le &lt;em&gt;08 Août&lt;/em&gt; entre &lt;em&gt;12h00&lt;/em&gt; et &lt;em&gt;14h59&lt;/em&gt; (heure locale)&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;~&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;cat 2015-08-08_tweets.json &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; jq &lt;span class=&quot;s1&quot;&gt;&amp;#39;.|select(.created_at|match(&amp;quot;Sat Aug 08 1[0-2].*&amp;quot;))|.retweeted_status.user.screen_name&amp;#39;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; grep -v &lt;span class=&quot;s2&quot;&gt;&amp;quot;null&amp;quot;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; sort &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; uniq -c &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; sort -rn &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; head -5
+ &lt;span class=&quot;m&quot;&gt;214&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;pauldraszen&amp;quot;&lt;/span&gt;
+ &lt;span class=&quot;m&quot;&gt;213&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;KarimaB_&amp;quot;&lt;/span&gt;
+ &lt;span class=&quot;m&quot;&gt;155&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;MadjidFalastine&amp;quot;&lt;/span&gt;
+ &lt;span class=&quot;m&quot;&gt;131&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;keyzer_usual&amp;quot;&lt;/span&gt;
+ &lt;span class=&quot;m&quot;&gt;124&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;Alkanz&amp;quot;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Effectuons la même opération mais en rajoutant le nombre d&amp;#39;abonnés à ces comptes et en formatant le résultat avec l&amp;#39;utilitaire &lt;code&gt;csvlook&lt;/code&gt; :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;~&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;Nb_rtweet Nb_Followers Compte&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; cat 2015-08-08_tweets.json &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; jq --raw-output &lt;span class=&quot;s1&quot;&gt;&amp;#39;[.|select(.created_at|match(&amp;quot;Sat Aug 08 1[0-2].*&amp;quot;))|.retweeted_status.user.followers_count,.retweeted_status.user.screen_name] | @csv&amp;#39;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; tr &lt;span class=&quot;s1&quot;&gt;&amp;#39;,&amp;#39;&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&amp;#39; &amp;#39;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; sed &lt;span class=&quot;s1&quot;&gt;&amp;#39;/^ *$/d;/^,$/d&amp;#39;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; sort -k2 &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; uniq -cf1 &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; sort -k1rn &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; sed -e &lt;span class=&quot;s1&quot;&gt;&amp;#39;s/^ *//&amp;#39;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; head -5 &lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; csvlook -d&lt;span class=&quot;s1&quot;&gt;&amp;#39; &amp;#39;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;------------+--------------+------------------&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  Nb_rtweet &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; Nb_Followers &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; Compte           &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;------------+--------------+------------------&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;214&lt;/span&gt;       &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;1199&lt;/span&gt;         &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; pauldraszen      &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;213&lt;/span&gt;       &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;13046&lt;/span&gt;        &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; KarimaB_         &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;155&lt;/span&gt;       &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;2748&lt;/span&gt;         &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; MadjidFalastine  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;131&lt;/span&gt;       &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;7165&lt;/span&gt;         &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; keyzer_usual     &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;124&lt;/span&gt;       &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;32831&lt;/span&gt;        &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; Alkanz           &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;------------+--------------+------------------&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Tous ces comptes sont connus pour être très engagés dans la promotion de la cause palestinienne.&lt;br /&gt;
+Il me semble évident qu&amp;#39;ils ont été à l&amp;#39;avant garde de la montée du hashtag (premiers pics du graphique).&lt;/p&gt;
+
+&lt;p&gt;Si on élargit la recherche à l&amp;#39;ensemble de la journée, on retrouve d&amp;#39;autres comptes à forte audience, tous critiques à l&amp;#39;égard de l&amp;#39;évènement :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;------------+--------------+------------------&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  Nb_rtweet &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; Nb_Followers &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; Compte           &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;------------+--------------+------------------&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;625&lt;/span&gt;       &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;12594&lt;/span&gt;        &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; ybenderbal       &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;544&lt;/span&gt;       &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;13045&lt;/span&gt;        &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; KarimaB_         &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;477&lt;/span&gt;       &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;1199&lt;/span&gt;         &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; pauldraszen      &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;424&lt;/span&gt;       &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;2748&lt;/span&gt;         &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; MadjidFalastine  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;374&lt;/span&gt;       &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;22067&lt;/span&gt;        &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; Linformatrice    &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;324&lt;/span&gt;       &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;3047&lt;/span&gt;         &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; oxymorus         &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;313&lt;/span&gt;       &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;32831&lt;/span&gt;        &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; Alkanz           &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;269&lt;/span&gt;       &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;8426&lt;/span&gt;         &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; DionJack2        &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;268&lt;/span&gt;       &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;7265&lt;/span&gt;         &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; s_assbague       &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;257&lt;/span&gt;       &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;12765&lt;/span&gt;        &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; LeBjrTristesse   &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;------------+--------------+------------------&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Sur la seule journée du &lt;em&gt;08&lt;/em&gt;, les retweets de ces 10 comptes représentent &lt;strong&gt;près d&amp;#39;un quart&lt;/strong&gt; du nombre total de tweets (&lt;code&gt;3 875&lt;/code&gt; sur &lt;code&gt;16 658&lt;/code&gt;).&lt;/p&gt;
+
+&lt;h3&gt;Courbe des tweets et RT par canal&lt;/h3&gt;
+
+&lt;p&gt;Nous avions vu plus haut que les principaux supports utilisés sont en moyenne, par ordre d&amp;#39;utilisation, l&amp;#39;&lt;em&gt;iPhone&lt;/em&gt;, un terminal &lt;em&gt;Android&lt;/em&gt; et un &lt;em&gt;navigateur web&lt;/em&gt; non mobile.
+La distribution des tweets par canal est intéressante :
+&lt;img src=&quot;/assets/article_images/iphone.png&quot; alt=&quot;Courbe des tweets via iPhone&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/article_images/android.png&quot; alt=&quot;Courbe des tweets via Android&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/article_images/web.png&quot; alt=&quot;Courbe des tweets via un navigateur Web&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;Les profils d&amp;#39;activité pour les canaux &lt;em&gt;iPhone&lt;/em&gt;, &lt;em&gt;Android&lt;/em&gt; et &lt;em&gt;web&lt;/em&gt; sont assez proches.&lt;br /&gt;
+En superposant les courbes, l&amp;#39;activité &lt;em&gt;web&lt;/em&gt; est toujours substantiellement en deçà des supports &lt;em&gt;iPhone&lt;/em&gt; et &lt;em&gt;Android&lt;/em&gt; &lt;strong&gt;sauf durant le pic du &lt;em&gt;10 Août&lt;/em&gt; vers 19h00&lt;/strong&gt;.&lt;/p&gt;
+
+&lt;p&gt;Cette sur-activité sur ce canal est peut-être induite par des comptes fictifs, mais il n&amp;#39;y a pas de certitude.&lt;/p&gt;
+
+&lt;h3&gt;Classement des &lt;em&gt;hashtags&lt;/em&gt;&lt;/h3&gt;
+
+&lt;p&gt;En comptabilisant les hashtags associés à &lt;code&gt;#telavivsurseine&lt;/code&gt;, on peut dégager les sentiments dominants. &lt;br /&gt;
+La commande ci-dessous permets d&amp;#39;extraire les 20 mots croisillons les plus populaires :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;~&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;Nb,Hashtag&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; cat *.json &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; jq &lt;span class=&quot;s2&quot;&gt;&amp;quot;.entities.hashtags[].text&amp;quot;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; tr &lt;span class=&quot;s1&quot;&gt;&amp;#39;[A-Z]&amp;#39;&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&amp;#39;[a-z]&amp;#39;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; tr &lt;span class=&quot;s1&quot;&gt;&amp;#39;[àâäéèêëîïôöùûü]&amp;#39;&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&amp;#39;[aaaeeeeiioouuu]&amp;#39;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; sort &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; uniq -c &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; sed -e &lt;span class=&quot;s1&quot;&gt;&amp;#39;s/^ *//;s/ /,/&amp;#39;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; sort -rn &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; head -20 &lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; csvlook
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;--------+-------------------------&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  Nb    &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; Hashtag                 &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;--------+-------------------------&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;77070&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; telavivsurseine         &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;5834&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; apartheidsurseine       &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;2880&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; israel                  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;2767&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; gaza                    &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;2406&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; paris                   &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;1868&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; againsttelavivsurseine  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;1860&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; parisplages             &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;1668&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; contretelavivsurseine   &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;1666&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; telaviv                 &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;1608&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; gazasurseine            &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;1606&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; parislovestlv           &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;1351&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; palestine               &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;843&lt;/span&gt;   &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; freepalestine           &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;822&lt;/span&gt;   &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; bds                     &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;787&lt;/span&gt;   &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; parisplage              &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;621&lt;/span&gt;   &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; france                  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;515&lt;/span&gt;   &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; icc4israel              &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;462&lt;/span&gt;   &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; hidalgo                 &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;434&lt;/span&gt;   &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; apartheid               &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;372&lt;/span&gt;   &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; boycottisrael           &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;--------+-------------------------&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h3&gt;Classement des comptes les plus mentionnés&lt;/h3&gt;
+
+&lt;p&gt;La commande ci-dessous permet d&amp;#39;établir les 20 comptes les plus mentionnés, ce qui permet de qualifier leur &lt;strong&gt;réputation&lt;/strong&gt; :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;~&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;Nb,Compte&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; cat *.json &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; jq &lt;span class=&quot;s2&quot;&gt;&amp;quot;.entities.user_mentions[].screen_name&amp;quot;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; sort &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; uniq -c &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; sed -e &lt;span class=&quot;s1&quot;&gt;&amp;#39;s/^ *//;s/ /,/&amp;#39;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; sort -rn &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; head -20 &lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; csvlook
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;-------+------------------&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  Nb   &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; Compte           &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;-------+------------------&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;8859&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; Anne_Hidalgo     &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;1772&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; ybenderbal       &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;1500&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; BrunoJulliard    &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;1380&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; Paris            &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;1317&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; KarimaB_         &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;1137&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; ericcoquerel     &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;1134&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; Campagnebds      &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;1130&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; Linformatrice    &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;1119&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; Simonnet2        &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;936&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; jeremo12         &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;909&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; MadjidFalastine  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;884&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; Alkanz           &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;845&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; Barakacity       &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;826&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; pauldraszen      &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;808&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; s_assbague       &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;803&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; oxymorus         &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;748&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; YASMINAREBEL     &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;611&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; keyzer_usual     &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;611&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; PKlugman         &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;588&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; itele            &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;-------+------------------&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;On y trouve pèle mèle :&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;des politiques&lt;/li&gt;
+&lt;li&gt;des activistes déjà identifiés plus haut&lt;/li&gt;
+&lt;li&gt;des comptes média généraliste et communautaires&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3&gt;Classement des 20 comptes ayant été le plus retweetés&lt;/h3&gt;
+
+&lt;p&gt;Le nombre de retweets est un indicateur &lt;strong&gt;d&amp;#39;influence&lt;/strong&gt;. On retrouve dans ce classement les comptes des principaux protagonistes, où dominent les comptes d&amp;#39;obédience pro palestiniennes :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;--------+-----------------+---------------------------------&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  Nb RT &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; Compte          &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; Date Creation                   &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;--------+-----------------+---------------------------------&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;1759&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; ybenderbal      &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; Sun Mar &lt;span class=&quot;m&quot;&gt;11&lt;/span&gt; 22:51:26 +0000 &lt;span class=&quot;m&quot;&gt;2012&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;1085&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; KarimaB_        &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; Sat Mar &lt;span class=&quot;m&quot;&gt;07&lt;/span&gt; 14:36:25 +0000 &lt;span class=&quot;m&quot;&gt;2009&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;1054&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; Linformatrice   &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; Thu Aug &lt;span class=&quot;m&quot;&gt;04&lt;/span&gt; 02:18:52 +0000 &lt;span class=&quot;m&quot;&gt;2011&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;1045&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; Campagnebds     &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; Tue Dec &lt;span class=&quot;m&quot;&gt;15&lt;/span&gt; 20:33:31 +0000 &lt;span class=&quot;m&quot;&gt;2009&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;916&lt;/span&gt;   &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; jeremo12        &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; Sun Feb &lt;span class=&quot;m&quot;&gt;26&lt;/span&gt; 22:54:54 +0000 &lt;span class=&quot;m&quot;&gt;2012&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;856&lt;/span&gt;   &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; MadjidFalastine &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; Sun May &lt;span class=&quot;m&quot;&gt;10&lt;/span&gt; 17:44:54 +0000 &lt;span class=&quot;m&quot;&gt;2009&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;825&lt;/span&gt;   &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; Barakacity      &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; Sun Oct &lt;span class=&quot;m&quot;&gt;30&lt;/span&gt; 17:08:53 +0000 &lt;span class=&quot;m&quot;&gt;2011&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;809&lt;/span&gt;   &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; pauldraszen     &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; Wed Apr &lt;span class=&quot;m&quot;&gt;07&lt;/span&gt; 22:04:56 +0000 &lt;span class=&quot;m&quot;&gt;2010&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;795&lt;/span&gt;   &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; oxymorus        &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; Sat Jul &lt;span class=&quot;m&quot;&gt;03&lt;/span&gt; 04:27:09 +0000 &lt;span class=&quot;m&quot;&gt;2010&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;738&lt;/span&gt;   &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; s_assbague      &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; Sun Jun &lt;span class=&quot;m&quot;&gt;09&lt;/span&gt; 18:04:58 +0000 &lt;span class=&quot;m&quot;&gt;2013&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;717&lt;/span&gt;   &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; Alkanz          &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; Sat Jul &lt;span class=&quot;m&quot;&gt;21&lt;/span&gt; 18:45:04 +0000 &lt;span class=&quot;m&quot;&gt;2007&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;648&lt;/span&gt;   &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; YASMINAREBEL    &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; Sat Jan &lt;span class=&quot;m&quot;&gt;15&lt;/span&gt; 14:26:25 +0000 &lt;span class=&quot;m&quot;&gt;2011&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;611&lt;/span&gt;   &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; keyzer_usual    &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; Thu Jan &lt;span class=&quot;m&quot;&gt;17&lt;/span&gt; 22:19:09 +0000 &lt;span class=&quot;m&quot;&gt;2013&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;472&lt;/span&gt;   &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; EladRatson      &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; Sun Feb &lt;span class=&quot;m&quot;&gt;22&lt;/span&gt; 17:16:34 +0000 &lt;span class=&quot;m&quot;&gt;2009&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;468&lt;/span&gt;   &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; opFethi         &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; Sat Apr &lt;span class=&quot;m&quot;&gt;13&lt;/span&gt; 22:53:43 +0000 &lt;span class=&quot;m&quot;&gt;2013&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;464&lt;/span&gt;   &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; mllesosso       &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; Mon Dec &lt;span class=&quot;m&quot;&gt;22&lt;/span&gt; 10:15:10 +0000 &lt;span class=&quot;m&quot;&gt;2008&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;442&lt;/span&gt;   &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; pierrebleue3d   &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; Sat Nov &lt;span class=&quot;m&quot;&gt;12&lt;/span&gt; 22:53:42 +0000 &lt;span class=&quot;m&quot;&gt;2011&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;441&lt;/span&gt;   &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; julienbahloul   &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; Sat Jan &lt;span class=&quot;m&quot;&gt;09&lt;/span&gt; 08:40:16 +0000 &lt;span class=&quot;m&quot;&gt;2010&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;421&lt;/span&gt;   &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; Thalwen         &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; Sun Jul &lt;span class=&quot;m&quot;&gt;15&lt;/span&gt; 17:09:19 +0000 &lt;span class=&quot;m&quot;&gt;2012&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;419&lt;/span&gt;   &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; ZohraBitan      &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; Thu Sep &lt;span class=&quot;m&quot;&gt;23&lt;/span&gt; 16:13:46 +0000 &lt;span class=&quot;m&quot;&gt;2010&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;--------+-----------------+---------------------------------&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h3&gt;Classement des 20 comptes ayant le plus twitté&lt;/h3&gt;
+
+&lt;p&gt;Ce tableau est intéressant :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;------------+--------------+-----------------+------------+---------------------------------&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  Nb_tweets &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; Nb_Followers &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; Compte          &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; ID         &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; Date_creation                   &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;------------+--------------+-----------------+------------+---------------------------------&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;3030&lt;/span&gt;      &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;36&lt;/span&gt;           &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; Dajjalsystem    &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;3126834263&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; Sun Mar &lt;span class=&quot;m&quot;&gt;29&lt;/span&gt; 16:24:44 +0000 &lt;span class=&quot;m&quot;&gt;2015&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;483&lt;/span&gt;       &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;840&lt;/span&gt;          &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; ahenjar         &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;2390165938&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; Fri Mar &lt;span class=&quot;m&quot;&gt;07&lt;/span&gt; 06:02:44 +0000 &lt;span class=&quot;m&quot;&gt;2014&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;437&lt;/span&gt;       &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;1919&lt;/span&gt;         &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; amilcarhanniba1 &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;2414559685&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; Thu Mar &lt;span class=&quot;m&quot;&gt;27&lt;/span&gt; 15:37:54 +0000 &lt;span class=&quot;m&quot;&gt;2014&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;357&lt;/span&gt;       &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;560&lt;/span&gt;          &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; AgatheNRV       &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;21016128&lt;/span&gt;   &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; Mon Feb &lt;span class=&quot;m&quot;&gt;16&lt;/span&gt; 19:22:40 +0000 &lt;span class=&quot;m&quot;&gt;2009&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;328&lt;/span&gt;       &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;13&lt;/span&gt;           &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; NataliaGGarcia5 &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;3409050532&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; Sat Aug &lt;span class=&quot;m&quot;&gt;08&lt;/span&gt; 18:47:23 +0000 &lt;span class=&quot;m&quot;&gt;2015&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;323&lt;/span&gt;       &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;926&lt;/span&gt;          &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; LILTIKKIB       &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;407732116&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; Tue Nov &lt;span class=&quot;m&quot;&gt;08&lt;/span&gt; 13:22:29 +0000 &lt;span class=&quot;m&quot;&gt;2011&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;322&lt;/span&gt;       &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;130&lt;/span&gt;          &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; yanisssou       &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;117523080&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; Thu Feb &lt;span class=&quot;m&quot;&gt;25&lt;/span&gt; 20:42:53 +0000 &lt;span class=&quot;m&quot;&gt;2010&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;312&lt;/span&gt;       &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;369&lt;/span&gt;          &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; mouadibun       &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;2402247031&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; Fri Mar &lt;span class=&quot;m&quot;&gt;21&lt;/span&gt; 22:37:25 +0000 &lt;span class=&quot;m&quot;&gt;2014&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;279&lt;/span&gt;       &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;89&lt;/span&gt;           &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; Mrelguevara     &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;266072395&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; Mon Mar &lt;span class=&quot;m&quot;&gt;14&lt;/span&gt; 16:11:00 +0000 &lt;span class=&quot;m&quot;&gt;2011&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;260&lt;/span&gt;       &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;4502&lt;/span&gt;         &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; blabalade       &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;244170872&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; Fri Jan &lt;span class=&quot;m&quot;&gt;28&lt;/span&gt; 17:37:02 +0000 &lt;span class=&quot;m&quot;&gt;2011&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;235&lt;/span&gt;       &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;1002&lt;/span&gt;         &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; fredussart      &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;2864427501&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; Thu Nov &lt;span class=&quot;m&quot;&gt;06&lt;/span&gt; 20:46:09 +0000 &lt;span class=&quot;m&quot;&gt;2014&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;228&lt;/span&gt;       &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;539&lt;/span&gt;          &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; RafikBiff       &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;282921586&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; Sat Apr &lt;span class=&quot;m&quot;&gt;16&lt;/span&gt; 06:24:28 +0000 &lt;span class=&quot;m&quot;&gt;2011&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;217&lt;/span&gt;       &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;1344&lt;/span&gt;         &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; opFethi         &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;1350411432&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; Sat Apr &lt;span class=&quot;m&quot;&gt;13&lt;/span&gt; 22:53:43 +0000 &lt;span class=&quot;m&quot;&gt;2013&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;198&lt;/span&gt;       &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;2206&lt;/span&gt;         &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; BenLevyCohen    &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;194045521&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; Thu Sep &lt;span class=&quot;m&quot;&gt;23&lt;/span&gt; 09:02:08 +0000 &lt;span class=&quot;m&quot;&gt;2010&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;193&lt;/span&gt;       &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;4938&lt;/span&gt;         &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; FinDesTemps     &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;736880372&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; Sat Aug &lt;span class=&quot;m&quot;&gt;04&lt;/span&gt; 15:03:52 +0000 &lt;span class=&quot;m&quot;&gt;2012&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;188&lt;/span&gt;       &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;13&lt;/span&gt;           &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; GozoGazi        &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;3243703193&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; Sat May &lt;span class=&quot;m&quot;&gt;09&lt;/span&gt; 17:18:15 +0000 &lt;span class=&quot;m&quot;&gt;2015&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;179&lt;/span&gt;       &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;1194&lt;/span&gt;         &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; Mars1300        &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;573709142&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; Mon May &lt;span class=&quot;m&quot;&gt;07&lt;/span&gt; 15:00:56 +0000 &lt;span class=&quot;m&quot;&gt;2012&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;178&lt;/span&gt;       &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;4257&lt;/span&gt;         &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; Aevalillith     &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;242492168&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; Mon Jan &lt;span class=&quot;m&quot;&gt;24&lt;/span&gt; 22:30:44 +0000 &lt;span class=&quot;m&quot;&gt;2011&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;155&lt;/span&gt;       &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;216&lt;/span&gt;          &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; Giiorgio100     &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;2271358198&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; Thu Jan &lt;span class=&quot;m&quot;&gt;09&lt;/span&gt; 18:47:01 +0000 &lt;span class=&quot;m&quot;&gt;2014&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;151&lt;/span&gt;       &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;637&lt;/span&gt;          &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; julievalles     &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;618927738&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; Tue Jun &lt;span class=&quot;m&quot;&gt;26&lt;/span&gt; 07:52:22 +0000 &lt;span class=&quot;m&quot;&gt;2012&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;------------+--------------+-----------------+------------+---------------------------------&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;ul&gt;
+&lt;li&gt;il n&amp;#39;y a aucun compte connu ou réputé influent&lt;/li&gt;
+&lt;li&gt;la majorité des comptes possède relativement peu de followers mais ils sont particulièrement volubiles&lt;/li&gt;
+&lt;li&gt;en particulier, le compte &lt;code&gt;Dajjalsystem&lt;/code&gt; intrigue par le nombre de tweets et RT (&lt;code&gt;3 030&lt;/code&gt;) au regard de son très faible nombre d&amp;#39;abonnés (&lt;code&gt;36&lt;/code&gt;)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Le qualificatif de &lt;em&gt;&amp;quot;compte pour crier&amp;quot;&lt;/em&gt; utilisée par Nicolas dans son article prend là tout son sens.&lt;/p&gt;
+
+&lt;p&gt;L&amp;#39;API Twitter &lt;code&gt;followers/ids&lt;/code&gt; est très utile pour reconstituer le réseau de relations de ces petits comptes avec les comptes d&amp;#39;activistes patentés.&lt;/p&gt;
+
+&lt;p&gt;Dans leur immense majorité, les comptes les plus volubiles sont liés à l&amp;#39;un des comptes ouvertement pro palestiniens :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;Dajjalsystem        Linformatrice, Campagnebds, Alkanz, ybenderbal
+ahenjar             KarimaB_, YASMINAREBEL, MadjidFalastine, Linformatrice, Campagnebds, Alkanz, pauldraszen, s_assbague
+amilcarhanniba1     Campagnebds, ybenderbal, Barakacity
+AgatheNRV           YASMINAREBEL, MadjidFalastine, Campagnebds, Alkanz, ybenderbal, pauldraszen, s_assbague
+NataliaGGarcia5     Campagnebds
+LILTIKKIB           KarimaB_, keyzer_usual, Linformatrice, oxymorus, Campagnebds, Alkanz, ybenderbal, Barakacity, s_assbague
+yanisssou           KarimaB_, MadjidFalastine, Linformatrice, Campagnebds, Alkanz, ybenderbal, Barakacity, pauldraszen, s_assbague
+mouadibun           YASMINAREBEL, keyzer_usual, MadjidFalastine, Linformatrice, oxymorus, Campagnebds, Alkanz, Barakacity, pauldraszen, s_assbague
+Mrelguevara
+blabalade           Campagnebds
+fredussart          jeremo12
+RafikBiff           KarimaB_, Linformatrice, Campagnebds, Alkanz, ybenderbal, Barakacity
+opFethi             KarimaB_, keyzer_usual, MadjidFalastine, Linformatrice, Alkanz, ybenderbal
+BenLevyCohen        jeremo12
+FinDesTemps 
+GozoGazi            KarimaB_, oxymorus
+Mars1300    
+Aevalillith         KarimaB_, MadjidFalastine, Linformatrice, Campagnebds, Alkanz, ybenderbal, Barakacity, pauldraszen, s_assbague
+Giiorgio100         jeremo12
+julievalles         KarimaB_, MadjidFalastine, ybenderbal, pauldraszen, s_assbague&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;En définitive, cette polémique est une &lt;strong&gt;tempête dans un verre d&amp;#39;eau&lt;/strong&gt; qui n&amp;#39;aurait jamais dû sortir des réseaux sociaux ni des cercles militants.&lt;/p&gt;
+</description>
+        <pubDate>Fri, 14 Aug 2015 08:00:00 +0200</pubDate>
+        <link>http://ksahnine.github.io/datascience/unix/bigdata/2015/08/14/analyse-hashtag-telavivsurseine.html</link>
+        <guid isPermaLink="true">http://ksahnine.github.io/datascience/unix/bigdata/2015/08/14/analyse-hashtag-telavivsurseine.html</guid>
+        
+        <category>regular</category>
+        
+        
+        <category>datascience</category>
+        
+        <category>unix</category>
+        
+        <category>bigdata</category>
+        
+      </item>
     
       <item>
         <title>La science des données vue d&#39;un unixien</title>
@@ -1874,157 +2191,6 @@ docker push ksahnine/ratp-rest-api:1.0&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
         <category>microservice</category>
         
         <category>docker</category>
-        
-        <category>dropwizard</category>
-        
-      </item>
-    
-      <item>
-        <title>Le développement de microservices avec Dropwizard</title>
-        <description>&lt;p&gt;Après avoir présenté &lt;strong&gt;Dropwizard&lt;/strong&gt; dans le précédent billet de la série, dont la lecture est un préalable, place aux travaux pratiques.&lt;/p&gt;
-
-&lt;p&gt;Cet article est consacré au développement d’un service de consultation temps-réel des horaires du métro parisien avec &lt;strong&gt;Dropwizard&lt;/strong&gt;.&lt;/p&gt;
-
-&lt;p&gt;L’ensemble du projet est &lt;a href=&quot;https://github.com/ksahnine/trafic-ratp-dropwizard&quot;&gt;disponible sur GitHub&lt;/a&gt;.&lt;/p&gt;
-
-&lt;p&gt;L’interface &lt;em&gt;RESTful&lt;/em&gt; du service est la suivante :&lt;br /&gt;
-&lt;u&gt;&lt;em&gt;Requête&lt;/em&gt; :&lt;/u&gt;
-&lt;pre&gt;
-GET /trafic-ratp/metro/&lt;strong&gt;:numero_ligne&lt;/strong&gt;/&lt;strong&gt;:nom_station&lt;/strong&gt;/&lt;strong&gt;:sens&lt;/strong&gt;
-&lt;/pre&gt;
-où :&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;code&gt;numero_ligne&lt;/code&gt; est le numéro de la ligne du métro&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;nom_station&lt;/code&gt; est le nom de la station de métro pour laquelle on souhaite connaître les prochains passages&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;sens&lt;/code&gt; a 2 valeurs possibles : &lt;code&gt;A&lt;/code&gt; pour &lt;em&gt;Aller&lt;/em&gt; ou &lt;code&gt;R&lt;/code&gt; pour &lt;em&gt;Retour&lt;/em&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;A titre d’exemple, la requête &lt;code&gt;GET /trafic-ratp/metro/14/pyramides/A&lt;/code&gt; restitue la liste des prochains passages de rames de métro de la station &lt;em&gt;Pyramides&lt;/em&gt;, sur la ligne &lt;em&gt;14&lt;/em&gt; en direction de &lt;em&gt;Saint-Lazare&lt;/em&gt;.&lt;/p&gt;
-
-&lt;p&gt;&lt;u&gt;&lt;em&gt;Réponse&lt;/em&gt; :&lt;/u&gt;&lt;br /&gt;
-Le format de la réponse, au format &lt;strong&gt;JSON&lt;/strong&gt;, contient une liste des prochains passages d’une rame dont voici un exemple :&lt;/p&gt;
-
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-json&quot; data-lang=&quot;json&quot;&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;
-  &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;nt&quot;&gt;&amp;quot;direction&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;Saint-Lazare&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;nt&quot;&gt;&amp;quot;attente&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;1 mn&amp;quot;&lt;/span&gt;
-  &lt;span class=&quot;p&quot;&gt;},&lt;/span&gt;
-  &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;nt&quot;&gt;&amp;quot;direction&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;Saint-Lazare&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;nt&quot;&gt;&amp;quot;attente&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;4 mn&amp;quot;&lt;/span&gt;
-  &lt;span class=&quot;p&quot;&gt;},&lt;/span&gt;
-  &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;nt&quot;&gt;&amp;quot;direction&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;Saint-Lazare&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-    &lt;span class=&quot;nt&quot;&gt;&amp;quot;attente&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;7 mn&amp;quot;&lt;/span&gt;
-  &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;h2&gt;Structure de l&amp;#39;application&lt;/h2&gt;
-
-&lt;h3&gt;Architecture&lt;/h3&gt;
-
-&lt;p&gt;Les différents composants constituant l’application sont représentés dans le schéma ci-dessous :&lt;/p&gt;
-
-&lt;p&gt;&lt;center&gt;&lt;img src=&quot;http://blog.inovia-conseil.fr/wp-content/uploads/2015/01/architecture-app.png&quot; alt=&quot;Architecture applicative&quot;&gt;&lt;/center&gt;&lt;/p&gt;
-
-&lt;h3&gt;Configuration de l’application&lt;/h3&gt;
-
-&lt;p&gt;Le fichier de configuration de l’application &lt;code&gt;trafic-ratp.yml&lt;/code&gt; est décrit au format &lt;strong&gt;YAML&lt;/strong&gt;. On externalise en particulier le paramètre applicatif &lt;code&gt;urlRatp&lt;/code&gt;, l’URL du portail de la RATP.
-&lt;script src=&quot;https://gist.github.com/a96a3f5a44e39b9c34c7.js&quot;&gt; &lt;/script&gt;&lt;/p&gt;
-
-&lt;p&gt;Le fichier de configuration pourrait être réduit au minimum. Il est évidemment possible de surcharger la &lt;a href=&quot;https://dropwizard.github.io/dropwizard/manual/configuration.html&quot;&gt;centaine de paramètres&lt;/a&gt; par défaut, dont le port d’écoute du conteneur &lt;em&gt;Jetty&lt;/em&gt; par exemple (port &lt;code&gt;8080&lt;/code&gt; par défaut).&lt;/p&gt;
-
-&lt;p&gt;La classe &lt;code&gt;TraficRatpConfiguration&lt;/code&gt; est le gestionnaire de configuration de l’application. C’est par ce biais que l’on accède aux paramètres applicatifs.
-&lt;script src=&quot;https://gist.github.com/1b478e5ccf87453fc8dd.js&quot;&gt; &lt;/script&gt;&lt;/p&gt;
-
-&lt;h3&gt;Objet métier &lt;code&gt;Rame&lt;/code&gt;&lt;/h3&gt;
-
-&lt;p&gt;L’objet métier &lt;code&gt;Rame.java&lt;/code&gt; modélise l’état du passage d’une rame de métro. Il possède deux propriétés : la direction et la durée d’attente.
-&lt;script src=&quot;https://gist.github.com/372c92038462887b47e4.js&quot;&gt; &lt;/script&gt;&lt;/p&gt;
-
-&lt;h3&gt;Ressource &lt;code&gt;TraficRatpResource&lt;/code&gt;&lt;/h3&gt;
-
-&lt;p&gt;La ressource (au sens REST du terme) implémente le point de terminaison du service JAX-RS. La récupération des informations sur le trafic consiste à interroger le portail &lt;a href=&quot;http://www.ratp.fr/&quot;&gt;ratp.fr&lt;/a&gt; puis à extraire les informations utiles en utilisant la technique du &lt;a href=&quot;http://fr.wikipedia.org/wiki/Web_scraping&quot;&gt;&lt;em&gt;web scraping&lt;/em&gt;&lt;/a&gt;. La librairie &lt;a href=&quot;http://jsoup.org/&quot;&gt;&lt;strong&gt;jsoup&lt;/strong&gt;&lt;/a&gt; est utilisée à cet effet.
-&lt;script src=&quot;https://gist.github.com/1f9f2c0839a46d19026b.js&quot;&gt; &lt;/script&gt;&lt;/p&gt;
-
-&lt;p&gt;On récupère les 3 paramètres &lt;code&gt;ligne&lt;/code&gt;, &lt;code&gt;station&lt;/code&gt; et &lt;code&gt;sens&lt;/code&gt; dans le nom de la ressource.&lt;/p&gt;
-
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-java&quot; data-lang=&quot;java&quot;&gt;&lt;span class=&quot;nd&quot;&gt;@Path&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;/metro/{ligne: [0-9]{1,2}[b]{0,1}}/{station}/{sens: [A|R]}&amp;quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;p&gt;Noter que l’on a choisit de poser des contraintes en utilisant des expressions régulières au niveau de l’annotation &lt;code&gt;@Path&lt;/code&gt;. Le paramètre &lt;code&gt;sens&lt;/code&gt; par exemple n’a que 2 valeurs possibles : &lt;code&gt;A&lt;/code&gt; ou &lt;code&gt;R&lt;/code&gt;.&lt;/p&gt;
-
-&lt;p&gt;Si l’expression régulière est fausse, le code statut &lt;code&gt;HTTP 404&lt;/code&gt; est retourné, ce qui est logique puisqu’on considère que la ressource n’existerait pas dans ce cas.&lt;/p&gt;
-
-&lt;p&gt;Malheureusement, la validation des paramètres de méthode par annotation (&lt;code&gt;@Valid&lt;/code&gt;) ne fonctionne pas avec &lt;em&gt;Dropwizard&lt;/em&gt; 0.7.x (qui intègre &lt;em&gt;Jersey&lt;/em&gt; 1.x). Il faudra attendre une version compatible avec &lt;em&gt;Jersey&lt;/em&gt; 2.x).&lt;/p&gt;
-
-&lt;h3&gt;Exception mapper &lt;code&gt;IOExceptionMapper&lt;/code&gt;&lt;/h3&gt;
-
-&lt;p&gt;Cette classe permet de traiter l’exception &lt;code&gt;IOException&lt;/code&gt;, lorsqu’elle est levée pendant l’interrogation du portail &lt;a href=&quot;http://www.ratp.fr/&quot;&gt;ratp.fr&lt;/a&gt;, sous la forme d’une réponse &lt;code&gt;HTTP 500&lt;/code&gt; avec une charge utile au format &lt;strong&gt;JSON&lt;/strong&gt; contenant le message d’erreur technique.
-&lt;script src=&quot;https://gist.github.com/28a8a7a423ca8990365d.js&quot;&gt; &lt;/script&gt;&lt;/p&gt;
-
-&lt;h3&gt;Health checker &lt;code&gt;RatpHealthChecker&lt;/code&gt;&lt;/h3&gt;
-
-&lt;p&gt;Le test de disponibilité d’une ressource vitale de l’application consiste à s’assurer de la disponibilité du portail RATP (le test, basique, n’a qu’une valeur pédagogique).
-&lt;script src=&quot;https://gist.github.com/b36f6a56c78f162d0113.js&quot;&gt; &lt;/script&gt;&lt;/p&gt;
-
-&lt;p&gt;Le &lt;em&gt;&amp;quot;bilan de santé&amp;quot;&lt;/em&gt; de l’application est consultable par simple interrogation de la ressource &lt;code&gt;GET /healthcheck?pretty=true&lt;/code&gt; dont voici la réponse lorsque le système est opérationnel :&lt;/p&gt;
-
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-json&quot; data-lang=&quot;json&quot;&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-  &lt;span class=&quot;nt&quot;&gt;&amp;quot;Dispo site RATP&amp;quot;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;nt&quot;&gt;&amp;quot;healthy&amp;quot;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;true&lt;/span&gt;
-  &lt;span class=&quot;p&quot;&gt;},&lt;/span&gt;
-  &lt;span class=&quot;nt&quot;&gt;&amp;quot;deadlocks&amp;quot;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;nt&quot;&gt;&amp;quot;healthy&amp;quot;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;true&lt;/span&gt;
-  &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;h3&gt;Classe application &lt;code&gt;TraficRatpApplication&lt;/code&gt;&lt;/h3&gt;
-
-&lt;p&gt;Il s’agit de la classe &lt;code&gt;main&lt;/code&gt; assemblant le tout, responsable du démarrage de l’application (enregistrement des &lt;em&gt;ressources&lt;/em&gt;, &lt;em&gt;exception mappers&lt;/em&gt;, &lt;em&gt;configuration&lt;/em&gt;, &lt;em&gt;health checkers&lt;/em&gt;).
-&lt;script src=&quot;https://gist.github.com/c380ea1236e8b89db73e.js&quot;&gt; &lt;/script&gt;&lt;/p&gt;
-
-&lt;h2&gt;Construction et exécution&lt;/h2&gt;
-
-&lt;p&gt;Récupérer le &lt;a href=&quot;https://github.com/ksahnine/trafic-ratp-dropwizard&quot;&gt;code source du projet&lt;/a&gt; sur GitHub :&lt;/p&gt;
-
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;git clone https://github.com/ksahnine/trafic-ratp-dropwizard.git&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;p&gt;puis construire le projet &lt;em&gt;Maven&lt;/em&gt; (fabrique l’unité de déploiement &lt;code&gt;trafic-ratp-1.0.0-SNAPSHOT.jar&lt;/code&gt;) :&lt;/p&gt;
-
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;&lt;span class=&quot;nb&quot;&gt;cd &lt;/span&gt;trafic-ratp-dropwizard
-mvn package&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;p&gt;Pour démarrer le service, exécuter la commande :&lt;/p&gt;
-
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;java -jar target/trafic-ratp-1.0.0-SNAPSHOT.jar server trafic-ratp.yml&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;p&gt;On utilisera &lt;a href=&quot;http://curl.haxx.se/&quot;&gt;&lt;strong&gt;cURL&lt;/strong&gt;&lt;/a&gt; en association avec l’utilitaire &lt;a href=&quot;http://stedolan.github.io/jq/&quot;&gt;&lt;code&gt;jq&lt;/code&gt;&lt;/a&gt; pour requêter le service et formater la sortie standard.&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;prochains passages du métro ligne &lt;em&gt;14&lt;/em&gt; / Station &lt;em&gt;Pyramides&lt;/em&gt; / Direction &lt;em&gt;Saint-Lazare&lt;/em&gt; :&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;curl -s http://localhost:8080/trafic-ratp/metro/14/pyramides/A &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; jq &lt;span class=&quot;s2&quot;&gt;&amp;quot;.&amp;quot;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;ul&gt;
-&lt;li&gt;prochains passages du métro ligne &lt;em&gt;14&lt;/em&gt; / Station &lt;em&gt;Pyramides&lt;/em&gt; / Direction &lt;em&gt;Olympiades&lt;/em&gt; :&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;curl -s http://localhost:8080/trafic-ratp/metro/14/pyramides/R &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; jq &lt;span class=&quot;s2&quot;&gt;&amp;quot;.&amp;quot;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;p&gt;Le &lt;a href=&quot;/microservice/docker/dropwizard/2015/01/21/dockeriser-microservice.html&quot;&gt;prochain billet&lt;/a&gt; de la série sera consacré au déploiement d’un microservice Dropwizard via &lt;a href=&quot;https://www.docker.com/&quot;&gt;&lt;strong&gt;Docker&lt;/strong&gt;&lt;/a&gt;.&lt;/p&gt;
-</description>
-        <pubDate>Mon, 19 Jan 2015 07:00:00 +0100</pubDate>
-        <link>http://ksahnine.github.io/architecture/microservice/dropwizard/2015/01/19/developpement-microservice-dropwizard.html</link>
-        <guid isPermaLink="true">http://ksahnine.github.io/architecture/microservice/dropwizard/2015/01/19/developpement-microservice-dropwizard.html</guid>
-        
-        <category>regular</category>
-        
-        
-        <category>architecture</category>
-        
-        <category>microservice</category>
         
         <category>dropwizard</category>
         
