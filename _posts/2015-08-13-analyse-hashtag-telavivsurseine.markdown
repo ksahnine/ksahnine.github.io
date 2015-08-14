@@ -51,10 +51,11 @@ En 2 commandes on établit qu'il y a eu `76 698` tweets pour `16 666` comptes, s
 Voyons comment sont répartis les tweets par type de support :
 
 {% highlight sh %}
-$ cat *.json | jq ".source" | sed 's/"\(<.*>\)\(.*\)\(<.*>\)"/\2/' | sort | uniq -c | sort -rn | head -3
+$ cat *.json | jq ".source" | sed 's/"\(<.*>\)\(.*\)\(<.*>\)"/\2/' | sort | uniq -c | sort -rn | head -4
 23210 Twitter for iPhone
 21341 Twitter for Android
 19954 Twitter Web Client
+ 3444 Twitter for iPad
 {% endhighlight %}
 
 Nous en aurons besoin plus tard. Relevons au passage que l'activité est majoritairement mobile.
@@ -146,7 +147,7 @@ La distribution des tweets par canal est intéressante :
 [![Courbe des tweets via un navigateur Web](/assets/article_images/web.png)](/assets/article_images/web.png)
 
 Les profils d'activité pour les canaux *iPhone*, *Android* et *web* sont assez semblables.<br />
-En superposant les courbes, l'activité *web* est toujours substantiellement en deçà des supports *iPhone* et *Android* **sauf durant le pic du *10 Août* vers 19h00**.
+En superposant les courbes, l'activité *web* est toujours substantiellement en deçà des supports *iPhone* ou *Android* **sauf durant le pic du *10 Août* vers 19h00**.
 
 Cette sur-activité sur ce canal est peut-être induite par des comptes fictifs, mais il n'y a pas de certitude.
 
