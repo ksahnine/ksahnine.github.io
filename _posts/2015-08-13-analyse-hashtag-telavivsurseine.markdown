@@ -5,7 +5,7 @@ titleColor: "#fff"
 date:   2015-08-14 06:00:00
 categories: datascience unix bigdata
 tags: regular
-image: /assets/article_images/peace.jpg
+image: /assets/images_article/peace.jpg
 legend: Salam / Shalom
 ---
 L'organisation de l'opération *"Tel Aviv Sur Seine"* a suscité une [importante polémique](http://www.lemonde.fr/societe/article/2015/08/09/tel-aviv-sur-seine-la-mairie-de-paris-ne-renonce-pas-malgre-la-polemique_4718346_3224.html) née d'abord au sein des **réseaux sociaux** (*Twitter* en particulier) avant de prendre une tournure **politique** puis **médiatique**.
