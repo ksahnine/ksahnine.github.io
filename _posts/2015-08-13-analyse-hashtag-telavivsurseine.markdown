@@ -79,7 +79,7 @@ Etablissons le classement des comptes les plus retweetés le *10 Août* entre *1
 {% endhighlight %}
 On constate que le compte `@Campagnebds` ressort très largement en tête.<br />
 Ce pic peut donc être parfaitement corrélé avec l'annonce d'un [*tweet storm*](https://twitter.com/Campagnebds/status/630378884563906560) sur le compte de la campagne [BDS (*Boycott, Désinvestissement et Sanctions*)](https://fr.wikipedia.org/wiki/Boycott,_d%C3%A9sinvestissement_et_sanctions) :
-<center>{% tweet 630378884563906560 %}</center>
+<center>![](/assets/article_images/bds.png)</center>
 
 A noter la présence en seconde position du compte du *Parti de Gauche* : la polémique prend largement une **tournure politique**. On ne reverra plus jamais le compte du PdG à une telle position dans le classement des RT.
 
