@@ -32,8 +32,8 @@ Dans mon prochain billet, j'aborderai à nouveau ce sujet mais sous un angle bea
 
 ### Collecte des données
 Le script de collecte consiste à rechercher l'ensemble des tweets portant le hashtag `#TelAvivSurSeine`. Il s'appuie sur `tweepy`, un excellent client de l'API Twitter pour l'écosystème Python.<br />
-J'ai pu collecter `76 698` tweets au format **JSON** sur une période allant du *03 Août 2015 10h49* au *12 Août 2015 08h03*, stockés dans des fichiers horodatés (`2015-08-*DD*_tweets.json`) et représantant plus de 800 Mo de données brutes.<br />
-Chaque tweet collecté au format JSON contient une masse très importante d'informations que nous exploiterons avec l'utilitaire `jq`, l'équivalent de la commande `grep` adaptée au format JSON.<br />
+J'ai pu collecter `76 698` tweets au format **JSON** sur une période allant du *03 Août 2015 10h49* au *12 Août 2015 08h03*, stockés dans des fichiers horodatés (`2015-08-*DD*_tweets.json`) et représentant plus de 800 Mo de données brutes.<br />
+Chaque tweet collecté au format JSON contient une masse très importante d'informations que nous exploiterons avec l'utilitaire [`jq`](https://stedolan.github.io/jq/), l'équivalent de la commande `grep` adaptée au format JSON.<br />
 La structure d'un tweet est décrite sur le [portail de dev de Twitter](https://dev.twitter.com/overview/api/tweets).
 
 ### Eléments statistiques sur l'ensemble de la période
