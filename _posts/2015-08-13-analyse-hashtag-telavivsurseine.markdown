@@ -24,7 +24,7 @@ J'en ai tiré les faits suivants :
 - la mobilisation sur *Twitter* contre l'évènement `#TelAvivSurSeine` n'est pas assis sur un mouvement massif, spontané et populaire
 - elle est d'abord le fait d'une poignée de comptes militants jouissant d'une certaine audience et liés les uns aux autres par des affinités politiques ou identitaires
 - le compte du *Parti de Gauche* et de militants adhérents à ce parti a joué un rôle important dans la médiatisation de la polémique, à l'instar de comptes de personnalités connues et pro évènement
-- la campagne BDS du *10 Août 2015* contre l'évènement a été efficace et coordonnée
+- la campagne [BDS](https://fr.wikipedia.org/wiki/Boycott,_d%C3%A9sinvestissement_et_sanctions) du *10 Août 2015* contre l'évènement a été efficace et coordonnée
 - sur toutes les périodes étudiées, les clients Twitter les plus utilisés sont, dans l'ordre, le client *iPhone*, le client *Android* puis le client *Web* **sauf** le *10 Août 2015* autour de 19h où c'est le client *Web* (navigateur) qui arrive en tête. Cette anormalité pourrait s'expliquer par une utilisation de comptes fictifs durant cette période, et destinés à *faire du bruit*.
 
 Je présenterai dans cet article les résultats obtenus en évitant les digressions techniques car l'article serait trop long.<br />
