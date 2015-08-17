@@ -216,7 +216,7 @@ join -1 2 -2 2 stats_brevet_meTB.csv stats_brevet_full.csv | \
 {% endhighlight %}
 [<sub><sup>Source : `reduce-join_results.sh`</sup></sub>](https://github.com/ksahnine/datascience-brevet-mentions/blob/master/app/reduce-join_results.sh)
 
-Voici un extrait du fichier `brevet-mentions-2015.csv où l’on relève que 16,3 % des prénommées Amandine ont obtenu une mention TB :
+Voici un extrait du fichier `brevet-mentions-2015.csv` où l’on relève que 16,3 % des prénommées Amandine ont obtenu une mention TB :
 {% highlight text %}
 […]
 Allan 12 228 5,3
