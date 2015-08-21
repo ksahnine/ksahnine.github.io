@@ -327,7 +327,7 @@ Sinon, vous pouvez utiliser mes routines :
 ./compute.sh csv_retweeted_users ../../data/*.json ".*" 15 >> users.csv
 {% endhighlight %}
 
-Reconstituons le réseau de rélations entre ces utilisateurs :
+Reconstituons le réseau de relations entre ces utilisateurs :
 {% highlight sh %}
 ./social-network.py -l users.csv
 {% endhighlight %}
@@ -351,8 +351,8 @@ Le graphe orienté est généré à l'aide de l'excellente librairie [D3](http:/
 
 Les cercles représentent les comptes. Leur taille est proportionnelle à leur nombre d'abonnés.
 
-Il s'agit d'une version très expérimentale bien sûr, mais je trouve remarquable la visualisation des 2 groupes de *tweetos* dont l'un concentre les tweets défavorable à l'évènement.<br />
-Par ailleurs, on visualise bien les signes révélateur d'[astroturfing](https://fr.wikipedia.org/wiki/Astroturfing).
+Il s'agit d'une version très expérimentale bien sûr, mais je trouve remarquable la visualisation des 2 groupes de *tweetos* dont l'un concentre les tweets défavorables à l'évènement.<br />
+Par ailleurs, on visualise bien les signes révélateurs d'[astroturfing](https://fr.wikipedia.org/wiki/Astroturfing).
 
 [jekyll]:      http://jekyllrb.com
 [jekyll-gh]:   https://github.com/jekyll/jekyll
