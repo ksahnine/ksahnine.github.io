@@ -13,6 +13,7 @@ J'ai présenté dans [mon article précédent](/datascience/unix/bigdata/2015/08
 Ces résutats sont le fruit d'une analyse rationnelle et distanciée des tweets associés à ce hashtag, analyse à la portée d'un informaticien suffisamment à l'aise sous **UNIX** et familier du langage de programmation **Python**.
 
 Je présenterai dans cet article les outils et techniques m'ayant permis d'effectuer cette analyse. <br />
+Le code est disponible dans [mon repository *GitHub*](https://github.com/ksahnine/datascience-twitter). <br />
 Nous verrons comment **extraire**, **explorer**, **synthétiser** et **visualiser** de la connaissance à partir d'une importante masse d'information disponible sur Twitter. Ainsi nous verrons, entre autres, comment :
 
 - visualiser l'évolution du nombre de tweets et retweets par heure
