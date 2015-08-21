@@ -28,7 +28,7 @@ J'en ai tiré les faits suivants :
 - sur toutes les périodes étudiées, les clients Twitter les plus utilisés sont, dans l'ordre, le client *iPhone*, le client *Android* puis le client *Web* **sauf** le *10 Août 2015* autour de 19h où c'est le client *Web* (navigateur) qui arrive en tête. Cette anormalité pourrait s'expliquer par une utilisation de comptes fictifs durant cette période, et destinés à *faire du bruit*.
 
 Je présenterai dans cet article les résultats obtenus en évitant les digressions techniques car l'article serait trop long.<br />
-Dans mon [prochain billet](/datascience/unix/bigdata/2015/08/19/exploration-donnees-twitter.html), j'aborderai à nouveau ce sujet mais sous un angle beaucoup plus technique, à l'occasion duquel je publierai sur [mon compte *GitHub*](https://github.com/ksahnine) l'ensemble du code source m'ayant permis d'obtenir ces résultats.
+Dans mon [prochain billet](/datascience/unix/bigdata/2015/08/19/exploration-donnees-twitter.html), j'aborderai à nouveau ce sujet mais sous un angle beaucoup plus technique, à l'occasion duquel je publierai sur [mon compte *GitHub*](https://github.com/ksahnine/datascience-twitter) l'ensemble du code source m'ayant permis d'obtenir ces résultats.
 
 ### Collecte des données
 Le script de collecte consiste à rechercher l'ensemble des tweets portant le hashtag `#TelAvivSurSeine`. Il s'appuie sur `tweepy`, un excellent client de l'API Twitter pour l'écosystème Python.<br />
