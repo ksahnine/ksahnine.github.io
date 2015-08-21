@@ -6,9 +6,383 @@
 </description>
     <link>http://ksahnine.github.io/</link>
     <atom:link href="http://ksahnine.github.io/feed.xml" rel="self" type="application/rss+xml" />
-    <pubDate>Sun, 16 Aug 2015 15:47:05 +0200</pubDate>
-    <lastBuildDate>Sun, 16 Aug 2015 15:47:05 +0200</lastBuildDate>
+    <pubDate>Fri, 21 Aug 2015 17:19:21 +0200</pubDate>
+    <lastBuildDate>Fri, 21 Aug 2015 17:19:21 +0200</lastBuildDate>
     <generator>Jekyll v2.5.3</generator>
+    
+      <item>
+        <title>L&#39;exploration de données Twitter</title>
+        <description>&lt;p&gt;J&amp;#39;ai présenté dans &lt;a href=&quot;/datascience/unix/bigdata/2015/08/14/analyse-hashtag-telavivsurseine.html&quot;&gt;mon article précédent&lt;/a&gt; les résultats de l&amp;#39;analyse du mot croisillon &lt;code&gt;#TelAvivSurSeine&lt;/code&gt;, l&amp;#39;évènement au centre d&amp;#39;une &lt;a href=&quot;http://www.lemonde.fr/societe/article/2015/08/09/tel-aviv-sur-seine-la-mairie-de-paris-ne-renonce-pas-malgre-la-polemique_4718346_3224.html&quot;&gt;polémique&lt;/a&gt; qui n&amp;#39;aurait jamais dû sortir des réseaux sociaux ni des cercles militants.&lt;/p&gt;
+
+&lt;p&gt;Ces résutats sont le fruit d&amp;#39;une analyse rationnelle et distanciée des tweets associés à ce hashtag, analyse à la portée d&amp;#39;un informaticien suffisamment à l&amp;#39;aise sous &lt;strong&gt;UNIX&lt;/strong&gt; et familier du langage de programmation &lt;strong&gt;Python&lt;/strong&gt;.&lt;/p&gt;
+
+&lt;p&gt;Je présenterai dans cet article les outils et techniques m&amp;#39;ayant permis d&amp;#39;effectuer cette analyse. &lt;br /&gt;
+Nous verrons comment &lt;strong&gt;extraire&lt;/strong&gt;, &lt;strong&gt;explorer&lt;/strong&gt;, &lt;strong&gt;synthétiser&lt;/strong&gt; et &lt;strong&gt;visualiser&lt;/strong&gt; de la connaissance à partir d&amp;#39;une importante masse d&amp;#39;information disponible sur Twitter. Ainsi nous verrons, entre autres, comment :&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;visualiser l&amp;#39;évolution du nombre de tweets et retweets par heure&lt;/li&gt;
+&lt;li&gt;identifier les comptes les plus retweetés ou mentionnés&lt;/li&gt;
+&lt;li&gt;identifier les comptes ayant le plus tweeté ou retweeté&lt;/li&gt;
+&lt;li&gt;comptabiliser les hashtags les plus utilisés&lt;/li&gt;
+&lt;li&gt;identifier les photos les plus diffusées&lt;/li&gt;
+&lt;li&gt;visualiser le réseau social constitué des 15 comptes ayant le plus (re)tweeté et des 15 comptes les plus retweetés :&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;center&gt;&lt;img src=&quot;/assets/article_images/social_network.png&quot; alt=&quot;Réseau social de différents protagonistes&quot;&gt;&lt;/center&gt;&lt;/p&gt;
+
+&lt;h2&gt;Collecte des données&lt;/h2&gt;
+
+&lt;p&gt;Vous devez évidemment disposer d&amp;#39;un compte Twitter. Si c&amp;#39;est le cas, connectez-vous sur le &lt;a href=&quot;https://apps.twitter.com&quot;&gt;gestionnaire d&amp;#39;applications Twitter&lt;/a&gt; puis : &lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;remplissez le formulaire de création d&amp;#39;une application Twitter.&lt;/li&gt;
+&lt;li&gt;cliquer sur l&amp;#39;onglet &lt;em&gt;Keys and Access Token&lt;/em&gt; et générer le jeton d&amp;#39;accès (bouton &lt;em&gt;Create my access token&lt;/em&gt;)&lt;/li&gt;
+&lt;li&gt;récupérez :
+
+&lt;ul&gt;
+&lt;li&gt;la clé de l&amp;#39;API (&lt;code&gt;Consumer Key&lt;/code&gt;) et son mot de passe (&lt;code&gt;Consumer Secret&lt;/code&gt;)&lt;/li&gt;
+&lt;li&gt;le jeton d&amp;#39;accès (&lt;code&gt;Access Token&lt;/code&gt;) et son mot de passe (&lt;code&gt;Access Token Secret&lt;/code&gt;)&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Note :&lt;/strong&gt; votre profil Twitter doit être renseigné avec un numéro de téléphone valide sans quoi il ne vous sera pas possible de créer une application.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;L&amp;#39;utilisation de l&amp;#39;API Twitter est plafonnée &lt;a href=&quot;https://dev.twitter.com/rest/public/rate-limits&quot;&gt;selon des critères variables&lt;/a&gt;. &lt;br /&gt;
+Vous ne pourrez par exemple pas faire plus de 15 appels à la requête &lt;code&gt;GET followers/ids&lt;/code&gt; par quart d&amp;#39;heure. Néanmoins, un seul appel restitue jusqu&amp;#39;à 5000 identifiants de &lt;em&gt;followers&lt;/em&gt;.&lt;br /&gt;
+Fort heureusement, la librairie &lt;code&gt;tweepy&lt;/code&gt; propose un mode (&lt;a href=&quot;http://docs.tweepy.org/en/latest/api.html&quot;&gt;&lt;code&gt;wait_on_rate_limit&lt;/code&gt;&lt;/a&gt;) permettant au client de temporiser lorsque le quota est atteint, puis de reprendre le processus.&lt;/p&gt;
+
+&lt;p&gt;Par ailleurs, notez que l&amp;#39;API de recherche (&lt;code&gt;GET search/tweets&lt;/code&gt;) a une profondeur de &lt;strong&gt;10 jours maximum&lt;/strong&gt;.  &lt;/p&gt;
+
+&lt;p&gt;Je mets à disposition &lt;a href=&quot;https://github.com/ksahnine/datascience-twitter/blob/master/scripts/collect/collect.py&quot;&gt;un script&lt;/a&gt; Python implémentant la collecte des tweets, à adapter selon votre contexte et après avoir renseigné les vecteurs d&amp;#39;accréditation (&lt;em&gt;Consumer key&lt;/em&gt;, &lt;em&gt;Consumer secret&lt;/em&gt;, &lt;em&gt;Access token&lt;/em&gt;, &lt;em&gt;Access token secret&lt;/em&gt;).&lt;/p&gt;
+
+&lt;p&gt;Le mode opératoire d&amp;#39;installation est le suivant :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;pip install tweepy
+git clone https://github.com/ksahnine/datascience-twitter.git&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Editez le script &lt;code&gt;collect.py&lt;/code&gt; situé dans le répertoire &lt;code&gt;datascience-twitter/scripts/collect&lt;/code&gt; et renseignez les variables &lt;code&gt;consumer_key&lt;/code&gt;, &lt;code&gt;consumer_secret&lt;/code&gt;, &lt;code&gt;access_token&lt;/code&gt; et &lt;code&gt;access_token_secret&lt;/code&gt; avec les vecteurs d&amp;#39;accéditation créés plus haut.&lt;/p&gt;
+
+&lt;p&gt;Ensuite, vous pourrez lancer la commande suivante afin de collecter les tweets en relation avec le hashtag &lt;code&gt;#TelAvivSurSeine&lt;/code&gt; et &lt;em&gt;dumper&lt;/em&gt; les résultats dans le répertoire &lt;code&gt;./data&lt;/code&gt; :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;&lt;span class=&quot;nb&quot;&gt;cd &lt;/span&gt;datascience-twitter/scripts/collect
+python ./collect.py -s &lt;span class=&quot;s2&quot;&gt;&amp;quot;#TelAvivSurSeine&amp;quot;&lt;/span&gt; -o &lt;span class=&quot;s2&quot;&gt;&amp;quot;./data&amp;quot;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h2&gt;Quelques préliminaires&lt;/h2&gt;
+
+&lt;h3&gt;Structure d&amp;#39;un tweet&lt;/h3&gt;
+
+&lt;p&gt;Avant d&amp;#39;explorer les données, il est important de connaître la structure d&amp;#39;un tweet restitué par l&amp;#39;API Twitter. Elle est pleinement décrite sur le &lt;a href=&quot;https://dev.twitter.com/overview/api/tweets&quot;&gt;portail de dev de Twitter&lt;/a&gt;.&lt;br /&gt;
+Pour vous donner une idée, voici &lt;a href=&quot;https://gist.github.com/ksahnine/bfd56bd72b1a3e3e0d2e&quot;&gt;un lien&lt;/a&gt; contenant un exemple complet de tweet au format &lt;strong&gt;JSON&lt;/strong&gt;. &lt;br /&gt;
+On trouvera ci-dessous une représentation très élaguée d&amp;#39;un tweet, ne contenant que les propriétés que nous exploiterons dans le cadre de cet article :&lt;/p&gt;
+
+&lt;script src=&quot;https://gist.github.com/a33b59a8884d2c38ab9e.js&quot;&gt; &lt;/script&gt;
+
+&lt;p&gt;Voici une description des principaux champs :&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;.text&lt;/code&gt; : contenu du texte associé au tweet&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;.created_at&lt;/code&gt; : date et heure UTC de création du tweet (ou retweet) &lt;/li&gt;
+&lt;li&gt;&lt;code&gt;.source&lt;/code&gt; : support utilisé (terminal Android dans l&amp;#39;exemple)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;.entities.hashtags&lt;/code&gt; : liste des mots croisillons contenu dans le tweet&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;.entities.user_mentions&lt;/code&gt; : liste des comptes mentionnés dans le tweet&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;.media&lt;/code&gt; : liste des ressources médias contenues dans le tweet (des images par exemple)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;.user.screen_name&lt;/code&gt; : nom du compte ayant tweeté (ce qui suit après le caractère &lt;code&gt;@&lt;/code&gt;)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;.user.followers_count&lt;/code&gt; : nombre d&amp;#39;abonnés à ce compte&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;.user.friends_count&lt;/code&gt; : nombre de comptes suivis &lt;/li&gt;
+&lt;li&gt;&lt;code&gt;.retweeted_status&lt;/code&gt; : contenu du tweet à l&amp;#39;origine du retweet&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;.quoted_status&lt;/code&gt; : contenu du tweet à l&amp;#39;origine de la citation&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3&gt;Outils&lt;/h3&gt;
+
+&lt;p&gt;J&amp;#39;ai une affinité particulière pour les outils en ligne de commande. Je vous recommande les suivants :&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;https://stedolan.github.io/jq/&quot;&gt;&lt;code&gt;jq&lt;/code&gt;&lt;/a&gt; est un extraordinaire outil permettant de requêter des structures de données au format &lt;strong&gt;JSON&lt;/strong&gt;. C&amp;#39;est un authentique couteau suisse absolument indispensable pour quiconque exploite des données sous ce format (c&amp;#39;est à dire, tout le monde...). &lt;br /&gt;
+Bien qu&amp;#39;installable via &lt;code&gt;pip&lt;/code&gt;, je vous conseille d&amp;#39;installer directement la version binaire pour votre plateforme 64 bits. A ce jour, la version 1.5 est disponible sous &lt;a href=&quot;https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64&quot;&gt;Linux&lt;/a&gt;, &lt;a href=&quot;https://github.com/stedolan/jq/releases/download/jq-1.5/jq-osx-amd64&quot;&gt;OS X&lt;/a&gt;, &lt;a href=&quot;https://github.com/stedolan/jq/releases/download/jq-1.5/jq-win64.exe&quot;&gt;Windows&lt;/a&gt; ou &lt;a href=&quot;https://stedolan.github.io/jq/download/&quot;&gt;d&amp;#39;autres plateformes&lt;/a&gt;&lt;br /&gt;
+Je trouve que cet outil permet de mieux &lt;em&gt;sentir&lt;/em&gt; les données. Par ailleurs, il peut être très efficacement associés à d&amp;#39;autres commandes Unix (&lt;code&gt;wc&lt;/code&gt;, &lt;code&gt;sort&lt;/code&gt;, &lt;code&gt;sed&lt;/code&gt;, &lt;code&gt;awk&lt;/code&gt;, &lt;code&gt;join&lt;/code&gt; etc.) jusqu&amp;#39;à obtenir le résultat final.&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;http://www.gnuplot.info/&quot;&gt;&lt;code&gt;gnuplot&lt;/code&gt;&lt;/a&gt; est un logiciel multiplateforme produisant des représentations graphiques de données en 2D ou 3D&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;csvlook&lt;/code&gt; est un utilitaire permettant de formater proprement les données sous la forme de tableaux. Il est intégré au module Python &lt;a href=&quot;https://csvkit.readthedocs.org/&quot;&gt;&lt;strong&gt;csvkit&lt;/strong&gt;&lt;/a&gt; dont le mode opératoire d&amp;#39;installation est des plus simples : &lt;code&gt;pip install csvkit&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Note&lt;/strong&gt; : vérifier les &lt;a href=&quot;http://csvkit.readthedocs.org/en/latest/install.html&quot;&gt;prérequis d&amp;#39;installation&lt;/a&gt; en particulier sous Ubuntu&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h2&gt;Exploration des données&lt;/h2&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Note :&lt;/strong&gt; si vous souhaitez faire l&amp;#39;économie de la collecte des données et vous adonner directement à leur exploration, je mets à disposition un échantillon de données brutes (toute la journée du &lt;em&gt;10 Août 2015&lt;/em&gt;).&lt;/p&gt;
+
+&lt;p&gt;Pour récupérer le jeu de données :&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;git clone https://github.com/ksahnine/datascience-twitter.git
+&lt;span class=&quot;nb&quot;&gt;cd &lt;/span&gt;datascience-twitter
+gunzip data/*.gz&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h3&gt;Visualisation&lt;/h3&gt;
+
+&lt;p&gt;Produisons le fichier &lt;code&gt;courbe_tweets.csv&lt;/code&gt; (séparateur &lt;code&gt;,&lt;/code&gt;) contenant la série temporelle du nombre de tweets par tranche horaire :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ LANG&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;en_US
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;jq &lt;span class=&quot;s2&quot;&gt;&amp;quot;.created_at&amp;quot;&lt;/span&gt; data/*.json &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; xargs -I ? date -j -f &lt;span class=&quot;s2&quot;&gt;&amp;quot;%a %h %d %H:%M:%S %z %Y&amp;quot;&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;?&amp;quot;&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;+%Y-%m-%d_%H:00:00&amp;quot;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; sort &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; uniq -c &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; sed -e &lt;span class=&quot;s1&quot;&gt;&amp;#39;s/^ *//;s/ /,/&amp;#39;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; awk -F&lt;span class=&quot;s2&quot;&gt;&amp;quot;,&amp;quot;&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&amp;#39;{ print $2 &amp;quot;,&amp;quot; $1}&amp;#39;&lt;/span&gt; &amp;gt; courbe_tweets.csv&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Note :&lt;/strong&gt; notez que l&amp;#39;heure UTC de création des tweets est convertie en heure locale&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Une fois le fichier généré, produisons sa représentation graphique avec &lt;code&gt;gnuplot&lt;/code&gt; : &lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;gnuplot &lt;span class=&quot;s&quot;&gt;&amp;lt;&amp;lt;EOF&lt;/span&gt;
+&lt;span class=&quot;s&quot;&gt;set datafile separator &amp;quot;,&amp;quot;&lt;/span&gt;
+&lt;span class=&quot;s&quot;&gt;set timefmt &amp;#39;%Y-%m-%d_%H:%M:%S&amp;#39;&lt;/span&gt;
+
+&lt;span class=&quot;s&quot;&gt;set xdata time&lt;/span&gt;
+&lt;span class=&quot;s&quot;&gt;set xtic rotate by -45 scale 0&lt;/span&gt;
+&lt;span class=&quot;s&quot;&gt;set format x &amp;#39;%Y-%m-%d&amp;#39;&lt;/span&gt;
+&lt;span class=&quot;s&quot;&gt;set ylabel &amp;quot;Nb tweets&amp;quot;&lt;/span&gt;
+
+&lt;span class=&quot;s&quot;&gt;set grid ytics&lt;/span&gt;
+&lt;span class=&quot;s&quot;&gt;set grid xtics&lt;/span&gt;
+
+&lt;span class=&quot;s&quot;&gt;plot &amp;#39;courbe_tweets.csv&amp;#39; u 1:2 with lines title &amp;#39;Timeseries #TelAvivSurSeine&amp;#39;&lt;/span&gt;
+&lt;span class=&quot;s&quot;&gt;EOF&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;a href=&quot;/assets/article_images/TelAv_timeseries.png&quot;&gt;&lt;img src=&quot;/assets/article_images/TelAv_timeseries.png&quot; alt=&quot;Timeseries du hashtag #TelAvivSurSeine&quot;&gt;&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;Autre exemple. Produisons le fichier &lt;code&gt;devices.csv&lt;/code&gt; contenant la distribution des tweets par &lt;code&gt;device&lt;/code&gt; :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;jq &lt;span class=&quot;s2&quot;&gt;&amp;quot;.source&amp;quot;&lt;/span&gt; data/*.json &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; sed &lt;span class=&quot;s1&quot;&gt;&amp;#39;s/&amp;quot;\(&amp;lt;.*&amp;gt;\)\(.*\)\(&amp;lt;.*&amp;gt;\)&amp;quot;/\2/&amp;#39;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; sort &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; uniq -c &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; sort -rn &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; sed -e &lt;span class=&quot;s1&quot;&gt;&amp;#39;s/^ *//;s/ /,/&amp;#39;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;head -8 &amp;gt; devices.csv&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;La représentation graphique de la distribution sous la forme d&amp;#39;histogrammes est obtenue comme suit :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;gnuplot &lt;span class=&quot;s&quot;&gt;&amp;lt;&amp;lt;EOF&lt;/span&gt;
+&lt;span class=&quot;s&quot;&gt;set datafile separator &amp;quot;,&amp;quot;&lt;/span&gt;
+&lt;span class=&quot;s&quot;&gt;set style data histogram&lt;/span&gt;
+
+&lt;span class=&quot;s&quot;&gt;set title &amp;quot;Distribution des tweets par device&amp;quot;&lt;/span&gt;
+&lt;span class=&quot;s&quot;&gt;set xlabel &amp;quot;Devices&amp;quot;&lt;/span&gt;
+&lt;span class=&quot;s&quot;&gt;set ylabel &amp;quot;Nb tweets&amp;quot;&lt;/span&gt;
+
+&lt;span class=&quot;s&quot;&gt;set xtic rotate by -45 scale 0&lt;/span&gt;
+&lt;span class=&quot;s&quot;&gt;set grid ytics&lt;/span&gt;
+&lt;span class=&quot;s&quot;&gt;set style fill solid&lt;/span&gt;
+
+&lt;span class=&quot;s&quot;&gt;plot &amp;#39;devices.csv&amp;#39; u 1:xtic(2) notitle &lt;/span&gt;
+&lt;span class=&quot;s&quot;&gt;EOF&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;a href=&quot;/assets/article_images/TelAv_devices.png&quot;&gt;&lt;img src=&quot;/assets/article_images/TelAv_devices.png&quot; alt=&quot;Distribution des tweets par device&quot;&gt;&lt;/a&gt;&lt;/p&gt;
+
+&lt;h3&gt;Eléments statistiques&lt;/h3&gt;
+
+&lt;p&gt;Les commandes ci-dessous permettent d&amp;#39;obtenir différents indicateurs statistiques sur l&amp;#39;ensemble du jeu de données. &lt;br /&gt;
+On verra dans le paragraphe suivant comment obtenir ces mêmes indicateurs sur une plage de temps restreinte :&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;comptabiliser le nombre total de tweets :&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;wc -l data/*.json
+
+   &lt;span class=&quot;m&quot;&gt;76698&lt;/span&gt; total&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;ul&gt;
+&lt;li&gt;comptabiliser le nombre total de &lt;em&gt;twittos&lt;/em&gt; (utilisateurs de Twitter) :&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;jq &lt;span class=&quot;s1&quot;&gt;&amp;#39;.user.screen_name&amp;#39;&lt;/span&gt; data/*.json &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; sort -u &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; wc -l
+
+   16666&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;ul&gt;
+&lt;li&gt;extraire les 5 photos les plus diffusées, avec leur nombre d&amp;#39;occurrences :&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;jq &lt;span class=&quot;s1&quot;&gt;&amp;#39;select(.entities.media!=null)|select(.entities.media[].type=&amp;quot;photo&amp;quot;)|.entities.media[].media_url&amp;#39;&lt;/span&gt; data/*.json &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; sort &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; uniq -c &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; sort -rn &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; head -5
+
+ &lt;span class=&quot;m&quot;&gt;478&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;http://pbs.twimg.com/media/CL9DfpFWgAAZWQi.jpg&amp;quot;&lt;/span&gt;
+ &lt;span class=&quot;m&quot;&gt;434&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;http://pbs.twimg.com/media/CL3vnXOWgAA67oa.jpg&amp;quot;&lt;/span&gt;
+ &lt;span class=&quot;m&quot;&gt;336&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;http://pbs.twimg.com/media/CMC7JJxWsAAFDVD.jpg&amp;quot;&lt;/span&gt;
+ &lt;span class=&quot;m&quot;&gt;294&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;http://pbs.twimg.com/media/CMEr3oWWwAAYbEf.png&amp;quot;&lt;/span&gt;
+ &lt;span class=&quot;m&quot;&gt;269&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;http://pbs.twimg.com/media/CMEChkgWEAAIep-.jpg&amp;quot;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;ul&gt;
+&lt;li&gt;extraire les 4 types de clients Twitter les plus utilisés :&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;jq &lt;span class=&quot;s2&quot;&gt;&amp;quot;.source&amp;quot;&lt;/span&gt; data/*.json &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; sed &lt;span class=&quot;s1&quot;&gt;&amp;#39;s/&amp;quot;\(&amp;lt;.*&amp;gt;\)\(.*\)\(&amp;lt;.*&amp;gt;\)&amp;quot;/\2/&amp;#39;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; sort &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; uniq -c &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; sort -rn &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; head -4
+
+&lt;span class=&quot;m&quot;&gt;23210&lt;/span&gt; Twitter &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; iPhone
+&lt;span class=&quot;m&quot;&gt;21341&lt;/span&gt; Twitter &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; Android
+&lt;span class=&quot;m&quot;&gt;19954&lt;/span&gt; Twitter Web Client
+ &lt;span class=&quot;m&quot;&gt;3444&lt;/span&gt; Twitter &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; iPad&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;ul&gt;
+&lt;li&gt;extraire les 3 comptes les plus retweetés (c&amp;#39;est un &lt;strong&gt;indicateur d&amp;#39;influence&lt;/strong&gt;) avec le nombre de RT :&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;jq &lt;span class=&quot;s1&quot;&gt;&amp;#39;select(.retweeted_status!=null)|.retweeted_status.user.screen_name&amp;#39;&lt;/span&gt; data/*.json &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; sort &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; uniq -c &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; sort -rn &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; head -3
+
+&lt;span class=&quot;m&quot;&gt;1759&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;ybenderbal&amp;quot;&lt;/span&gt;
+&lt;span class=&quot;m&quot;&gt;1085&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;KarimaB_&amp;quot;&lt;/span&gt;
+&lt;span class=&quot;m&quot;&gt;1054&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;Linformatrice&amp;quot;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;ul&gt;
+&lt;li&gt;extraire les 3 comptes les plus cités (équivalent au retweet mais moins usité) avec le nombre de citations :&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;jq &lt;span class=&quot;s1&quot;&gt;&amp;#39;select(.quoted_status!=null)|.quoted_status.user.screen_name&amp;#39;&lt;/span&gt; data/*.json &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; sort &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; uniq -c &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; sort -rn &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; head -3
+
+  &lt;span class=&quot;m&quot;&gt;97&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;Col_Connaughton&amp;quot;&lt;/span&gt;
+  &lt;span class=&quot;m&quot;&gt;52&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;notstat&amp;quot;&lt;/span&gt;
+  &lt;span class=&quot;m&quot;&gt;49&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;Farah_Gazan&amp;quot;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;ul&gt;
+&lt;li&gt;extraire les 3 comptes les plus mentionnés (c&amp;#39;est un &lt;strong&gt;indicateur de notoriété&lt;/strong&gt;) avec le nombre de mentions :&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;jq &lt;span class=&quot;s2&quot;&gt;&amp;quot;.entities.user_mentions[].screen_name&amp;quot;&lt;/span&gt; data/*.json &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; sort &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; uniq -c &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; sort -rn &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; head -3
+
+&lt;span class=&quot;m&quot;&gt;8859&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;Anne_Hidalgo&amp;quot;&lt;/span&gt;
+&lt;span class=&quot;m&quot;&gt;1772&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;ybenderbal&amp;quot;&lt;/span&gt;
+&lt;span class=&quot;m&quot;&gt;1500&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;BrunoJulliard&amp;quot;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;ul&gt;
+&lt;li&gt;dégager les 20 &lt;strong&gt;sentiments dominants&lt;/strong&gt; en comptabilisant le nombre de &lt;em&gt;hashtags&lt;/em&gt; :&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;jq &lt;span class=&quot;s2&quot;&gt;&amp;quot;.entities.hashtags[].text&amp;quot;&lt;/span&gt; data/*.json &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; tr &lt;span class=&quot;s1&quot;&gt;&amp;#39;[A-Z]&amp;#39;&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&amp;#39;[a-z]&amp;#39;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; tr &lt;span class=&quot;s1&quot;&gt;&amp;#39;[àâäéèêëîïôöùûü]&amp;#39;&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&amp;#39;[aaaeeeeiioouuu]&amp;#39;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; sort &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; uniq -c &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; sort -rn &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; head -20
+
+&lt;span class=&quot;m&quot;&gt;77070&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;telavivsurseine&amp;quot;&lt;/span&gt;
+&lt;span class=&quot;m&quot;&gt;5834&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;apartheidsurseine&amp;quot;&lt;/span&gt;
+&lt;span class=&quot;m&quot;&gt;2880&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;israel&amp;quot;&lt;/span&gt;
+&lt;span class=&quot;m&quot;&gt;2767&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;gaza&amp;quot;&lt;/span&gt;
+&lt;span class=&quot;m&quot;&gt;2406&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;paris&amp;quot;&lt;/span&gt;
+&lt;span class=&quot;m&quot;&gt;1868&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;againsttelavivsurseine&amp;quot;&lt;/span&gt;
+&lt;span class=&quot;m&quot;&gt;1860&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;parisplages&amp;quot;&lt;/span&gt;
+&lt;span class=&quot;m&quot;&gt;1668&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;contretelavivsurseine&amp;quot;&lt;/span&gt;
+&lt;span class=&quot;m&quot;&gt;1666&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;telaviv&amp;quot;&lt;/span&gt;
+&lt;span class=&quot;m&quot;&gt;1608&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;gazasurseine&amp;quot;&lt;/span&gt;
+&lt;span class=&quot;m&quot;&gt;1606&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;parislovestlv&amp;quot;&lt;/span&gt;
+&lt;span class=&quot;m&quot;&gt;1351&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;palestine&amp;quot;&lt;/span&gt;
+ &lt;span class=&quot;m&quot;&gt;843&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;freepalestine&amp;quot;&lt;/span&gt;
+ &lt;span class=&quot;m&quot;&gt;822&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;bds&amp;quot;&lt;/span&gt;
+ &lt;span class=&quot;m&quot;&gt;787&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;parisplage&amp;quot;&lt;/span&gt;
+ &lt;span class=&quot;m&quot;&gt;621&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;france&amp;quot;&lt;/span&gt;
+ &lt;span class=&quot;m&quot;&gt;515&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;icc4israel&amp;quot;&lt;/span&gt;
+ &lt;span class=&quot;m&quot;&gt;462&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;hidalgo&amp;quot;&lt;/span&gt;
+ &lt;span class=&quot;m&quot;&gt;434&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;apartheid&amp;quot;&lt;/span&gt;
+ &lt;span class=&quot;m&quot;&gt;372&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;boycottisrael&amp;quot;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h3&gt;Filtrer par date&lt;/h3&gt;
+
+&lt;p&gt;Utilisons le sélecteur &lt;code&gt;select&lt;/code&gt;/&lt;code&gt;match&lt;/code&gt; supporté par &lt;code&gt;jq&lt;/code&gt; pour filtrer sur la date de création du tweet &lt;code&gt;created_at&lt;/code&gt;.&lt;br /&gt;
+Ainsi, la commande suivante permet d&amp;#39;identifier les 3 comptes les plus retweetés le &lt;em&gt;10 Août&lt;/em&gt; entre 18h et 19h59 (soit entre 16h et 18h50 heure UTC) :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;jq &lt;span class=&quot;s1&quot;&gt;&amp;#39;select(.created_at|match(&amp;quot;Mon Aug 10 1[6-7].*&amp;quot;))|select(.retweeted_status!=null)|.retweeted_status.user.screen_name&amp;#39;&lt;/span&gt; data/*.json &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; sort &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; uniq -c &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; sort -rn &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; head -3
+
+ &lt;span class=&quot;m&quot;&gt;337&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;Campagnebds&amp;quot;&lt;/span&gt;
+ &lt;span class=&quot;m&quot;&gt;114&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;LePG&amp;quot;&lt;/span&gt;
+ &lt;span class=&quot;m&quot;&gt;100&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;Thalwen&amp;quot;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h3&gt;Formatage des résultats avec &lt;code&gt;csvlook&lt;/code&gt;&lt;/h3&gt;
+
+&lt;p&gt;Voyons comment afficher les 5 comptes les plus influents (i.e les plus retweetés) sous la forme d&amp;#39;un tableau à 3 colonnes : le nombre de RT, le nom du compte (&lt;code&gt;.user.screen_name&lt;/code&gt;) et la date de création du compte (&lt;code&gt;.user.created_at&lt;/code&gt;).&lt;br /&gt;
+On utilisera un shell imbriqué à 2 commandes :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;Nb RT,Compte,Date Creation&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; jq --raw-output &lt;span class=&quot;s1&quot;&gt;&amp;#39;select(.retweeted_status!=null)|[.retweeted_status.user.screen_name,.retweeted_status.user.created_at] | @csv&amp;#39;&lt;/span&gt; data/*.json &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; sort &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; uniq -c &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; -k1rn &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; sed -e &lt;span class=&quot;s1&quot;&gt;&amp;#39;s/^ *//;s/ /,/&amp;#39;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; head -5 &lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; csvlook
+
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;--------+---------------+---------------------------------&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  Nb RT &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; Compte        &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; Date Creation                   &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;--------+---------------+---------------------------------&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;1759&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; ybenderbal    &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; Sun Mar &lt;span class=&quot;m&quot;&gt;11&lt;/span&gt; 22:51:26 +0000 &lt;span class=&quot;m&quot;&gt;2012&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;1085&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; KarimaB_      &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; Sat Mar &lt;span class=&quot;m&quot;&gt;07&lt;/span&gt; 14:36:25 +0000 &lt;span class=&quot;m&quot;&gt;2009&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;1054&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; Linformatrice &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; Thu Aug &lt;span class=&quot;m&quot;&gt;04&lt;/span&gt; 02:18:52 +0000 &lt;span class=&quot;m&quot;&gt;2011&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;1045&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; Campagnebds   &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; Tue Dec &lt;span class=&quot;m&quot;&gt;15&lt;/span&gt; 20:33:31 +0000 &lt;span class=&quot;m&quot;&gt;2009&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;  &lt;span class=&quot;m&quot;&gt;916&lt;/span&gt;   &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; jeremo12      &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; Sun Feb &lt;span class=&quot;m&quot;&gt;26&lt;/span&gt; 22:54:54 +0000 &lt;span class=&quot;m&quot;&gt;2012&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;--------+---------------+---------------------------------&lt;span class=&quot;p&quot;&gt;|&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Magique ? Pas tant que ça. Décomposons la commande :&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;echo &amp;quot;Nb RT,Compte,Date Creation&amp;quot;&lt;/code&gt; : affiche l&amp;#39;entête du tableau&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;jq --raw-output &amp;#39;select(.retweeted_status!=null)|[.retweeted_status.user.screen_name,.retweeted_status.user.created_at] | @csv&amp;#39; data/*.json&lt;/code&gt; : 
+
+&lt;ul&gt;
+&lt;li&gt;filtre les éléments en ne retenant que ceux ayant une propriété &lt;code&gt;retweeted_status&lt;/code&gt; non nulle&lt;/li&gt;
+&lt;li&gt;puis affiche les valeurs &lt;code&gt;screen_name&lt;/code&gt; et &lt;code&gt;created_at&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;puis formate la sortie standard en CSV&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;sort | uniq -c&lt;/code&gt; : tri et comptage du nombre d&amp;#39;occurrences (nombre de RT)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;sort -k1rn&lt;/code&gt; : le flag &lt;code&gt;-k1&lt;/code&gt; signifie que le tri s&amp;#39;effectue sur la première colonne (le nombre de RT)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3&gt;Plus de statistiques&lt;/h3&gt;
+
+&lt;p&gt;Je mets à disposition &lt;a href=&quot;https://github.com/ksahnine/datascience-twitter/blob/master/scripts/analyse/compute.sh&quot;&gt;un script&lt;/a&gt; &lt;em&gt;shell&lt;/em&gt; implémentant plusieurs routines suffisamment génériques pour s&amp;#39;adonner à tous types d&amp;#39;explorations de données.&lt;br /&gt;&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;&lt;span class=&quot;nb&quot;&gt;cd &lt;/span&gt;datascience-twitter/scripts/analyse&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;La liste des routines implémentées s&amp;#39;obtient en exécutant la commande : &lt;code&gt;./compute.sh&lt;/code&gt;.&lt;br /&gt;
+Pour obtenir la liste des 5 comptes les plus mentionnés sur toute la période :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;./compute.sh tab_mentions ../../data/*.json &lt;span class=&quot;s2&quot;&gt;&amp;quot;.*&amp;quot;&lt;/span&gt; 5&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Pour obtenir la liste des 3 comptes les plus retweetés le &lt;em&gt;10 Août&lt;/em&gt; entre 18h et 19h59 heure de Paris :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;./compute.sh tab_retweeted_users ../../data/*.json &lt;span class=&quot;s2&quot;&gt;&amp;quot;Aug 10 1[6-7]&amp;quot;&lt;/span&gt; 3&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h3&gt;Visualiser un réseau social&lt;/h3&gt;
+
+&lt;p&gt;Je mets à disposition un &lt;a href=&quot;https://github.com/ksahnine/datascience-twitter/blob/master/scripts/analyse/social-network.py&quot;&gt;script&lt;/a&gt; Python reconstituant le réseau de relations entre plusieurs utilisateurs Twitter.&lt;/p&gt;
+
+&lt;p&gt;Si vous avez bien suivi, vous ne devriez avoir aucun mal à produire un fichier contenant les 15 comptes les plus retweetés et les 15 comptes ayant le plus tweeté.&lt;br /&gt;
+Sinon, vous pouvez utiliser mes routines :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;./compute.sh csv_tweeted_users ../../data/*.json &lt;span class=&quot;s2&quot;&gt;&amp;quot;.*&amp;quot;&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;15&lt;/span&gt; &amp;gt; users.csv
+./compute.sh csv_retweeted_users ../../data/*.json &lt;span class=&quot;s2&quot;&gt;&amp;quot;.*&amp;quot;&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;15&lt;/span&gt; &amp;gt;&amp;gt; users.csv&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Reconstituons le réseau de rélations entre ces utilisateurs :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;./social-network.py -l users.csv&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Puis générons le réseau de relations :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;./social-network.py -u users.csv &amp;gt; ../graph/data.csv&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Pour visualiser le réseau de relation, lancer la commande suivante :&lt;/p&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;&lt;span class=&quot;nb&quot;&gt;cd &lt;/span&gt;datascience-twitter/scripts/graph
+./serve.sh&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Pour visualiser le résultat, ouvrir un navigateur et consulter le lien &lt;a href=&quot;http://localhost:8000&quot;&gt;&lt;code&gt;http://localhost:8000&lt;/code&gt;&lt;/a&gt; :&lt;/p&gt;
+
+&lt;p&gt;&lt;center&gt;&lt;img src=&quot;/assets/article_images/social_network.png&quot; alt=&quot;Réseau social de différents protagonistes&quot;&gt;&lt;/center&gt;&lt;/p&gt;
+
+&lt;p&gt;Le graphe orienté est généré à l&amp;#39;aide de l&amp;#39;excellente librairie &lt;a href=&quot;http://d3js.org/&quot;&gt;D3&lt;/a&gt; pour laquelle j&amp;#39;ai consacré &lt;a href=&quot;http://blog.inovia-conseil.fr/?p=110&quot;&gt;un article&lt;/a&gt; il y a 3 ans.&lt;/p&gt;
+
+&lt;p&gt;Les cercles représentent les comptes. Leur taille est proportionnelle à leur nombre d&amp;#39;abonnés.&lt;/p&gt;
+
+&lt;p&gt;Il s&amp;#39;agit d&amp;#39;une version très expérimentale bien sûr, mais je trouve remarquable la visualisation des 2 groupes de &lt;em&gt;tweetos&lt;/em&gt; dont l&amp;#39;un concentre les tweets défavorable à l&amp;#39;évènement.&lt;br /&gt;
+Par ailleurs, on visualise bien les signes révélateur d&amp;#39;&lt;a href=&quot;https://fr.wikipedia.org/wiki/Astroturfing&quot;&gt;astroturfing&lt;/a&gt;.&lt;/p&gt;
+</description>
+        <pubDate>Wed, 19 Aug 2015 08:00:00 +0200</pubDate>
+        <link>http://ksahnine.github.io/datascience/unix/bigdata/2015/08/19/exploration-donnees-twitter.html</link>
+        <guid isPermaLink="true">http://ksahnine.github.io/datascience/unix/bigdata/2015/08/19/exploration-donnees-twitter.html</guid>
+        
+        <category>regular</category>
+        
+        
+        <category>datascience</category>
+        
+        <category>unix</category>
+        
+        <category>bigdata</category>
+        
+      </item>
     
       <item>
         <title>Analyse du hashtag #TelAvivSurSeine</title>
@@ -29,7 +403,7 @@ Je me suis prêté à cet exercice par &lt;strong&gt;simple curiosité intellect
 &lt;li&gt;la mobilisation sur &lt;em&gt;Twitter&lt;/em&gt; contre l&amp;#39;évènement &lt;code&gt;#TelAvivSurSeine&lt;/code&gt; n&amp;#39;est pas assis sur un mouvement massif, spontané et populaire&lt;/li&gt;
 &lt;li&gt;elle est d&amp;#39;abord le fait d&amp;#39;une poignée de comptes militants jouissant d&amp;#39;une certaine audience et liés les uns aux autres par des affinités politiques ou identitaires&lt;/li&gt;
 &lt;li&gt;le compte du &lt;em&gt;Parti de Gauche&lt;/em&gt; et de militants adhérents à ce parti a joué un rôle important dans la médiatisation de la polémique, à l&amp;#39;instar de comptes de personnalités connues et pro évènement&lt;/li&gt;
-&lt;li&gt;la campagne BDS du &lt;em&gt;10 Août 2015&lt;/em&gt; contre l&amp;#39;évènement a été efficace et coordonnée&lt;/li&gt;
+&lt;li&gt;la campagne &lt;a href=&quot;https://fr.wikipedia.org/wiki/Boycott,_d%C3%A9sinvestissement_et_sanctions&quot;&gt;BDS&lt;/a&gt; du &lt;em&gt;10 Août 2015&lt;/em&gt; contre l&amp;#39;évènement a été efficace et coordonnée&lt;/li&gt;
 &lt;li&gt;sur toutes les périodes étudiées, les clients Twitter les plus utilisés sont, dans l&amp;#39;ordre, le client &lt;em&gt;iPhone&lt;/em&gt;, le client &lt;em&gt;Android&lt;/em&gt; puis le client &lt;em&gt;Web&lt;/em&gt; &lt;strong&gt;sauf&lt;/strong&gt; le &lt;em&gt;10 Août 2015&lt;/em&gt; autour de 19h où c&amp;#39;est le client &lt;em&gt;Web&lt;/em&gt; (navigateur) qui arrive en tête. Cette anormalité pourrait s&amp;#39;expliquer par une utilisation de comptes fictifs durant cette période, et destinés à &lt;em&gt;faire du bruit&lt;/em&gt;.&lt;/li&gt;
 &lt;/ul&gt;
 
@@ -573,7 +947,7 @@ Housni 1 2
 
 &lt;p&gt;&lt;a href=&quot;https://github.com/ksahnine/datascience-brevet-mentions/blob/master/app/reduce-join_results.sh&quot;&gt;&lt;sub&gt;&lt;sup&gt;Source : &lt;code&gt;reduce-join_results.sh&lt;/code&gt;&lt;/sup&gt;&lt;/sub&gt;&lt;/a&gt;&lt;/p&gt;
 
-&lt;p&gt;Voici un extrait du fichier `brevet-mentions-2015.csv où l’on relève que 16,3 % des prénommées Amandine ont obtenu une mention TB :&lt;/p&gt;
+&lt;p&gt;Voici un extrait du fichier &lt;code&gt;brevet-mentions-2015.csv&lt;/code&gt; où l’on relève que 16,3 % des prénommées Amandine ont obtenu une mention TB :&lt;/p&gt;
 
 &lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;[…]
 Allan 12 228 5,3
@@ -1998,201 +2372,6 @@ pegase.local               : &lt;span class=&quot;nv&quot;&gt;ok&lt;/span&gt;&lt
         <category>ansible</category>
         
         <category>docker</category>
-        
-      </item>
-    
-      <item>
-        <title>Dockeriser un microservice (Dropwizard + Docker)</title>
-        <description>&lt;p&gt;L’association de &lt;strong&gt;Dropwizard&lt;/strong&gt; et &lt;strong&gt;Docker&lt;/strong&gt; constitue une solution fort intéressante pour une architecture orientée microservices.&lt;br /&gt;
-En effet, elle répond remarquablement aux besoins :&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;d’&lt;strong&gt;isolation&lt;/strong&gt; de l’environnement d’exécution d’un service&lt;/li&gt;
-&lt;li&gt;de déploiement &lt;strong&gt;rapide&lt;/strong&gt; et sans couture&lt;/li&gt;
-&lt;li&gt;de &lt;strong&gt;portabilité&lt;/strong&gt; et de &lt;strong&gt;scalabilité&lt;/strong&gt;&lt;/li&gt;
-&lt;li&gt;de compatibilité avec des solutions d’hébergement dans un &lt;strong&gt;Cloud&lt;/strong&gt; privé, public ou hybride&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;Accessoirement, une application &lt;em&gt;Dropwizard&lt;/em&gt; est packagée sous la forme d’un fichier &lt;em&gt;jar&lt;/em&gt; &lt;strong&gt;unique&lt;/strong&gt; et &lt;strong&gt;autonome&lt;/strong&gt; ce qui rendra d’autant plus simple la fabrication d’une image Docker comme on le verra dans cet article.&lt;/p&gt;
-
-&lt;p&gt;En pratique, nous verrons comment :&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;strong&gt;dockeriser&lt;/strong&gt; le service de consultation des horaires du métro parisien, une application &lt;em&gt;Dropwizard&lt;/em&gt; qui a fait l’objet du &lt;a href=&quot;/architecture/microservice/dropwizard/2015/01/19/developpement-microservice-dropwizard.html&quot;&gt;précédent billet de la série&lt;/a&gt; (sa lecture préalable est recommandée) et dont le &lt;a href=&quot;https://github.com/ksahnine/trafic-ratp-dropwizard&quot;&gt;code source est disponible&lt;/a&gt; sur GitHub&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;créer des environnements d’exécution cloisonnés&lt;/strong&gt; en mappant un volume de données du conteneur sur le système de fichier local&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;publier&lt;/strong&gt; l’image dans un dépôt privé (situé dans un réseau local) mais également dans le dépôt en ligne &lt;em&gt;Docker Hub&lt;/em&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2&gt;Construction de l&amp;#39;image Docker&lt;/h2&gt;
-
-&lt;p&gt;J’ai choisi une recette simple en construisant séparément :&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;l’application &lt;em&gt;Dropwizard&lt;/em&gt; matérialisée par le fichier &lt;em&gt;jar&lt;/em&gt; &lt;code&gt;trafic-ratp-1.0.0-SNAPSHOT.jar&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;une image Docker dérivée de l’image publique d’OpenJDK 7 (&lt;code&gt;FROM dockerfile/java:openjdk-7-jdk&lt;/code&gt;) à laquelle on intègre le &lt;em&gt;jar&lt;/em&gt; de l’application précédemment fabriqué ainsi que son fichier de configuration (`trafic-ratp.yml)&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;Le fichier &lt;code&gt;Dockerfile&lt;/code&gt; résultant est le suivant :
-&lt;script src=&quot;https://gist.github.com/9f0f24f1d3073d2ceff6.js&quot;&gt; &lt;/script&gt;&lt;/p&gt;
-
-&lt;p&gt;Quelques observations :&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;le premier paramètre de l’instruction &lt;code&gt;ADD&lt;/code&gt; correspond au fichier source à copier dans le conteneur (&lt;code&gt;target/trafic-ratp-1.0.0-SNAPSHOT.jar&lt;/code&gt;). &lt;br /&gt;Le chemin est relatif au répertoire contenant le fichier &lt;code&gt;Dockerfile&lt;/code&gt; (répertoire racine). Il n’est pas possible d’ajouter un fichier situé à l’extérieur du répertoire racine ou de ses sous-répertoires (par ex. &lt;code&gt;../dist/20150204/trafic-ratp-1.0.0-SNAPSHOT.jar&lt;/code&gt;)&lt;/li&gt;
-&lt;li&gt;le second paramètre de l’instruction &lt;code&gt;ADD&lt;/code&gt; correspond au fichier de destination dans le système de fichiers du conteneur (&lt;code&gt;/app/trafic-ratp-1.0.0-SNAPSHOT.jar&lt;/code&gt;)&lt;/li&gt;
-&lt;li&gt;le service est exposé par le conteneur sur le port &lt;code&gt;8080&lt;/code&gt; (instruction &lt;code&gt;EXPOSE&lt;/code&gt;)&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;La séquence complète de construction de l’image en repartant du code source sur GitHub se résume aux commandes suivantes :&lt;/p&gt;
-
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;git clone https://github.com/ksahnine/trafic-ratp-dropwizard.git
-&lt;span class=&quot;nb&quot;&gt;cd &lt;/span&gt;trafic-ratp-dropwizard
-mvn package
-docker build -t ksahnine:trafic-ratp-dropwizard .&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;p&gt;Si l’on ne dispose pas d’environnement de développement, on pourrait tout à fait &lt;em&gt;dockeriser&lt;/em&gt; l’étape de construction du microservice :&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;en partant de l’image de base d’une &lt;em&gt;Debian&lt;/em&gt; (&lt;code&gt;FROM debian:wheezy&lt;/code&gt;)&lt;/li&gt;
-&lt;li&gt;sur laquelle on installerait &lt;em&gt;OpenJDK&lt;/em&gt; (&lt;code&gt;RUN apt-get install -y openjdk-7-jdk&lt;/code&gt;), &lt;em&gt;git&lt;/em&gt; (&lt;code&gt;RUN apt-get install -y git&lt;/code&gt;) et &lt;em&gt;Maven&lt;/em&gt; (&lt;code&gt;RUN apt-get install -y maven&lt;/code&gt;)&lt;/li&gt;
-&lt;li&gt;suivie de la construction de l’application (récupération du code source et compilation)&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2&gt;Démarrage du conteneur&lt;/h2&gt;
-
-&lt;p&gt;Il n’existe pas d’hôte Docker natif pour les systèmes d’exploitation autres que Linux. Sous Windows ou Mac OS X, vous devez installer la VM ultra légère &lt;a href=&quot;http://boot2docker.io/&quot;&gt;Boot2docker&lt;/a&gt;, basée sur &lt;em&gt;Virtual Box&lt;/em&gt; et la distribution &lt;a href=&quot;http://tinycorelinux.net/&quot;&gt;&lt;em&gt;Tiny Core Linux&lt;/em&gt;&lt;/a&gt;.&lt;/p&gt;
-
-&lt;p&gt;&lt;center&gt;&lt;img src=&quot;http://blog.inovia-conseil.fr/wp-content/uploads/2015/01/b2d.png&quot; alt=&quot;Hôte Docker&quot;&gt;&lt;/center&gt;&lt;/p&gt;
-
-&lt;p&gt;Dans cette situation, les conteneurs Docker ne s’exécutent pas directement au dessus de l’OS mais &lt;strong&gt;au sein de la machine virtuelle&lt;/strong&gt; &lt;em&gt;Boot2docker&lt;/em&gt;.&lt;/p&gt;
-
-&lt;p&gt;La commande &lt;code&gt;docker run&lt;/code&gt; permet de lancer un conteneur à partir de l’image précédemment construite :&lt;/p&gt;
-
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;docker run -td -p 8080:8080 ksahnine:trafic-ratp-dropwizard&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;p&gt;L’application embarquée dans le conteneur ne sera accessible qu’à travers l’adresse IP et le port &lt;strong&gt;de la VM&lt;/strong&gt; (et non &lt;code&gt;localhost&lt;/code&gt;).&lt;br /&gt;
-La commande &lt;code&gt;boot2docker ip&lt;/code&gt; permet de connaître l’adresse IP de la VM :&lt;/p&gt;
-
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;ksahnine@inoviabook:~&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;boot2docker ip
-192.168.59.103&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;p&gt;Le service &lt;em&gt;dockerisé&lt;/em&gt; est donc interrogeable via &lt;strong&gt;cURL&lt;/strong&gt; comme suit :&lt;/p&gt;
-
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;curl -s http://192.168.59.103:8080/trafic-ratp/metro/14/pyramides/A&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;h2&gt;Créer des environnements cloisonnés en mappant les volumes&lt;/h2&gt;
-
-&lt;p&gt;Pour créer 2 environnements d’exécution distincts (appelons les &lt;em&gt;dev&lt;/em&gt; et &lt;em&gt;recette&lt;/em&gt;) à partir de la même image, il suffit de mapper le volume &lt;code&gt;/conf&lt;/code&gt; du conteneur vers le répertoire du système de fichier local contenant le fichier de configuration idoine :&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;configuration de &lt;em&gt;dev&lt;/em&gt; : &lt;code&gt;~/conf/dev/trafic-ratp-dropwizard.yml&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;configuration de &lt;em&gt;recette&lt;/em&gt; : &lt;code&gt;~/conf/rec/trafic-ratp-dropwizard.yml&lt;/code&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;Le fichier &lt;code&gt;Dockerfile&lt;/code&gt; initial a été très légèrement modifié de sorte à ne pas ajouter le fichier de configuration dans l’image :
-&lt;script src=&quot;https://gist.github.com/43478d2d052622554361.js&quot;&gt; &lt;/script&gt;&lt;/p&gt;
-
-&lt;p&gt;Ainsi, le démarrage des instances de &lt;em&gt;dev&lt;/em&gt; et &lt;em&gt;recette&lt;/em&gt; (ports &lt;code&gt;9010&lt;/code&gt; et &lt;code&gt;9020&lt;/code&gt;) s’effectue avec les commandes &lt;code&gt;docker run&lt;/code&gt; suivantes :&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;em&gt;dev&lt;/em&gt; : &lt;code&gt;docker run -t -p 9010:8080 -v ~/conf/dev:/conf --name svc-metro-dev ksahnine:trafic-ratp-dropwizard&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;&lt;em&gt;recette&lt;/em&gt; : &lt;code&gt;docker run -t -p 9020:8080 -v ~/conf/rec:/conf --name svc-metro-rec ksahnine:trafic-ratp-dropwizard&lt;/code&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;L’option &lt;code&gt;-v rep_local:rep_conteneur&lt;/code&gt; rend accessible le contenu d’un répertoire local (&lt;code&gt;rep_local&lt;/code&gt;) depuis le conteneur (&lt;code&gt;rep_conteneur&lt;/code&gt;).&lt;br /&gt;
-Si vous travaillez sous Mac OS X, le point de montage du conteneur accède en réalité à la VM &lt;em&gt;boot2docker&lt;/em&gt; et non au système de fichier du Mac.&lt;br /&gt;
-&lt;a href=&quot;https://blog.docker.com/2014/10/docker-1-3-signed-images-process-injection-security-options-mac-shared-directories/&quot;&gt;Depuis la version 1.3 de Docker&lt;/a&gt;, le montage de volume s’effectue sans couture mais est &lt;strong&gt;limité uniquement aux sous-répertoires contenus dans le répertoire&lt;/strong&gt; &lt;code&gt;/Users&lt;/code&gt;.&lt;br /&gt;
-Pour les versions antérieures de Docker il est nécessaire d’installer une version modifiée de &lt;em&gt;boot2docker&lt;/em&gt; (lire cet &lt;a href=&quot;https://medium.com/boot2docker-lightweight-linux-for-docker/boot2docker-together-with-virtualbox-guest-additions-da1e3ab2465c&quot;&gt;excellent article&lt;/a&gt;).&lt;/p&gt;
-
-&lt;h2&gt;Distribuer une image Docker&lt;/h2&gt;
-
-&lt;h3&gt;Publier dans un index privé d’images&lt;/h3&gt;
-
-&lt;p&gt;Il suffit d’une machine sur le réseau local (&lt;code&gt;192.168.0.29&lt;/code&gt; dans l’exemple ci-après) sur laquelle est installée Docker, puis d’installer et démarrer le registry en exécutant la commande suivante :&lt;/p&gt;
-
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;docker run -d -p 5000:5000 registry&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;p&gt;La commande &lt;code&gt;docker push&lt;/code&gt; permet d’ajouter l’image de notre microservice dockerisé :&lt;/p&gt;
-
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;docker tag ksahnine:trafic-ratp-dropwizard 192.168.0.29:5000/ksahnine:trafic-ratp-dropwizard
-docker push 192.168.0.29:5000/ksahnine:trafic-ratp-dropwizard&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;p&gt;L’accès à un index non sécurisé (HTTP) doit être explicitement autorisé au démarrage du démon docker (option &lt;code&gt;--insecure-registry&lt;/code&gt;), sous peine de rencontrer l’erreur suivante :&lt;/p&gt;
-
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;Error response from daemon: Invalid registry endpoint https://192.168.0.29:5000/v1/[...]&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;p&gt;Avec &lt;code&gt;boot2docker&lt;/code&gt;, l’option peut être passée via la variable &lt;code&gt;EXTRA_ARGS&lt;/code&gt; :&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;accéder à la VM en mode &lt;em&gt;shell&lt;/em&gt; :&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;boot2docker ssh&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;ul&gt;
-&lt;li&gt;puis renseigner la variable &lt;code&gt;EXTRA_ARGS&lt;/code&gt; dans le fichier &lt;code&gt;/var/lib/boot2docker/profile&lt;/code&gt; :&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;&lt;span class=&quot;nv&quot;&gt;EXTRA_ARGS&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;–insecure-registry 192.168.0.29:5000&amp;quot;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;ul&gt;
-&lt;li&gt;enfin sortir du &lt;em&gt;shell&lt;/em&gt; :&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;&lt;span class=&quot;nb&quot;&gt;exit&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;p&gt;A noter que le client &lt;code&gt;boot2docker&lt;/code&gt; sera à relativement court terme remplacé par la commande &lt;code&gt;docker machine&lt;/code&gt; toujours en &lt;a href=&quot;https://github.com/docker/machine&quot;&gt;cours de développement&lt;/a&gt; à ce jour.&lt;/p&gt;
-
-&lt;p&gt;Une simple interrogation de l’index via &lt;strong&gt;cURL&lt;/strong&gt; confirme que l’image a bien été publiée :&lt;/p&gt;
-
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;ksahnine@inoviabook:~&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;curl -s http://192.168.0.29:5000/v1/repositories/ksahnine/tags &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; jq &lt;span class=&quot;s2&quot;&gt;&amp;quot;.&amp;quot;&lt;/span&gt;
-&lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-  &lt;span class=&quot;s2&quot;&gt;&amp;quot;trafic-ratp-dropwizard&amp;quot;&lt;/span&gt;: &lt;span class=&quot;s2&quot;&gt;&amp;quot;c1454f0f800331644e43971e56c1e391bf06625a13600fc52160fc1c927e6fa4&amp;quot;&lt;/span&gt;
-&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;p&gt;Elle peut ensuite être récupérée via la commande &lt;code&gt;docker pull&lt;/code&gt; :&lt;/p&gt;
-
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;docker pull 192.168.0.29:5000/ksahnine:trafic-ratp-dropwizard&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;p&gt;et enfin exécutée :&lt;/p&gt;
-
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;docker run -td -p 8080:8080 192.168.0.29:5000/ksahnine:trafic-ratp-dropwizard&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;h3&gt;Publier sur Docker Hub&lt;/h3&gt;
-
-&lt;p&gt;&lt;a href=&quot;https://hub.docker.com/account/signup/&quot;&gt;Docker Hub&lt;/a&gt; est le dépôt central des repositories hébergés chez Docker. L’hébergement d’index publics est gratuit tout comme le premier index privé (&lt;a href=&quot;https://registry.hub.docker.com/plans/&quot;&gt;payant au delà&lt;/a&gt;).&lt;br /&gt;
-Mon repository public &lt;a href=&quot;https://registry.hub.docker.com/u/ksahnine/ratp-rest-api/&quot;&gt;&lt;code&gt;ksahnine/ratp-rest-api&lt;/code&gt;&lt;/a&gt; contient l’image de notre service dockerisé.&lt;br /&gt;
-La publication de l’image dans le repository s’effectue comme suit :&lt;/p&gt;
-
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;docker tag ksahnine:trafic-ratp-dropwizard ksahnine/ratp-rest-api:1.0
-docker push ksahnine/ratp-rest-api:1.0&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;p&gt;La récupération de l’image suivie de la création du conteneur et du démarrage du service depuis le hub s’effectue par cette simple commande :&lt;/p&gt;
-
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;docker run -td -p 8080:8080 ksahnine/ratp-rest-api:1.0&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;h3&gt;Sauvegarder et restaurer une image&lt;/h3&gt;
-
-&lt;p&gt;Plus rustique, la commande &lt;code&gt;docker save&lt;/code&gt; permet d’exporter une image dans un fichier de &lt;em&gt;dump&lt;/em&gt; :&lt;/p&gt;
-
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;docker save ksahnine:trafic-ratp-dropwizard &amp;gt; trafic-ratp-img.tar&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;p&gt;Réciproquement, la commande &lt;code&gt;docker load&lt;/code&gt; permet de restaurer une image à partir d’un &lt;em&gt;dump&lt;/em&gt; :&lt;/p&gt;
-
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;docker load ksahnine:trafic-ratp-dropwizard &amp;lt; trafic-ratp-img.tar&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-</description>
-        <pubDate>Wed, 21 Jan 2015 07:00:00 +0100</pubDate>
-        <link>http://ksahnine.github.io/microservice/docker/dropwizard/2015/01/21/dockeriser-microservice.html</link>
-        <guid isPermaLink="true">http://ksahnine.github.io/microservice/docker/dropwizard/2015/01/21/dockeriser-microservice.html</guid>
-        
-        <category>regular</category>
-        
-        
-        <category>microservice</category>
-        
-        <category>docker</category>
-        
-        <category>dropwizard</category>
         
       </item>
     
