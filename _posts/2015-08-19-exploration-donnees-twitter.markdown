@@ -308,11 +308,11 @@ cd datascience-twitter/scripts/analyse
 La liste des routines implémentées s'obtient en exécutant la commande : `./compute.sh`.<br />
 Pour obtenir la liste des 5 comptes les plus mentionnés sur toute la période :
 {% highlight sh %}
-./compute.sh tab_mentions ../../data/*.json ".*" 5
+./compute.sh tab_mentions "../../data/*.json" ".*" 5
 {% endhighlight %}
 Pour obtenir la liste des 3 comptes les plus retweetés le *10 Août* entre 18h et 19h59 heure de Paris :
 {% highlight sh %}
-./compute.sh tab_retweeted_users ../../data/*.json "Aug 10 1[6-7]" 3
+./compute.sh tab_retweeted_users "../../data/*.json" "Aug 10 1[6-7]" 3
 {% endhighlight %}
 
 ### Visualiser un réseau social
@@ -323,8 +323,8 @@ Si vous avez bien suivi, vous ne devriez avoir aucun mal à produire un fichier 
 Sinon, vous pouvez utiliser mes routines :
 
 {% highlight sh %}
-./compute.sh csv_tweeted_users ../../data/*.json ".*" 15 > users.csv
-./compute.sh csv_retweeted_users ../../data/*.json ".*" 15 >> users.csv
+./compute.sh csv_tweeted_users "../../data/*.json" ".*" 15 > users.csv
+./compute.sh csv_retweeted_users "../../data/*.json" ".*" 15 >> users.csv
 {% endhighlight %}
 
 Reconstituons le réseau de relations entre ces utilisateurs :
