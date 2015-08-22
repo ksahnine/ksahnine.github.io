@@ -282,7 +282,7 @@ Ce tableau est intéressant :
 - la majorité des comptes possède relativement peu de followers mais ils sont particulièrement volubiles
 - en particulier, le compte `Dajjalsystem` intrigue par le nombre de tweets et RT (`3 030`) au regard de son très faible nombre d'abonnés (`36`)
 
-Le qualificatif de *"compte pour crier"* utilisée par Nicolas dans son article prend là tout son sens.
+Le qualificatif de *"compte pour crier"* utilisé par Nicolas dans son article prend là tout son sens.
 
 L'API Twitter `followers/ids` est très utile pour reconstituer le réseau de relations de ces petits comptes avec les comptes d'activistes patentés.
 
