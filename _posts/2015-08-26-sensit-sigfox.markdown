@@ -33,7 +33,7 @@ J'ai eu l'occasion d'expérimenter dans le cadre de projets *IoT* plusieurs tech
 Par rapport à d'autres solutions de connexion à un réseau sans fil, en particuler le réseau GSM, le réseau *SIGFOX* présente un certain nombre d'avantages comparatifs :
 
 - une couverture internationale
-- un faible coût d'utilisation (10 à 16 € par an, variable en fonction du volume de données échangées et du nombre de *devices*)
+- un faible coût d'utilisation (variable en fonction du volume de données échangées et du nombre de *devices* : de 1 €/an pour les gros projets jusqu'à 10 / 16 €/an)
 - des modules ou transceivers *SIGFOX* **consommant très peu d'énergie** et bon marché (compter 15 € le *chip*)
 - des communications sécurisées
 
