@@ -324,7 +324,7 @@ Sinon, vous pouvez utiliser mes routines :
 
 {% highlight sh %}
 ./compute.sh csv_tweeted_users "../../data/*.json" ".*" 15 > users.csv
-./compute.sh csv_retweeted_users "../../data/*.json" ".*" 15 >> users.csv
+./compute.sh csv_retweeted_users "../../data/*.json	" ".*" 15 >> users.csv
 {% endhighlight %}
 
 Reconstituons le réseau de relations entre ces utilisateurs :

@@ -21,7 +21,7 @@ Développé par [**AXIBLE technologies**](http://www.axible-connects-for-you.com
 Une [API REST](https://api.sensit.io/v1/) permet fort heureusement d'étendre le champ des possibles. On verra dans cet article comment l'utiliser pour obtenir en un clic les disponibilités de stations [**Vélib**](http://www.velib.paris/) à proximité de son lieu de travail ou d'habitation :
 <center><iframe src="https://vid.me/e/n45c?tools=1" width="480" height="480" frameborder="0" allowfullscreen webkitallowfullscreen mozallowfullscreen scrolling="no"></iframe></center>
 
-Le service est *dockerisé* et déployé sur un *Raspberry Pi model B*.
+Le service est ***dockerisé*** et déployé sur un *Raspberry Pi model B*.
 
 ## Le réseau SIGFOX en bref
 J'ai eu l'occasion d'expérimenter dans le cadre de projets *IoT* plusieurs technologies de connexion à un réseau sans fil dont :
