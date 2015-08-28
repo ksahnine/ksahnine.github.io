@@ -10,7 +10,7 @@ legend: Data mining Twitter
 ---
 J'ai présenté dans [mon article précédent](/datascience/unix/bigdata/2015/08/14/analyse-hashtag-telavivsurseine.html) les résultats de l'analyse du mot croisillon `#TelAvivSurSeine`, l'évènement au centre d'une [polémique](http://www.lemonde.fr/societe/article/2015/08/09/tel-aviv-sur-seine-la-mairie-de-paris-ne-renonce-pas-malgre-la-polemique_4718346_3224.html) qui n'aurait jamais dû sortir des réseaux sociaux ni des cercles militants.
 
-Ces résutats sont le fruit d'une analyse rationnelle et distanciée des tweets associés à ce hashtag, analyse à la portée d'un informaticien suffisamment à l'aise sous **UNIX** et familier du langage de programmation **Python**.
+Ces résultats sont le fruit d'une analyse rationnelle et distanciée des tweets associés à ce hashtag, analyse à la portée d'un informaticien suffisamment à l'aise sous **UNIX** et familier du langage de programmation **Python**.
 
 Je présenterai dans cet article les outils et techniques m'ayant permis d'effectuer cette analyse. <br />
 Le code est disponible dans [mon repository *GitHub*](https://github.com/ksahnine/datascience-twitter). <br />
