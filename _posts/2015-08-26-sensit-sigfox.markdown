@@ -108,7 +108,7 @@ $ docker run -d -p 5000:5000 -v ~/config.yml:/app/conf/config.yml ksahnine/rpi-s
 <center>![Notification Sens'it](/assets/article_images/sensit-config.png)</center>
 - double cliquer sur le *Sens'it* pour recevoir une notification
 
-> **Remarque** : la taille de l'image de base utilisée peut être largement optimisée.
+> **Remarque** : Le `docker pull` initial est long sur un RPi model B. Néanmoins, la taille de l'image de base utilisée peut être largement optimisée.
 
 ## Eléments d'architecture
 Le schéma ci-dessous décrit l'ensemble de la chaîne de liaison :
