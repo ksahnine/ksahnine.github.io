@@ -43,6 +43,7 @@ Le schéma ci-dessous décrit l’architecture de l’ensemble :
 ![Nuage des prénoms](http://blog.inovia-conseil.fr/wp-content/uploads/2015/07/architecture.png)
 - **Agrégation des données** : la consolidation des données issue des traitements réalisés par le cluster est effectuée sur un portable (sous OS X) à l’aide des outils de tout bon Unixien (`grep`, `awk`, `sed`, `join`, `paste`, `bc`, `sort`, `uniq`, etc)
 - **Visualisation** : pour faciliter l’interprétation des résultats, la visualisation des données est effectuée avec `gnuplot` sur un portable (sous OS X)
+
 ## <a name="2"></a>Création du cluster EC2
 Il faut disposer d’un compte AWS (Amazon Web Services). Pour information, Amazon propose de tester (quasi) [gratuitement ses services](http://aws.amazon.com/fr/free/) pendant 12 mois à hauteur de 750 heures de consommation mensuelle.
 
