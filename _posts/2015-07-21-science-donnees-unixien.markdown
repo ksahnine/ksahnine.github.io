@@ -17,7 +17,7 @@ Sur le plan de l’analyse sociologique, j’aboutis aux mêmes conclusions que 
 - par ailleurs, les filles obtiennent de bien meilleurs résultats scolaires que les garçons
 
 La représentation visuelle du nuage des prénoms est réalisée avec **GNU Plot**, avec le pourcentage des mentions TB en abscisse et le nombre d’élèves en ordonnée (cliquer sur l’image pour l’agrandir).
-<center><a href="http://blog.inovia-conseil.fr/wp-content/uploads/2015/07/brevet-mentions-2015.png"><img width="60%" src="http://blog.inovia-conseil.fr/wp-content/uploads/2015/07/brevet-mentions-2015.png" /></a></center>
+<center>[![Nuage des prénoms](http://blog.inovia-conseil.fr/wp-content/uploads/2015/07/brevet-mentions-2015.png)](http://blog.inovia-conseil.fr/wp-content/uploads/2015/07/brevet-mentions-2015.png)</center>
 
 Dans cet article, je décrirai chacune des étapes m’ayant permis d’établir ce résultat, en usant abondamment de la **ligne de commande**.<br/>A travers cet article, j’espère pouvoir faire la démonstration qu’un Unixien est aussi un *Data Scientist* qui s’ignore.
 
