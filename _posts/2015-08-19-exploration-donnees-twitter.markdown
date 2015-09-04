@@ -344,6 +344,9 @@ cd datascience-twitter/scripts/graph
 {% endhighlight %}
 
 Pour visualiser le résultat, ouvrir un navigateur et consulter le lien [`http://localhost:8000`](http://localhost:8000) :
+{% highlight sh %}
+open http://localhost:8000
+{% endhighlight %}
 
 <center>![Réseau social de différents protagonistes](/assets/article_images/social_network.png)</center>
 
