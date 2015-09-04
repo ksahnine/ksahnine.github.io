@@ -16,7 +16,7 @@ En effet, dans un projet informatique impliquant plusieurs développeurs, la mis
 Nous allons voir à travers l’étude d’un cas pratique comment **Docker Compose** nous permettra de reconstituer un environnement d’exécution complet et autonome sur le poste du développeur par assemblage d’applications dockerisées.
 
 ## Etude de cas
-Dans le sillage de ma série d’articles traitant des architectures de microservices, en particulier celui consacré au développement d’une API RESTful avec **Dropwizard**, j’ai mis à disposition une application *AngularJS* permettant de consulter le trafic du métro parisien et dont le code source est [disponible sur Github](https://github.com/ksahnine/ratp-gui-angularjs) :
+Dans le sillage de ma [série d’articles](/architecture/microservice/2015/01/12/emergence-microservices.html) traitant des architectures de microservices, en particulier celui consacré au développement d’une API RESTful avec **Dropwizard**, j’ai mis à disposition une application *AngularJS* permettant de consulter le trafic du métro parisien et dont le code source est [disponible sur Github](https://github.com/ksahnine/ratp-gui-angularjs) :
 
 <center>![IHM AngularJS](http://blog.inovia-conseil.fr/wp-content/uploads/2015/03/metro-gui.png)</center>
 

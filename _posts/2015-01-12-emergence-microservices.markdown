@@ -34,7 +34,7 @@ C’est d’une part une réalité chez de nombreux acteurs du Web et dans des d
 D’autre part, certaines technologies ou pratiques qui sous-tendent une architecture orientée microservice sont désormais éprouvées et très largement répandues ou en voie de l’être :
 
 - l’approche **REST** et la généralisation du format d’échange de données **JSON**
-- l’émergence de frameworks légers adaptés au développement rapide de microservices, comme [*Dropwizard*](http://dropwizard.io/) (auquel j’ai consacré cet article), [*Spring Boot*](http://projects.spring.io/spring-boot/) et [*Spark*](http://sparkjava.com/) (Java), [*Flask*](http://flask.pocoo.org/) (Python), [*Sinatra*](http://www.sinatrarb.com/) (Ruby) ou [*Vert.x*](http://vertx.io/) (polyglotte)
+- l’émergence de frameworks légers adaptés au développement rapide de microservices, comme [*Dropwizard*](http://dropwizard.io/) (auquel j’ai consacré [cet article](/microservice/dropwizard/java/2015/01/16/presentation-dropwizard.html)), [*Spring Boot*](http://projects.spring.io/spring-boot/) et [*Spark*](http://sparkjava.com/) (Java), [*Flask*](http://flask.pocoo.org/) (Python), [*Sinatra*](http://www.sinatrarb.com/) (Ruby) ou [*Vert.x*](http://vertx.io/) (polyglotte)
 - la **montée en puissance** [**de technologies de containerisation**](https://linuxcontainers.org/), [Docker](https://www.docker.com/) étant bien parti pour devenir le standard de fait
 - le *cloud computing* comme nouveau paradigme d’hébergement (lire à ce sujet mon article publié il y a plus de 5 ans en 2009)
 
