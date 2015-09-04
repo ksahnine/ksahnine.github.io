@@ -7,7 +7,7 @@ tags: regular
 image: /assets/article_images/figues.jpg
 legend: Etal de figues sur un marché de Géorgie, Caucase
 ---
-Il y a plus de 5 ans (en janvier 2010), j’avais écrit un petit billet intitulé *L’inexorable migration du tiers Présentation* pour marquer l’émergence des **frameworks MV\* côté client** et ce, à une époque où **JSF** constituait encore un horizon indépassable au sein de nombreuses maîtrises d’oeuvre.<br />
+Il y a plus de 5 ans (en janvier 2010), j’avais écrit un petit billet intitulé [*L’inexorable migration du tiers Présentation*](http://blog.inovia-conseil.fr/?p=91) pour marquer l’émergence des **frameworks MV\* côté client** et ce, à une époque où **JSF** constituait encore un horizon indépassable au sein de nombreuses maîtrises d’oeuvre.<br />
 Fort heureusement, les temps ont changé en particulier depuis la déferlante [**AngularJS**](https://angularjs.org/), à telle enseigne que ce type de solution est désormais sur le point de devenir *mainstream*.
 
 Dans la caisse à outil du développeur **AngularJS** (entre autre), on trouvera naturellement le gestionnaire de paquets [**npm**](https://www.npmjs.com/), le gestionnaire de dépendances [**bower**](http://bower.io/) et l’outil d’automatisation [**grunt**](http://gruntjs.com/) (ou [**gulp**](http://gulpjs.com/)), mais on verra surtout dans cet article combien [**Docker Compose**](http://docs.docker.com/compose/) (anciennement [**Fig**](http://www.fig.sh/)) a sa place dans le dispositif, en particulier pour construire un environnement d’exécution calibré pour un projet et de le rendre **opérationnel sur un poste de développement en une seule commande** : `docker-compose up`.
