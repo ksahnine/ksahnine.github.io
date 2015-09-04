@@ -36,7 +36,7 @@ D’autre part, certaines technologies ou pratiques qui sous-tendent une archite
 - l’approche **REST** et la généralisation du format d’échange de données **JSON**
 - l’émergence de frameworks légers adaptés au développement rapide de microservices, comme [*Dropwizard*](http://dropwizard.io/) (auquel j’ai consacré [cet article](/microservice/dropwizard/java/2015/01/16/presentation-dropwizard.html)), [*Spring Boot*](http://projects.spring.io/spring-boot/) et [*Spark*](http://sparkjava.com/) (Java), [*Flask*](http://flask.pocoo.org/) (Python), [*Sinatra*](http://www.sinatrarb.com/) (Ruby) ou [*Vert.x*](http://vertx.io/) (polyglotte)
 - la **montée en puissance** [**de technologies de containerisation**](https://linuxcontainers.org/), [Docker](https://www.docker.com/) étant bien parti pour devenir le standard de fait
-- le *cloud computing* comme nouveau paradigme d’hébergement (lire à ce sujet mon article publié il y a plus de 5 ans en 2009)
+- le *cloud computing* comme nouveau paradigme d’hébergement (lire à ce sujet [mon article](http://blog.inovia-conseil.fr/?p=45) publié il y a plus de 5 ans en 2009)
 
 Enfin, les défis de la mutation numérique des entreprises vont contraindre les DSI à *"fluidifier"* le Système d’Information afin de produire, livrer, déployer, faire évoluer les composants du SI de plus en plus rapidement, défis face auxquels les applications monolithiques ne sont pas adaptées.
 
