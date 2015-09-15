@@ -173,7 +173,7 @@ find output -type f -name "Serie-Generale.csv" -exec cat {} \; | grep "TRES BIEN
 <br/>Distribuons les traitements sur le cluster (*map*) et comptabilisons les prénoms (*reduce*), triés par ordre alphabétique :
 
 - de tous les candidats :<br /><pre>
-parallel --nonall --basefile get_prenoms_full.sh --slf machines \
+parallel --nonall --basefile get\_prenoms\_full.sh --slf machines \
              --pipe "./get\_prenoms\_full.sh" | sort | uniq -c | \
              sort -k2 > stats\_brevet\_full.csv
 </pre>
