@@ -49,7 +49,7 @@ De par son format compact et sa nature stateless (le jeton n’est pas stocké d
 Ainsi, dans la requête d’accès à une ressource protégée, le jeton est véhiculé dans l’en-tête `Authorization` avec le mécanisme d’authentification `Bearer` :
 {% highlight text %}
 Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6ImRlbW8iLCJmdWxsTmFtZSI6
-{% highlight %}
+{% endhighlight %}
 
 Le schéma ci-dessous représente un dialogue entre un client (navigateur ou autre) et une API REST (et CORS compatible) exposant 2 services :
 - un service d’authentification : `POST /api/authenticate`
