@@ -36,10 +36,7 @@ Un jeton JWT est une chaîne de caractères décomposable en 3 sections séparé
   "username": "demo",
   "email": "demo@foobar.com"
 }
-{% endhighlight %}
-
-A noter que l’on distingue 3 types de *claims* :
-
+{% endhighlight %}<br /> A noter que l’on distingue 3 types de *claims* :
   - *claims* **réservés** : il s’agit de noms [réservés par la spécification](http://self-issued.info/docs/draft-ietf-oauth-json-web-token.html#RegisteredClaimName) et ne pouvant être utilisés par le développeur. Par exemple, `iat` contient la date de génération du jeton et `exp` sa date d’expiration.
   - *claims* **publics** : il s’agit de noms normalisés dont on encourage l’utilisation (ex. `name`, `email`, `phone_number`). Le registre est maintenu par l’organisation *IANA* et est [consultable sur leur site](http://www.iana.org/assignments/jwt/jwt.xhtml).
   - *claims* **privés** : il s’agit de noms à usage privé pour répondre à des besoins spécifiques à vos applications. Ils ne doivent pas entrer en conflit avec les autres types de *claims*.
