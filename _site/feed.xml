@@ -6,17 +6,180 @@
 </description>
     <link>http://ksahnine.github.io/</link>
     <atom:link href="http://ksahnine.github.io/feed.xml" rel="self" type="application/rss+xml" />
-    <pubDate>Fri, 21 Aug 2015 17:19:21 +0200</pubDate>
-    <lastBuildDate>Fri, 21 Aug 2015 17:19:21 +0200</lastBuildDate>
+    <pubDate>Fri, 04 Sep 2015 15:27:45 +0200</pubDate>
+    <lastBuildDate>Fri, 04 Sep 2015 15:27:45 +0200</lastBuildDate>
     <generator>Jekyll v2.5.3</generator>
+    
+      <item>
+        <title>Pratique du réseau M2M SIGFOX avec Sens&#39;it et Docker</title>
+        <description>&lt;p&gt;&lt;strong&gt;SIGFOX&lt;/strong&gt; est un opérateur de télécommunication français exploitant un réseau &lt;strong&gt;M2M&lt;/strong&gt; (&lt;em&gt;Machine to Machine&lt;/em&gt;) à vocation mondiale et dédié à l&amp;#39;&lt;a href=&quot;https://fr.wikipedia.org/wiki/Internet_des_objets&quot;&gt;&lt;em&gt;Internet des Objets&lt;/em&gt;&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;Cette société a eu la courtoisie de me faire parvenir un exemplaire du &lt;a href=&quot;https://www.sensit.io/&quot;&gt;&lt;strong&gt;Sens&amp;#39;it&lt;/strong&gt;&lt;/a&gt;, un objet connecté intégrant plusieurs capteurs (&lt;strong&gt;température&lt;/strong&gt;, &lt;strong&gt;mouvement&lt;/strong&gt;, &lt;strong&gt;son&lt;/strong&gt;) ainsi qu&amp;#39;un &lt;strong&gt;bouton poussoir&lt;/strong&gt;.&lt;/p&gt;
+
+&lt;p&gt;Développé par &lt;a href=&quot;http://www.axible-connects-for-you.com/&quot;&gt;&lt;strong&gt;AXIBLE technologies&lt;/strong&gt;&lt;/a&gt;, partenaire de &lt;em&gt;SIGFOX&lt;/em&gt;, &lt;em&gt;Sens&amp;#39;it&lt;/em&gt; est utilisable sans connaissances informatiques pour, par exemple :&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;effectuer un relevé de température régulier&lt;/li&gt;
+&lt;li&gt;être notifié par SMS ou email à chaque détection de mouvement&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Une &lt;a href=&quot;https://api.sensit.io/v1/&quot;&gt;API REST&lt;/a&gt; permet fort heureusement d&amp;#39;étendre le champ des possibles. On verra dans cet article comment l&amp;#39;utiliser pour obtenir en un clic les disponibilités de stations &lt;a href=&quot;http://www.velib.paris/&quot;&gt;&lt;strong&gt;Vélib&lt;/strong&gt;&lt;/a&gt; à proximité de son lieu de travail ou d&amp;#39;habitation :
+&lt;center&gt;&lt;iframe src=&quot;https://vid.me/e/n45c?tools=1&quot; width=&quot;480&quot; height=&quot;480&quot; frameborder=&quot;0&quot; allowfullscreen webkitallowfullscreen mozallowfullscreen scrolling=&quot;no&quot;&gt;&lt;/iframe&gt;&lt;/center&gt;&lt;/p&gt;
+
+&lt;p&gt;Le service est &lt;strong&gt;&lt;em&gt;dockerisé&lt;/em&gt;&lt;/strong&gt; et déployé sur un &lt;em&gt;Raspberry Pi model B&lt;/em&gt;.&lt;/p&gt;
+
+&lt;h2&gt;Le réseau SIGFOX en bref&lt;/h2&gt;
+
+&lt;p&gt;J&amp;#39;ai eu l&amp;#39;occasion d&amp;#39;expérimenter dans le cadre de projets &lt;em&gt;IoT&lt;/em&gt; plusieurs technologies de connexion à un réseau sans fil dont :&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;le microcontrôleur avec capacités WiFi &lt;a href=&quot;http://espressif.com/en/products/esp8266/&quot;&gt;&lt;strong&gt;ESP8266&lt;/strong&gt;&lt;/a&gt; (&lt;em&gt;Espressif&lt;/em&gt;), bon marché mais assez énergivore&lt;/li&gt;
+&lt;li&gt;le transceiver &lt;a href=&quot;https://www.nordicsemi.com/eng/Products/2.4GHz-RF/nRF24L01P&quot;&gt;&lt;strong&gt;nRF24l01+&lt;/strong&gt;&lt;/a&gt; (&lt;em&gt;Nordic&lt;/em&gt;), très bon marché et très économe en énergie, mais pas trivial à utiliser&lt;/li&gt;
+&lt;li&gt;le &lt;em&gt;dongle&lt;/em&gt; 3G &lt;strong&gt;Huawei e173&lt;/strong&gt;, relativement cher et très énergivore&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Par rapport à d&amp;#39;autres solutions de connexion à un réseau sans fil, en particuler le réseau GSM, le réseau &lt;em&gt;SIGFOX&lt;/em&gt; présente un certain nombre d&amp;#39;avantages comparatifs :&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;une couverture internationale&lt;/li&gt;
+&lt;li&gt;un faible coût d&amp;#39;utilisation (variable en fonction du volume de données échangées et du nombre de &lt;em&gt;devices&lt;/em&gt; : de 1 €/an pour les gros projets jusqu&amp;#39;à 10 - 16 €/an)&lt;/li&gt;
+&lt;li&gt;des modules ou transceivers &lt;em&gt;SIGFOX&lt;/em&gt; &lt;strong&gt;consommant très peu d&amp;#39;énergie&lt;/strong&gt; et bon marché (compter 15 € le &lt;em&gt;chip&lt;/em&gt;)&lt;/li&gt;
+&lt;li&gt;des communications sécurisées&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Noter que le réseau impose un certain nombre de contraintes :&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;il s&amp;#39;agit d&amp;#39;un réseau bas débit (jusqu&amp;#39;à 12 bytes par message), ce qui n&amp;#39;est pas contraignant pour un réseau M2M&lt;/li&gt;
+&lt;li&gt;il n&amp;#39;est pas possible d&amp;#39;émettre plus de 140 messages par jour et par device&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Note&lt;/strong&gt; : pour en savoir beaucoup plus sur le sujet, on lira avec profit &lt;a href=&quot;http://www.disk91.com/category/technology/sigfox/&quot;&gt;les articles&lt;/a&gt; de &lt;a href=&quot;https://twitter.com/disk_91&quot;&gt;Paul Pinault&lt;/a&gt; (aka &lt;em&gt;Disk91&lt;/em&gt;)&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h2&gt;Un peu de hardware&lt;/h2&gt;
+
+&lt;p&gt;Je n&amp;#39;ai pas résisté à la tentation d&amp;#39;ouvrir le boitier :
+&lt;center&gt;&lt;img src=&quot;/assets/article_images/sensit-inside.png&quot; alt=&quot;A l&amp;#39;intérieur du SensIt&quot;&gt;&lt;/center&gt;&lt;/p&gt;
+
+&lt;p&gt;En zoomant, on remarquera en particulier :&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;à gauche : le microcontrôlleur PIC &lt;strong&gt;PIC16F1718&lt;/strong&gt; de &lt;em&gt;Microchip&lt;/em&gt;&lt;/li&gt;
+&lt;li&gt;à droite : le transceiver &lt;strong&gt;CC1120&lt;/strong&gt; de &lt;em&gt;Texas Instrument&lt;/em&gt; opérant sur la bande de fréquence utilisée par &lt;em&gt;SIGFOX&lt;/em&gt; (868 MHz en Europe).
+&lt;center&gt;&lt;img src=&quot;/assets/article_images/sensit-zoom.png&quot; alt=&quot;Zoom&quot;&gt;&lt;/center&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://twitter.com/anthonny_q&quot;&gt;Anthonny Quérouil&lt;/a&gt; a &lt;a href=&quot;http://anthonnyquerouil.fr/2015/08/24/Sensit-mon-petit-objet-connecte.html&quot;&gt;écrit un billet&lt;/a&gt; très complet de présentation et d&amp;#39;utilisation du produit ainsi que de l&amp;#39;API REST.&lt;/p&gt;
+
+&lt;h2&gt;Un exemple de service avec Sens&amp;#39;it&lt;/h2&gt;
+
+&lt;p&gt;A titre personnel, je trouve que le bouton poussoir est une des fonctions les plus intéressantes de cet objet. &lt;/p&gt;
+
+&lt;p&gt;Etant parisien et utilisateur du service &lt;a href=&quot;http://www.velib.paris/&quot;&gt;&lt;strong&gt;Vélib&lt;/strong&gt;&lt;/a&gt;, je trouve l&amp;#39;application officielle peu pratique pour consulter les disponibilités.&lt;br /&gt;
+Quoi de plus simple que de cliquer sur un objet connecté et de savoir instantanément combien de vélos sont disponibles dans son quartier ?&lt;br /&gt;
+Voici une démo de l&amp;#39;application en action :
+&lt;center&gt;&lt;iframe src=&quot;https://vid.me/e/n45c?tools=1&quot; width=&quot;480&quot; height=&quot;480&quot; frameborder=&quot;0&quot; allowfullscreen webkitallowfullscreen mozallowfullscreen scrolling=&quot;no&quot;&gt;&lt;/iframe&gt;&lt;/center&gt;&lt;/p&gt;
+
+&lt;p&gt;Le service est développé sur une &lt;em&gt;stack&lt;/em&gt; Python (&lt;a href=&quot;http://flask.pocoo.org/&quot;&gt;&lt;strong&gt;Flask&lt;/strong&gt;&lt;/a&gt;) et utilise la technique du &lt;a href=&quot;https://fr.wikipedia.org/wiki/Web_scraping&quot;&gt;&lt;em&gt;web scraping&lt;/em&gt;&lt;/a&gt; pour extraire les disponibilités sur le site &lt;a href=&quot;http://www.velib.paris/&quot;&gt;&lt;em&gt;velib.paris.fr&lt;/em&gt;&lt;/a&gt;. &lt;br /&gt;
+A cet effet, j&amp;#39;ai utilisé l&amp;#39;excellente librairie &lt;a href=&quot;http://www.crummy.com/software/BeautifulSoup/&quot;&gt;&lt;strong&gt;BeautifulSoup&lt;/strong&gt;&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;Les notifications sont acheminées via &lt;a href=&quot;https://www.pushbullet.com/&quot;&gt;&lt;strong&gt;Pushbullet&lt;/strong&gt;&lt;/a&gt;, dont l&amp;#39;application est disponible sur une multitude de plateformes (&lt;em&gt;iOS&lt;/em&gt;, &lt;em&gt;Android&lt;/em&gt;, &lt;em&gt;Mac&lt;/em&gt;, &lt;em&gt;Windows&lt;/em&gt;, &lt;em&gt;Chrome&lt;/em&gt;, etc.) :
+&lt;center&gt;&lt;img src=&quot;/assets/article_images/velib.png&quot; alt=&quot;Notifications Vélib&quot;&gt;&lt;/center&gt;&lt;/p&gt;
+
+&lt;p&gt;Le code du service est disponible sur &lt;a href=&quot;https://github.com/ksahnine/sensit-sigfox/tree/master/apps/velib-callback&quot;&gt;&lt;em&gt;GitHub&lt;/em&gt;&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h2&gt;Déploiement du service&lt;/h2&gt;
+
+&lt;p&gt;Le service est packagé sous la forme d&amp;#39;une image &lt;strong&gt;Docker&lt;/strong&gt; &lt;em&gt;ARM&lt;/em&gt; (&lt;code&gt;ksahnine/rpi-sensit-velib&lt;/code&gt;), ce qui simplifiera grandement son déploiement.&lt;/p&gt;
+
+&lt;p&gt;Il existe plusieurs solutions pour déployer un hôte Docker sur Raspberry Pi (via &lt;em&gt;ArchLinux&lt;/em&gt; par exemple).&lt;br /&gt;
+Personnellement, j&amp;#39;utilise &lt;a href=&quot;http://blog.hypriot.com/downloads/&quot;&gt;l&amp;#39;image de &lt;strong&gt;Hypriot&lt;/strong&gt;&lt;/a&gt;, une distribution allégée de type &lt;em&gt;Debian&lt;/em&gt; intégrant Docker 1.6, très rapide à mettre en oeuvre et fonctionnant sur n&amp;#39;importe quel modèle de Raspberry Pi.&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;commencez par flasher l&amp;#39;image sur une carte SD (ex. sous OS X) :&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;diskutil unmountDisk /dev/disk1
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;sudo dd &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;hypriot-rpi-20150416-201537.img &lt;span class=&quot;nv&quot;&gt;of&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;/dev/rdisk1 &lt;span class=&quot;nv&quot;&gt;bs&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;1m&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;ul&gt;
+&lt;li&gt;se connecter au Raspberry Pi via ssh (&lt;code&gt;root&lt;/code&gt;/&lt;code&gt;hypriot&lt;/code&gt;)&lt;/li&gt;
+&lt;li&gt;récupérer le fichier de configuration modèle de l&amp;#39;application :&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;wget https://github.com/ksahnine/sensit-sigfox/raw/master/apps/velib-callback/conf/config.yml&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;ul&gt;
+&lt;li&gt;personnaliser le fichier de configuration &lt;code&gt;~/config.yml&lt;/code&gt; en renseignant &lt;a href=&quot;https://www.pushbullet.com/#settings/account&quot;&gt;le jeton d&amp;#39;accès de votre compte &lt;strong&gt;Pushbullet&lt;/strong&gt;&lt;/a&gt; ainsi que l&amp;#39;adresse de votre lieu de travail ou d&amp;#39;habitation :&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-yaml&quot; data-lang=&quot;yaml&quot;&gt;&lt;span class=&quot;c1&quot;&gt;# Pushbullet configuration&lt;/span&gt;
+&lt;span class=&quot;l-Scalar-Plain&quot;&gt;pushbullet&lt;/span&gt;&lt;span class=&quot;p-Indicator&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;l-Scalar-Plain&quot;&gt;api&lt;/span&gt;&lt;span class=&quot;p-Indicator&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;l-Scalar-Plain&quot;&gt;KcY0dyPlqiu0Dp1mrH7RI30AP8O83ZYa&lt;/span&gt;
+
+&lt;span class=&quot;c1&quot;&gt;# Address&lt;/span&gt;
+&lt;span class=&quot;l-Scalar-Plain&quot;&gt;location&lt;/span&gt;&lt;span class=&quot;p-Indicator&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;l-Scalar-Plain&quot;&gt;29 rue d&amp;#39;Astorg, Paris&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;ul&gt;
+&lt;li&gt;lancer l&amp;#39;application avec un simple &lt;code&gt;docker run&lt;/code&gt; :&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;docker run -d -p 5000:5000 -v ~/config.yml:/app/conf/config.yml ksahnine/rpi-sensit-velib&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;ul&gt;
+&lt;li&gt;se connecter à &lt;a href=&quot;https://www.sensit.io/&quot;&gt;l&amp;#39;interface d&amp;#39;administration&lt;/a&gt; de &lt;strong&gt;Sens&amp;#39;It&lt;/strong&gt; et configurer l&amp;#39;URL de &lt;em&gt;callback&lt;/em&gt; du bouton :
+&lt;center&gt;&lt;img src=&quot;/assets/article_images/sensit-config.png&quot; alt=&quot;Notification Sens&amp;#39;it&quot;&gt;&lt;/center&gt;&lt;/li&gt;
+&lt;li&gt;double cliquer sur le &lt;em&gt;Sens&amp;#39;it&lt;/em&gt; pour recevoir une notification&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Remarque&lt;/strong&gt; : Le &lt;code&gt;docker pull&lt;/code&gt; initial est long sur un RPi model B. Néanmoins, la taille de l&amp;#39;image de base utilisée peut être largement optimisée.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h2&gt;Eléments d&amp;#39;architecture&lt;/h2&gt;
+
+&lt;p&gt;Le schéma ci-dessous décrit l&amp;#39;ensemble de la chaîne de liaison :&lt;/p&gt;
+
+&lt;p&gt;&lt;center&gt;&lt;img src=&quot;/assets/article_images/sensit-archi.png&quot; alt=&quot;Chaîne de liaison&quot;&gt;&lt;/center&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;le double click du &lt;em&gt;Sens&amp;#39;it&lt;/em&gt; donne lieu à l&amp;#39;émission d&amp;#39;un message via le réseau &lt;em&gt;SIGFOX&lt;/em&gt;&lt;/li&gt;
+&lt;li&gt;&lt;em&gt;callback&lt;/em&gt; des serveurs d&amp;#39;&lt;em&gt;AXIBLE&lt;/em&gt; vers le service hébergé sur le Raspberry Pi&lt;/li&gt;
+&lt;li&gt;récupération des données depuis le site &lt;em&gt;velib.paris&lt;/em&gt;&lt;/li&gt;
+&lt;li&gt;envoi de la notification via &lt;em&gt;Pushbullet&lt;/em&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2&gt;Quelques remarques&lt;/h2&gt;
+
+&lt;p&gt;J&amp;#39;ai synthétisé &lt;a href=&quot;https://github.com/ksahnine/sensit-sigfox/wiki/Remarques-tests-API-Sens&amp;#x27;it&quot;&gt;quelques remarques et observations&lt;/a&gt; suite à mes expérimentations.&lt;/p&gt;
+</description>
+        <pubDate>Wed, 26 Aug 2015 08:00:00 +0200</pubDate>
+        <link>http://ksahnine.github.io/iot/m2m/sigfox/docker/2015/08/26/sensit-sigfox.html</link>
+        <guid isPermaLink="true">http://ksahnine.github.io/iot/m2m/sigfox/docker/2015/08/26/sensit-sigfox.html</guid>
+        
+        <category>regular</category>
+        
+        
+        <category>iot</category>
+        
+        <category>m2m</category>
+        
+        <category>sigfox</category>
+        
+        <category>docker</category>
+        
+      </item>
     
       <item>
         <title>L&#39;exploration de données Twitter</title>
         <description>&lt;p&gt;J&amp;#39;ai présenté dans &lt;a href=&quot;/datascience/unix/bigdata/2015/08/14/analyse-hashtag-telavivsurseine.html&quot;&gt;mon article précédent&lt;/a&gt; les résultats de l&amp;#39;analyse du mot croisillon &lt;code&gt;#TelAvivSurSeine&lt;/code&gt;, l&amp;#39;évènement au centre d&amp;#39;une &lt;a href=&quot;http://www.lemonde.fr/societe/article/2015/08/09/tel-aviv-sur-seine-la-mairie-de-paris-ne-renonce-pas-malgre-la-polemique_4718346_3224.html&quot;&gt;polémique&lt;/a&gt; qui n&amp;#39;aurait jamais dû sortir des réseaux sociaux ni des cercles militants.&lt;/p&gt;
 
-&lt;p&gt;Ces résutats sont le fruit d&amp;#39;une analyse rationnelle et distanciée des tweets associés à ce hashtag, analyse à la portée d&amp;#39;un informaticien suffisamment à l&amp;#39;aise sous &lt;strong&gt;UNIX&lt;/strong&gt; et familier du langage de programmation &lt;strong&gt;Python&lt;/strong&gt;.&lt;/p&gt;
+&lt;p&gt;Ces résultats sont le fruit d&amp;#39;une analyse rationnelle et distanciée des tweets associés à ce hashtag, analyse à la portée d&amp;#39;un informaticien suffisamment à l&amp;#39;aise sous &lt;strong&gt;UNIX&lt;/strong&gt; et familier du langage de programmation &lt;strong&gt;Python&lt;/strong&gt;.&lt;/p&gt;
 
 &lt;p&gt;Je présenterai dans cet article les outils et techniques m&amp;#39;ayant permis d&amp;#39;effectuer cette analyse. &lt;br /&gt;
+Le code est disponible dans &lt;a href=&quot;https://github.com/ksahnine/datascience-twitter&quot;&gt;mon repository &lt;em&gt;GitHub&lt;/em&gt;&lt;/a&gt;. &lt;br /&gt;
 Nous verrons comment &lt;strong&gt;extraire&lt;/strong&gt;, &lt;strong&gt;explorer&lt;/strong&gt;, &lt;strong&gt;synthétiser&lt;/strong&gt; et &lt;strong&gt;visualiser&lt;/strong&gt; de la connaissance à partir d&amp;#39;une importante masse d&amp;#39;information disponible sur Twitter. Ainsi nous verrons, entre autres, comment :&lt;/p&gt;
 
 &lt;ul&gt;
@@ -329,11 +492,11 @@ On utilisera un shell imbriqué à 2 commandes :&lt;/p&gt;
 &lt;p&gt;La liste des routines implémentées s&amp;#39;obtient en exécutant la commande : &lt;code&gt;./compute.sh&lt;/code&gt;.&lt;br /&gt;
 Pour obtenir la liste des 5 comptes les plus mentionnés sur toute la période :&lt;/p&gt;
 
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;./compute.sh tab_mentions ../../data/*.json &lt;span class=&quot;s2&quot;&gt;&amp;quot;.*&amp;quot;&lt;/span&gt; 5&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;./compute.sh tab_mentions &lt;span class=&quot;s2&quot;&gt;&amp;quot;../../data/*.json&amp;quot;&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;.*&amp;quot;&lt;/span&gt; 5&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;Pour obtenir la liste des 3 comptes les plus retweetés le &lt;em&gt;10 Août&lt;/em&gt; entre 18h et 19h59 heure de Paris :&lt;/p&gt;
 
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;./compute.sh tab_retweeted_users ../../data/*.json &lt;span class=&quot;s2&quot;&gt;&amp;quot;Aug 10 1[6-7]&amp;quot;&lt;/span&gt; 3&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;./compute.sh tab_retweeted_users &lt;span class=&quot;s2&quot;&gt;&amp;quot;../../data/*.json&amp;quot;&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;Aug 10 1[6-7]&amp;quot;&lt;/span&gt; 3&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;h3&gt;Visualiser un réseau social&lt;/h3&gt;
 
@@ -342,10 +505,10 @@ Pour obtenir la liste des 5 comptes les plus mentionnés sur toute la période :
 &lt;p&gt;Si vous avez bien suivi, vous ne devriez avoir aucun mal à produire un fichier contenant les 15 comptes les plus retweetés et les 15 comptes ayant le plus tweeté.&lt;br /&gt;
 Sinon, vous pouvez utiliser mes routines :&lt;/p&gt;
 
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;./compute.sh csv_tweeted_users ../../data/*.json &lt;span class=&quot;s2&quot;&gt;&amp;quot;.*&amp;quot;&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;15&lt;/span&gt; &amp;gt; users.csv
-./compute.sh csv_retweeted_users ../../data/*.json &lt;span class=&quot;s2&quot;&gt;&amp;quot;.*&amp;quot;&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;15&lt;/span&gt; &amp;gt;&amp;gt; users.csv&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;./compute.sh csv_tweeted_users &lt;span class=&quot;s2&quot;&gt;&amp;quot;../../data/*.json&amp;quot;&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;.*&amp;quot;&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;15&lt;/span&gt; &amp;gt; users.csv
+./compute.sh csv_retweeted_users &lt;span class=&quot;s2&quot;&gt;&amp;quot;../../data/*.json   &amp;quot;&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;.*&amp;quot;&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;15&lt;/span&gt; &amp;gt;&amp;gt; users.csv&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-&lt;p&gt;Reconstituons le réseau de rélations entre ces utilisateurs :&lt;/p&gt;
+&lt;p&gt;Reconstituons le réseau de relations entre ces utilisateurs :&lt;/p&gt;
 
 &lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;./social-network.py -l users.csv&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
@@ -360,14 +523,16 @@ Sinon, vous pouvez utiliser mes routines :&lt;/p&gt;
 
 &lt;p&gt;Pour visualiser le résultat, ouvrir un navigateur et consulter le lien &lt;a href=&quot;http://localhost:8000&quot;&gt;&lt;code&gt;http://localhost:8000&lt;/code&gt;&lt;/a&gt; :&lt;/p&gt;
 
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;open http://localhost:8000&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
 &lt;p&gt;&lt;center&gt;&lt;img src=&quot;/assets/article_images/social_network.png&quot; alt=&quot;Réseau social de différents protagonistes&quot;&gt;&lt;/center&gt;&lt;/p&gt;
 
 &lt;p&gt;Le graphe orienté est généré à l&amp;#39;aide de l&amp;#39;excellente librairie &lt;a href=&quot;http://d3js.org/&quot;&gt;D3&lt;/a&gt; pour laquelle j&amp;#39;ai consacré &lt;a href=&quot;http://blog.inovia-conseil.fr/?p=110&quot;&gt;un article&lt;/a&gt; il y a 3 ans.&lt;/p&gt;
 
 &lt;p&gt;Les cercles représentent les comptes. Leur taille est proportionnelle à leur nombre d&amp;#39;abonnés.&lt;/p&gt;
 
-&lt;p&gt;Il s&amp;#39;agit d&amp;#39;une version très expérimentale bien sûr, mais je trouve remarquable la visualisation des 2 groupes de &lt;em&gt;tweetos&lt;/em&gt; dont l&amp;#39;un concentre les tweets défavorable à l&amp;#39;évènement.&lt;br /&gt;
-Par ailleurs, on visualise bien les signes révélateur d&amp;#39;&lt;a href=&quot;https://fr.wikipedia.org/wiki/Astroturfing&quot;&gt;astroturfing&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Il s&amp;#39;agit d&amp;#39;une version très expérimentale bien sûr, mais je trouve remarquable la formation de 2 groupes distincts de &lt;em&gt;tweetos&lt;/em&gt; dont l&amp;#39;un concentre les tweets défavorables à l&amp;#39;évènement.&lt;br /&gt;
+Par ailleurs, on visualise bien les signes révélateurs d&amp;#39;&lt;a href=&quot;https://fr.wikipedia.org/wiki/Astroturfing&quot;&gt;astroturfing&lt;/a&gt;.&lt;/p&gt;
 </description>
         <pubDate>Wed, 19 Aug 2015 08:00:00 +0200</pubDate>
         <link>http://ksahnine.github.io/datascience/unix/bigdata/2015/08/19/exploration-donnees-twitter.html</link>
@@ -408,7 +573,7 @@ Je me suis prêté à cet exercice par &lt;strong&gt;simple curiosité intellect
 &lt;/ul&gt;
 
 &lt;p&gt;Je présenterai dans cet article les résultats obtenus en évitant les digressions techniques car l&amp;#39;article serait trop long.&lt;br /&gt;
-Dans mon prochain billet, j&amp;#39;aborderai à nouveau ce sujet mais sous un angle beaucoup plus technique, à l&amp;#39;occasion duquel je publierai sur &lt;a href=&quot;https://github.com/ksahnine&quot;&gt;mon compte &lt;em&gt;GitHub&lt;/em&gt;&lt;/a&gt; l&amp;#39;ensemble du code source m&amp;#39;ayant permis d&amp;#39;obtenir ces résultats.&lt;/p&gt;
+Dans mon &lt;a href=&quot;/datascience/unix/bigdata/2015/08/19/exploration-donnees-twitter.html&quot;&gt;prochain billet&lt;/a&gt;, j&amp;#39;aborderai à nouveau ce sujet mais sous un angle beaucoup plus technique, à l&amp;#39;occasion duquel je publierai sur &lt;a href=&quot;https://github.com/ksahnine/datascience-twitter&quot;&gt;mon compte &lt;em&gt;GitHub&lt;/em&gt;&lt;/a&gt; l&amp;#39;ensemble du code source m&amp;#39;ayant permis d&amp;#39;obtenir ces résultats.&lt;/p&gt;
 
 &lt;h3&gt;Collecte des données&lt;/h3&gt;
 
@@ -657,7 +822,7 @@ La commande ci-dessous permets d&amp;#39;extraire les 20 mots croisillons les pl
 &lt;li&gt;en particulier, le compte &lt;code&gt;Dajjalsystem&lt;/code&gt; intrigue par le nombre de tweets et RT (&lt;code&gt;3 030&lt;/code&gt;) au regard de son très faible nombre d&amp;#39;abonnés (&lt;code&gt;36&lt;/code&gt;)&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;Le qualificatif de &lt;em&gt;&amp;quot;compte pour crier&amp;quot;&lt;/em&gt; utilisée par Nicolas dans son article prend là tout son sens.&lt;/p&gt;
+&lt;p&gt;Le qualificatif de &lt;em&gt;&amp;quot;compte pour crier&amp;quot;&lt;/em&gt; utilisé par Nicolas dans son article prend là tout son sens.&lt;/p&gt;
 
 &lt;p&gt;L&amp;#39;API Twitter &lt;code&gt;followers/ids&lt;/code&gt; est très utile pour reconstituer le réseau de relations de ces petits comptes avec les comptes d&amp;#39;activistes patentés.&lt;/p&gt;
 
@@ -715,7 +880,7 @@ julievalles         KarimaB_, MadjidFalastine, ybenderbal, pauldraszen, s_assbag
 &lt;/ul&gt;
 
 &lt;p&gt;La représentation visuelle du nuage des prénoms est réalisée avec &lt;strong&gt;GNU Plot&lt;/strong&gt;, avec le pourcentage des mentions TB en abscisse et le nombre d’élèves en ordonnée (cliquer sur l’image pour l’agrandir).
-&lt;center&gt;&lt;a href=&quot;http://blog.inovia-conseil.fr/wp-content/uploads/2015/07/brevet-mentions-2015.png&quot;&gt;&lt;img width=&quot;60%&quot; src=&quot;http://blog.inovia-conseil.fr/wp-content/uploads/2015/07/brevet-mentions-2015.png&quot; /&gt;&lt;/a&gt;&lt;/center&gt;&lt;/p&gt;
+&lt;center&gt;&lt;a href=&quot;http://blog.inovia-conseil.fr/wp-content/uploads/2015/07/brevet-mentions-2015.png&quot;&gt;&lt;img src=&quot;http://blog.inovia-conseil.fr/wp-content/uploads/2015/07/brevet-mentions-2015.png&quot; alt=&quot;Nuage des prénoms&quot;&gt;&lt;/a&gt;&lt;/center&gt;&lt;/p&gt;
 
 &lt;p&gt;Dans cet article, je décrirai chacune des étapes m’ayant permis d’établir ce résultat, en usant abondamment de la &lt;strong&gt;ligne de commande&lt;/strong&gt;.&lt;br/&gt;A travers cet article, j’espère pouvoir faire la démonstration qu’un Unixien est aussi un &lt;em&gt;Data Scientist&lt;/em&gt; qui s’ignore.&lt;/p&gt;
 
@@ -746,10 +911,12 @@ Le script d’extraction est conçu pour être &lt;strong&gt;parallélisable&lt;
 Le schéma ci-dessous décrit l’architecture de l’ensemble :
 &lt;img src=&quot;http://blog.inovia-conseil.fr/wp-content/uploads/2015/07/architecture.png&quot; alt=&quot;Nuage des prénoms&quot;&gt;&lt;/li&gt;
 &lt;li&gt;&lt;strong&gt;Agrégation des données&lt;/strong&gt; : la consolidation des données issue des traitements réalisés par le cluster est effectuée sur un portable (sous OS X) à l’aide des outils de tout bon Unixien (&lt;code&gt;grep&lt;/code&gt;, &lt;code&gt;awk&lt;/code&gt;, &lt;code&gt;sed&lt;/code&gt;, &lt;code&gt;join&lt;/code&gt;, &lt;code&gt;paste&lt;/code&gt;, &lt;code&gt;bc&lt;/code&gt;, &lt;code&gt;sort&lt;/code&gt;, &lt;code&gt;uniq&lt;/code&gt;, etc)&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;Visualisation&lt;/strong&gt; : pour faciliter l’interprétation des résultats, la visualisation des données est effectuée avec &lt;code&gt;gnuplot&lt;/code&gt; sur un portable (sous OS X)
-## &lt;a name=&quot;2&quot;&gt;&lt;/a&gt;Création du cluster EC2
-Il faut disposer d’un compte AWS (Amazon Web Services). Pour information, Amazon propose de tester (quasi) &lt;a href=&quot;http://aws.amazon.com/fr/free/&quot;&gt;gratuitement ses services&lt;/a&gt; pendant 12 mois à hauteur de 750 heures de consommation mensuelle.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Visualisation&lt;/strong&gt; : pour faciliter l’interprétation des résultats, la visualisation des données est effectuée avec &lt;code&gt;gnuplot&lt;/code&gt; sur un portable (sous OS X)&lt;/li&gt;
 &lt;/ul&gt;
+
+&lt;h2&gt;&lt;a name=&quot;2&quot;&gt;&lt;/a&gt;Création du cluster EC2&lt;/h2&gt;
+
+&lt;p&gt;Il faut disposer d’un compte AWS (Amazon Web Services). Pour information, Amazon propose de tester (quasi) &lt;a href=&quot;http://aws.amazon.com/fr/free/&quot;&gt;gratuitement ses services&lt;/a&gt; pendant 12 mois à hauteur de 750 heures de consommation mensuelle.&lt;/p&gt;
 
 &lt;p&gt;Une fois votre compte créé, installer &lt;code&gt;awscli&lt;/code&gt;, le client en ligne de commande de l’API AWS ainsi que l’utilitaire &lt;code&gt;jq&lt;/code&gt;, un véritable couteau suisse de JSON. Ce dernier nous sera très utile car la sortie standard du client &lt;code&gt;awscli&lt;/code&gt; est au format JSON :&lt;/p&gt;
 
@@ -2046,7 +2213,7 @@ Hi! I&lt;span class=&quot;s1&quot;&gt;&amp;#39;m [svc1] service and my Docker co
     
       <item>
         <title>De l&#39;intêret de Docker Compose (ex Fig) pour le développeur AngularJS</title>
-        <description>&lt;p&gt;Il y a plus de 5 ans (en janvier 2010), j’avais écrit un petit billet intitulé &lt;em&gt;L’inexorable migration du tiers Présentation&lt;/em&gt; pour marquer l’émergence des &lt;strong&gt;frameworks MV* côté client&lt;/strong&gt; et ce, à une époque où &lt;strong&gt;JSF&lt;/strong&gt; constituait encore un horizon indépassable au sein de nombreuses maîtrises d’oeuvre.&lt;br /&gt;
+        <description>&lt;p&gt;Il y a plus de 5 ans (en janvier 2010), j’avais écrit un petit billet intitulé &lt;a href=&quot;http://blog.inovia-conseil.fr/?p=91&quot;&gt;&lt;em&gt;L’inexorable migration du tiers Présentation&lt;/em&gt;&lt;/a&gt; pour marquer l’émergence des &lt;strong&gt;frameworks MV* côté client&lt;/strong&gt; et ce, à une époque où &lt;strong&gt;JSF&lt;/strong&gt; constituait encore un horizon indépassable au sein de nombreuses maîtrises d’oeuvre.&lt;br /&gt;
 Fort heureusement, les temps ont changé en particulier depuis la déferlante &lt;a href=&quot;https://angularjs.org/&quot;&gt;&lt;strong&gt;AngularJS&lt;/strong&gt;&lt;/a&gt;, à telle enseigne que ce type de solution est désormais sur le point de devenir &lt;em&gt;mainstream&lt;/em&gt;.&lt;/p&gt;
 
 &lt;p&gt;Dans la caisse à outil du développeur &lt;strong&gt;AngularJS&lt;/strong&gt; (entre autre), on trouvera naturellement le gestionnaire de paquets &lt;a href=&quot;https://www.npmjs.com/&quot;&gt;&lt;strong&gt;npm&lt;/strong&gt;&lt;/a&gt;, le gestionnaire de dépendances &lt;a href=&quot;http://bower.io/&quot;&gt;&lt;strong&gt;bower&lt;/strong&gt;&lt;/a&gt; et l’outil d’automatisation &lt;a href=&quot;http://gruntjs.com/&quot;&gt;&lt;strong&gt;grunt&lt;/strong&gt;&lt;/a&gt; (ou &lt;a href=&quot;http://gulpjs.com/&quot;&gt;&lt;strong&gt;gulp&lt;/strong&gt;&lt;/a&gt;), mais on verra surtout dans cet article combien &lt;a href=&quot;http://docs.docker.com/compose/&quot;&gt;&lt;strong&gt;Docker Compose&lt;/strong&gt;&lt;/a&gt; (anciennement &lt;a href=&quot;http://www.fig.sh/&quot;&gt;&lt;strong&gt;Fig&lt;/strong&gt;&lt;/a&gt;) a sa place dans le dispositif, en particulier pour construire un environnement d’exécution calibré pour un projet et de le rendre &lt;strong&gt;opérationnel sur un poste de développement en une seule commande&lt;/strong&gt; : &lt;code&gt;docker-compose up&lt;/code&gt;.&lt;/p&gt;
@@ -2056,7 +2223,7 @@ Nous allons voir à travers l’étude d’un cas pratique comment &lt;strong&gt
 
 &lt;h2&gt;Etude de cas&lt;/h2&gt;
 
-&lt;p&gt;Dans le sillage de ma série d’articles traitant des architectures de microservices, en particulier celui consacré au développement d’une API RESTful avec &lt;strong&gt;Dropwizard&lt;/strong&gt;, j’ai mis à disposition une application &lt;em&gt;AngularJS&lt;/em&gt; permettant de consulter le trafic du métro parisien et dont le code source est &lt;a href=&quot;https://github.com/ksahnine/ratp-gui-angularjs&quot;&gt;disponible sur Github&lt;/a&gt; :&lt;/p&gt;
+&lt;p&gt;Dans le sillage de ma &lt;a href=&quot;/architecture/microservice/2015/01/12/emergence-microservices.html&quot;&gt;série d’articles&lt;/a&gt; traitant des architectures de microservices, en particulier celui consacré au développement d’une API RESTful avec &lt;strong&gt;Dropwizard&lt;/strong&gt;, j’ai mis à disposition une application &lt;em&gt;AngularJS&lt;/em&gt; permettant de consulter le trafic du métro parisien et dont le code source est &lt;a href=&quot;https://github.com/ksahnine/ratp-gui-angularjs&quot;&gt;disponible sur Github&lt;/a&gt; :&lt;/p&gt;
 
 &lt;p&gt;&lt;center&gt;&lt;img src=&quot;http://blog.inovia-conseil.fr/wp-content/uploads/2015/03/metro-gui.png&quot; alt=&quot;IHM AngularJS&quot;&gt;&lt;/center&gt;&lt;/p&gt;
 
@@ -2196,182 +2363,6 @@ Néanmoins au cas où vous l’utiliseriez, voici quelques-uns de mes retours d�
         <category>docker</category>
         
         <category>angularjs</category>
-        
-      </item>
-    
-      <item>
-        <title>Provisionner des microservices avec Ansible et Docker</title>
-        <description>&lt;p&gt;C’est bien connu, la fainéantise est la plus grande qualité d’un administrateur système.&lt;br /&gt;
-Si ce dernier est en outre un inconditionnel de &lt;a href=&quot;http://puppetlabs.com/&quot;&gt;&lt;strong&gt;Puppet&lt;/strong&gt;&lt;/a&gt;, &lt;a href=&quot;https://www.chef.io/chef/&quot;&gt;&lt;strong&gt;Chef&lt;/strong&gt;&lt;/a&gt; ou &lt;a href=&quot;http://www.ansible.com/&quot;&gt;&lt;strong&gt;Ansible&lt;/strong&gt;&lt;/a&gt;, c’est qu’il élève l’indolence au rang de valeur cardinale.&lt;br /&gt;
-C’est dans cet état d’esprit que nous allons voir comment provisionner depuis un ordinateur portable et avec très peu d’efforts, une plateforme d’hébergement de microservices à l’aide de &lt;strong&gt;Docker&lt;/strong&gt; et &lt;strong&gt;Ansible&lt;/strong&gt;.&lt;/p&gt;
-
-&lt;h2&gt;Ansible : présentation et fonctionnement&lt;/h2&gt;
-
-&lt;p&gt;&lt;a href=&quot;http://www.ansible.com/&quot;&gt;&lt;strong&gt;Ansible&lt;/strong&gt;&lt;/a&gt; est un outil automatisant la configuration et la gestion d’un parc de machines.&lt;br /&gt;
-Ecrit en Python et doté de &lt;a href=&quot;http://docs.ansible.com/modules_by_category.html&quot;&gt;nombreux modules&lt;/a&gt; extensibles, il permet de réaliser à distance des tâches aussi diverses que l’installation et la configuration d’une application, le montage d’un système de fichiers ou le déploiement sur le cloud EC2 d’Amazon.&lt;br /&gt;
-&lt;strong&gt;Aucun agent n’est installé sur les machines à administrer&lt;/strong&gt;, les seuls pré-requis étant la disponibilité de &lt;strong&gt;SSH&lt;/strong&gt; et &lt;strong&gt;Python&lt;/strong&gt;.&lt;/p&gt;
-
-&lt;p&gt;Un &lt;strong&gt;module Ansible&lt;/strong&gt; est une unité de traitement réutilisable écrite en Python et effectuant une tâche précise. Par exemple, le module &lt;a href=&quot;http://docs.ansible.com/shell_module.html&quot;&gt;&lt;code&gt;shell&lt;/code&gt;&lt;/a&gt; permet d’exécuter une commande quelconque sur une machine distante.&lt;br /&gt;
-Lorsque qu’une tâche Ansible est lancée depuis le poste de contrôle, Ansible :&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;transfère via SSH le ou les modules dans le répertoire temporaire &lt;code&gt;~/.ansible/tmp&lt;/code&gt; du serveur distant&lt;/li&gt;
-&lt;li&gt;exécute via SSH le ou les modules sur le serveur distant&lt;/li&gt;
-&lt;li&gt;analyse la sortie standard du module (au format JSON)&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;Si, comme on le verra dans notre cas d’utilisation, les clés publiques SSH sont déployées sur les serveurs distants, Ansible peut ouvrir une connexion SSH sans avoir besoin de mot de passe.&lt;/p&gt;
-
-&lt;h2&gt;Exercice pratique&lt;/h2&gt;
-
-&lt;p&gt;Dans de précédents articles d’&lt;em&gt;Inovia Blog&lt;/em&gt;, nous avions d’une part développé un service REST de consultation des horaires du métro avec &lt;em&gt;Dropwizard&lt;/em&gt; et d’autre part dockerisé celui-ci (l’image &lt;code&gt;ksahnine/ratp-rest-api:1.0&lt;/code&gt; est &lt;a href=&quot;https://registry.hub.docker.com/u/ksahnine/ratp-rest-api/&quot;&gt;disponible sur mon repository public sur &lt;em&gt;Docker Hub&lt;/em&gt;&lt;/a&gt;).&lt;br /&gt;
-Nous allons repartir de cet exemple pour construire l’infrastructure hébergeant ce service.&lt;br /&gt;
-Toutes les tâches de construction et de configuration de l’infrastructure, décrite dans le schéma ci-dessous, sont coordonnées par Ansible et exécutées depuis un ordinateur portable (&lt;code&gt;laptop.local&lt;/code&gt;).&lt;/p&gt;
-
-&lt;p&gt;&lt;center&gt;&lt;img src=&quot;http://blog.inovia-conseil.fr/wp-content/uploads/2015/01/ansible-docker-architecture.png&quot; alt=&quot;Architecture&quot;&gt;&lt;/center&gt;&lt;/p&gt;
-
-&lt;p&gt;L’infrastructure technique est constituées de 2 serveurs Linux :&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;code&gt;pegase.loca&lt;/code&gt;l : un serveur sous &lt;em&gt;Arch Linux&lt;/em&gt; hébergeant un répartiteur de charge (&lt;em&gt;nginx&lt;/em&gt; configuré en loadbalancer)&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;orion.local&lt;/code&gt; : un serveur sous &lt;em&gt;Debian&lt;/em&gt; hébergeant 2 instances du service dockerisé sur 2 ports différents (&lt;code&gt;8080&lt;/code&gt; et &lt;code&gt;8081&lt;/code&gt;).&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;Voici les tâches à réaliser sur chacun des noeuds :&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;côté front (&lt;code&gt;pegase.local&lt;/code&gt;) :
-
-&lt;ul&gt;
-&lt;li&gt;installation de &lt;em&gt;nginx&lt;/em&gt; via le gestionnaire de paquets &lt;code&gt;pacman&lt;/code&gt; (on est sur un serveur &lt;em&gt;Arch Linux&lt;/em&gt;). &lt;br /&gt;Noter que &lt;em&gt;nginx&lt;/em&gt; aurait très bien pu être déployé dans un conteneur Docker.&lt;/li&gt;
-&lt;li&gt;déploiement de la configuration &lt;em&gt;nginx&lt;/em&gt; pour répartir la charge sur les 2 instances du service&lt;/li&gt;
-&lt;li&gt;redémarrage du serveur &lt;em&gt;nginx&lt;/em&gt;&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;côté back (&lt;code&gt;orion.local&lt;/code&gt;) :
-
-&lt;ul&gt;
-&lt;li&gt;installation de Docker, via le gestionnaire de paquets aptitude (&lt;code&gt;apt-get&lt;/code&gt;)&lt;/li&gt;
-&lt;li&gt;provisionnement de 2 conteneurs Docker avec l’image du service de consultation des horaires du métro (image &lt;code&gt;ksahnine/ratp-rest-api:1.0&lt;/code&gt; disponible sur &lt;em&gt;Docker Hub&lt;/em&gt;)&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;Réaliser toutes ces tâches manuellement serait fastidieux et potentiellement source d’erreur. Avec Ansible, &lt;strong&gt;toutes ces tâches peuvent être réalisées en une seule commande&lt;/strong&gt; et sans risque d’erreur.&lt;br /&gt;
-Toutes les opérations qui vont suivre sont à réaliser sur la machine de contrôle, un simple portable dans notre cas (&lt;code&gt;laptop.local&lt;/code&gt;).&lt;/p&gt;
-
-&lt;h2&gt;Mise en oeuvre&lt;/h2&gt;
-
-&lt;h3&gt;Installation de Ansible&lt;/h3&gt;
-
-&lt;p&gt;Le mode opératoire d’installation le plus simple s’effectue via &lt;code&gt;brew&lt;/code&gt; (sous OS X) :&lt;/p&gt;
-
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;brew install ansible&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;p&gt;ou &lt;code&gt;pip&lt;/code&gt; :&lt;/p&gt;
-
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;sudo pip install ansible&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;h3&gt;Création et déploiement des clés SSH&lt;/h3&gt;
-
-&lt;p&gt;Pour permettre à Ansible d’ouvrir une connexion SSH sans utiliser de mot de passe, nous allons mettre en oeuvre une &lt;strong&gt;authentification par clé SSH&lt;/strong&gt;.&lt;br /&gt;
-Commençons par générer une paire de clés RSA2 sans &lt;em&gt;passphrase&lt;/em&gt; à l’aide de la commande &lt;code&gt;ssh-keygen&lt;/code&gt; :&lt;/p&gt;
-
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;ssh-keygen -t rsa -f ~/.ssh/id_rsa_galaxy -N &lt;span class=&quot;s2&quot;&gt;&amp;quot;&amp;quot;&lt;/span&gt; -C &lt;span class=&quot;s2&quot;&gt;&amp;quot;Galaxy&amp;quot;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;p&gt;La clé privée (fichier &lt;code&gt;~/.ssh/id_rsa_galaxy&lt;/code&gt;) reste évidemment sur le poste client (&lt;code&gt;laptop.local&lt;/code&gt;) et sera utilisée par Ansible.&lt;br /&gt;
-En revanche, la clé publique (fichier &lt;code&gt;~/.ssh/id_rsa_galaxy.pub&lt;/code&gt;) doit être copiée sur les 2 serveurs à administrer (&lt;code&gt;orion.local&lt;/code&gt; et &lt;code&gt;pegase.local&lt;/code&gt;).&lt;br /&gt;
-L’utilitaire &lt;code&gt;ssh-copy-id&lt;/code&gt; permet de copier une clé publique dans le fichier &lt;code&gt;~/.ssh/authorized_keys&lt;/code&gt; des comptes d’exécution des serveurs distants :&lt;/p&gt;
-
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;ssh-copy-id -i ~/.ssh/id_galaxy.pub markab@pegase.local
-ssh-copy-id -i ~/.ssh/id_galaxy.pub betelgeuse@orion.local&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;p&gt;Sous OSX, vous pouvez installer l’utilitaire &lt;code&gt;ssh-copy-id&lt;/code&gt; comme suit :&lt;/p&gt;
-
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;curl -L https://raw.githubusercontent.com/beautifulcode/ssh-copy-id-for-OSX/master/install.sh &lt;span class=&quot;p&quot;&gt;|&lt;/span&gt; sh&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;h3&gt;Le fichier d’inventaire&lt;/h3&gt;
-
-&lt;p&gt;Ce fichier au &lt;a href=&quot;http://fr.wikipedia.org/wiki/Fichier_INI&quot;&gt;format INI&lt;/a&gt; contient l’inventaire des machines orchestrées par Ansible (fichier &lt;code&gt;/etc/ansible/hosts&lt;/code&gt; par défaut), avec 2 serveurs dans notre cas :
-&lt;script src=&quot;https://gist.github.com/15527b36a4470dde98ce.js&quot;&gt; &lt;/script&gt;&lt;/p&gt;
-
-&lt;p&gt;Les comptes d’exécution des serveurs distants sont définis dans la variable Ansible &lt;code&gt;ansible_ssh_user&lt;/code&gt;.&lt;br /&gt;
-Par ailleurs, la localisation de la clé privée utilisée pour l’ouverture des connexions SSH est définie dans la variable Ansible &lt;code&gt;ansible_ssh_private_key_file&lt;/code&gt;.&lt;br /&gt;
-Enfin, on remarquera l’utilisation d’une variable personnalisée &lt;code&gt;env&lt;/code&gt; que l’on exploitera plus loin.&lt;/p&gt;
-
-&lt;h3&gt;Le fichier Playbook : un Makefile de l’infrastructure&lt;/h3&gt;
-
-&lt;p&gt;Les tâches de construction et de configuration de l’infrastructure sont décrites dans un langage très simple utilisant le format &lt;strong&gt;YAML&lt;/strong&gt; : le &lt;strong&gt;playbook&lt;/strong&gt;.&lt;br /&gt;
-D’une certaine façon, &lt;strong&gt;le playbook est le Makefile de construction d’une infrastructure IT&lt;/strong&gt;. On pourrait également dire que le &lt;em&gt;playbook&lt;/em&gt; est à Ansible ce que le &lt;em&gt;Dockerfile&lt;/em&gt; est à Docker, mais au fond la paternité de cette idée revient au bon vieux &lt;em&gt;Makefile&lt;/em&gt; !&lt;br /&gt;
-Le fichier &lt;code&gt;infra_services_playbook.yml&lt;/code&gt; ci-dessous décrit l’ensemble des tâches à réaliser pour notre environnement :
-&lt;script src=&quot;https://gist.github.com/bb0872a005e25b675774.js&quot;&gt; &lt;/script&gt;&lt;/p&gt;
-
-&lt;p&gt;Quelques observations sur la façon dont nous configurons &lt;em&gt;nginx&lt;/em&gt; dans le fichier &lt;em&gt;playbook&lt;/em&gt; :&lt;/p&gt;
-
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;- name: Configuration loadbalancer
-  template: src=conf/loadbalancer-nginx-.conf dest=/etc/nginx/nginx.conf&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;p&gt;On remarquera que :&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;p&gt;le fichier de configuration &lt;em&gt;Nginx&lt;/em&gt; à déployer (&lt;code&gt;conf/loadbalancer-nginx-prod.conf&lt;/code&gt; dont le contenu figure ci-après) est stocké sur le poste de contrôle (&lt;code&gt;laptop.local&lt;/code&gt;).
-&lt;script src=&quot;https://gist.github.com/b7e947a8f6e73d51a3d0.js&quot;&gt; &lt;/script&gt;&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;Le fichier de destination (&lt;code&gt;/etc/nginx/nginx.conf&lt;/code&gt;) correspond au système de fichier du serveur distant (&lt;code&gt;pegase.local&lt;/code&gt;).&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;le nom du fichier source est variabilisé dans le &lt;em&gt;playbook&lt;/em&gt; (variable &lt;code&gt;env&lt;/code&gt; déréférencée &lt;code&gt;{\{ env }}&lt;/code&gt;)&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;la variable &lt;code&gt;env&lt;/code&gt; est renseignée dans le fichier d’inventaire &lt;code&gt;hosts.ini&lt;/code&gt; (&lt;code&gt;env=prod&lt;/code&gt;)&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3&gt;Construction de l’infrastructure&lt;/h3&gt;
-
-&lt;p&gt;La commande &lt;code&gt;ansible-playbook&lt;/code&gt; permet d’exécuter un &lt;em&gt;playbook&lt;/em&gt;, et donc l’ensemble des tâches de construction de l’infrastructure. Il prend en paramètre le fichier d’inventaire (&lt;code&gt;-i hosts.ini&lt;/code&gt;) ainsi que le fichier &lt;em&gt;playbook&lt;/em&gt; &lt;code&gt;infra_services_playbook.yml&lt;/code&gt; décrit plus haut :&lt;/p&gt;
-
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;ansible-playbook -i hosts.ini infra_services_playbook.yml&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;p&gt;Voici le compte-rendu d’exécution du playbook affiché sur la sortie standard :&lt;/p&gt;
-
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-sh&quot; data-lang=&quot;sh&quot;&gt;PLAY &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;** Frontend **&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt; *********************************************************
-
-TASK: &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;Installation nginx&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt; ****************************************************
-changed: &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;pegase.local&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt;
-
-TASK: &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;Configuration loadbalancer&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt; ********************************************
-changed: &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;pegase.local&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt;
-
-TASK: &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;Redemarrage nginx&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt; *****************************************************
-changed: &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;pegase.local&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt;
-
-PLAY &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;** Backend **&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt; **********************************************************
-
-TASK: &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;Installation Docker&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt; **************************************************
-changed: &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;orion.local&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt;
-
-TASK: &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;Arret des containers&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt; **************************************************
-changed: &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;orion.local&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt;
-
-TASK: &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;Provisionnement du service &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;instance 1&lt;span class=&quot;o&quot;&gt;)]&lt;/span&gt; *******************************
-changed: &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;orion.local&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt;
-
-TASK: &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;Provisionnement du service &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;instance 2&lt;span class=&quot;o&quot;&gt;)]&lt;/span&gt; *******************************
-changed: &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;orion.local&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt;
-
-PLAY RECAP ********************************************************************
-orion.local                : &lt;span class=&quot;nv&quot;&gt;ok&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;4&lt;/span&gt;    &lt;span class=&quot;nv&quot;&gt;changed&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;4&lt;/span&gt;    &lt;span class=&quot;nv&quot;&gt;unreachable&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;0&lt;/span&gt;    &lt;span class=&quot;nv&quot;&gt;failed&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;0
-pegase.local               : &lt;span class=&quot;nv&quot;&gt;ok&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;3&lt;/span&gt;    &lt;span class=&quot;nv&quot;&gt;changed&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;3&lt;/span&gt;    &lt;span class=&quot;nv&quot;&gt;unreachable&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;0&lt;/span&gt;    &lt;span class=&quot;nv&quot;&gt;failed&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;0&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-
-&lt;p&gt;Et voilà !&lt;/p&gt;
-
-&lt;p&gt;A noter que l’on pourrait élégamment utiliser le &lt;a href=&quot;http://docs.ansible.com/docker_module.html&quot;&gt;module Ansible docker&lt;/a&gt;, en installant préalablement le module Python &lt;a href=&quot;https://github.com/docker/docker-py&quot;&gt;&lt;em&gt;docker-py&lt;/em&gt;&lt;/a&gt; dont il dépend.&lt;/p&gt;
-</description>
-        <pubDate>Sun, 01 Feb 2015 07:00:00 +0100</pubDate>
-        <link>http://ksahnine.github.io/microservice/ansible/docker/2015/02/01/ansible-docker.html</link>
-        <guid isPermaLink="true">http://ksahnine.github.io/microservice/ansible/docker/2015/02/01/ansible-docker.html</guid>
-        
-        <category>regular</category>
-        
-        
-        <category>microservice</category>
-        
-        <category>ansible</category>
-        
-        <category>docker</category>
         
       </item>
     

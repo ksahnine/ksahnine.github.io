@@ -74,7 +74,7 @@
 </ul>
 
 <p>La représentation visuelle du nuage des prénoms est réalisée avec <strong>GNU Plot</strong>, avec le pourcentage des mentions TB en abscisse et le nombre d’élèves en ordonnée (cliquer sur l’image pour l’agrandir).
-<center><a href="http://blog.inovia-conseil.fr/wp-content/uploads/2015/07/brevet-mentions-2015.png"><img width="60%" src="http://blog.inovia-conseil.fr/wp-content/uploads/2015/07/brevet-mentions-2015.png" /></a></center></p>
+<center><a href="http://blog.inovia-conseil.fr/wp-content/uploads/2015/07/brevet-mentions-2015.png"><img src="http://blog.inovia-conseil.fr/wp-content/uploads/2015/07/brevet-mentions-2015.png" alt="Nuage des prénoms"></a></center></p>
 
 <p>Dans cet article, je décrirai chacune des étapes m’ayant permis d’établir ce résultat, en usant abondamment de la <strong>ligne de commande</strong>.<br/>A travers cet article, j’espère pouvoir faire la démonstration qu’un Unixien est aussi un <em>Data Scientist</em> qui s’ignore.</p>
 
@@ -105,10 +105,12 @@ Le script d’extraction est conçu pour être <strong>parallélisable</strong>,
 Le schéma ci-dessous décrit l’architecture de l’ensemble :
 <img src="http://blog.inovia-conseil.fr/wp-content/uploads/2015/07/architecture.png" alt="Nuage des prénoms"></li>
 <li><strong>Agrégation des données</strong> : la consolidation des données issue des traitements réalisés par le cluster est effectuée sur un portable (sous OS X) à l’aide des outils de tout bon Unixien (<code>grep</code>, <code>awk</code>, <code>sed</code>, <code>join</code>, <code>paste</code>, <code>bc</code>, <code>sort</code>, <code>uniq</code>, etc)</li>
-<li><strong>Visualisation</strong> : pour faciliter l’interprétation des résultats, la visualisation des données est effectuée avec <code>gnuplot</code> sur un portable (sous OS X)
-## <a name="2"></a>Création du cluster EC2
-Il faut disposer d’un compte AWS (Amazon Web Services). Pour information, Amazon propose de tester (quasi) <a href="http://aws.amazon.com/fr/free/">gratuitement ses services</a> pendant 12 mois à hauteur de 750 heures de consommation mensuelle.</li>
+<li><strong>Visualisation</strong> : pour faciliter l’interprétation des résultats, la visualisation des données est effectuée avec <code>gnuplot</code> sur un portable (sous OS X)</li>
 </ul>
+
+<h2><a name="2"></a>Création du cluster EC2</h2>
+
+<p>Il faut disposer d’un compte AWS (Amazon Web Services). Pour information, Amazon propose de tester (quasi) <a href="http://aws.amazon.com/fr/free/">gratuitement ses services</a> pendant 12 mois à hauteur de 750 heures de consommation mensuelle.</p>
 
 <p>Une fois votre compte créé, installer <code>awscli</code>, le client en ligne de commande de l’API AWS ainsi que l’utilitaire <code>jq</code>, un véritable couteau suisse de JSON. Ce dernier nous sera très utile car la sortie standard du client <code>awscli</code> est au format JSON :</p>
 
