@@ -21,14 +21,14 @@ Un jeton JWT est une chaîne de caractères décomposable en 3 sections séparé
 <center>![Jeton JWT](/assets/article_images/jeton_jwt.png)</center>
 
 - **En-tête** : c’est un document au format JSON, **encodé en base 64** et contenant des méta-données. Il doit contenir au minimum le type de jeton et l’algorithme de chiffrement utilisé pour le signer numériquement. <br/>Exemple :<br />
-```
+{% highlight text %}
 {
   "typ": "JWT",
   "alg": "HS256"
 }
-```
+{% endhighlight %}
 - **Charge utile** : cette section est un document au format JSON **encodé en base 64**, contenant des données fonctionnelles minimales que l’on souhaite transmettre au service (ces propriétés sont appelées *claims* ou *revendications* selon la terminologie de la RFC). En pratique, on y fait transiter des informations sur l’identité de l’utilisateur (login, nom complet, rôles, etc.). **Il ne doit pas contenir de données sensibles**. Voici un exemple :<br/>
-```
+{% highlight text %}
 {
   "iat": 1448383708,
   "exp": 1448383768,
@@ -36,8 +36,9 @@ Un jeton JWT est une chaîne de caractères décomposable en 3 sections séparé
   "username": "demo",
   "email": "demo@foobar.com"
 }
-```
-A noter que l’on distingue 3 types de claims :
+{% endhighlight %}
+
+A noter que l’on distingue 3 types de *claims* :
   - *claims* **réservés** : il s’agit de noms [réservés par la spécification](http://self-issued.info/docs/draft-ietf-oauth-json-web-token.html#RegisteredClaimName) et ne pouvant être utilisés par le développeur. Par exemple, `iat` contient la date de génération du jeton et `exp` sa date d’expiration.
   - *claims* **publics** : il s’agit de noms normalisés dont on encourage l’utilisation (ex. `name`, `email`, `phone_number`). Le registre est maintenu par l’organisation *IANA* et est [consultable sur leur site](http://www.iana.org/assignments/jwt/jwt.xhtml).
   - *claims* **privés** : il s’agit de noms à usage privé pour répondre à des besoins spécifiques à vos applications. Ils ne doivent pas entrer en conflit avec les autres types de *claims*.
@@ -46,9 +47,9 @@ A noter que l’on distingue 3 types de claims :
 # Fonctionnement et étude de cas
 De par son format compact et sa nature stateless (le jeton n’est pas stocké dans une base de données), JWT est très adapté aux transactions HTTP.<br/>
 Ainsi, dans la requête d’accès à une ressource protégée, le jeton est véhiculé dans l’en-tête `Authorization` avec le mécanisme d’authentification `Bearer` :
-```
+{% highlight text %}
 Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6ImRlbW8iLCJmdWxsTmFtZSI6
-```
+{% highlight %}
 
 Le schéma ci-dessous représente un dialogue entre un client (navigateur ou autre) et une API REST (et CORS compatible) exposant 2 services :
 - un service d’authentification : `POST /api/authenticate`
@@ -75,6 +76,7 @@ npm start
 {% endhighlight %}
 
 Voici quelques cas d’utilisation de l’API via l’utilitaire **cURL** :
+
 - **Cas 1** : accès à une ressource protégée sans jeton :
 {% highlight sh %}
 $ curl http://localhost:8000/api/restricted/accounts
