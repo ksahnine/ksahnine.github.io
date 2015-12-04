@@ -49,9 +49,10 @@ Ainsi, dans la requête d’accès à une ressource protégée, le jeton est vé
 ```
 Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6ImRlbW8iLCJmdWxsTmFtZSI6
 ```
+
 Le schéma ci-dessous représente un dialogue entre un client (navigateur ou autre) et une API REST (et CORS compatible) exposant 2 services :
-- un service d’authentification : `**POST** /api/authenticate`
-- un service à accès restreint retournant une liste de comptes : `**GET** /api/restricted/accounts`
+- un service d’authentification : `POST /api/authenticate`
+- un service à accès restreint retournant une liste de comptes : `GET /api/restricted/accounts`
 
 <center>![Cinématique JWT](/assets/article_images/cinematique_jwt.png)</center>
 
@@ -72,26 +73,27 @@ Pour démarrer le conteneur de services, exécuter la commande :
 {% highlight sh %}
 npm start
 {% endhighlight %}
+
 Voici quelques cas d’utilisation de l’API via l’utilitaire **cURL** :
 - **Cas 1** : accès à une ressource protégée sans jeton :
-```
+{% highlight sh %}
 $ curl http://localhost:8000/api/restricted/accounts
 {
   "status": "error",
   "msg": "Jeton invalide",
   "url": "/api/restricted/accounts"
 }
-```
+{% endhighlight %}
 - **Cas 2** : authentification avec récupération d’un jeton :
-```
+{% highlight sh %}
 $ curl -X POST --data "username=demo1&password=Demo2015" http://localhost:8000/api/authenticate
 {
   "status": "ok",
   "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6ImRlbW8xIiwiZn"
 }
-```
+{% endhighlight %}
 - **Cas 3** : accès à une ressource protégée avec un jeton valide :
-```
+{% highlight sh %}
 $ curl -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6ImRlbW8xIiwiZn" \
         http://localhost:8000/api/restricted/accounts
 [
@@ -104,7 +106,8 @@ $ curl -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2Vybm
     "name": "Account 1"
   }
 ]
-```
+{% endhighlight %}
+
 ## Description de la pile technique
 L’[API](https://github.com/ksahnine/jwt-secured-api-node) est construite au dessus de [**Node.js**](https://nodejs.org/) et s’appuie les modules suivants :
 - le framework web [**Express**](https://github.com/strongloop/express) pour l’implémentation des services REST/JSON et la gestion du routage
