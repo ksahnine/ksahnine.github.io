@@ -1,10 +1,10 @@
 ---
 layout: post
 title:  "Sécuriser une API REST avec JSON Web Token (JWT)"
-date:   2008-01-21 06:00:00
+date:   2015-11-26 06:00:00
 categories: rest security jwt
 tags: regular
-image: http://soocurious.com/fr/wp-content/uploads/2014/12/alan-turing.jpg
+image: /assets/article_images/alan-turing.jpg
 legend: Statue d'Alan Turing à Manchester. Alan Turing est aussi un des pères de la cryptographie moderne.
 ---
 
