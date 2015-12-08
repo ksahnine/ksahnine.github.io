@@ -111,6 +111,7 @@ $ curl -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2Vybm
 
 ## Description de la pile technique
 L’[API](https://github.com/ksahnine/jwt-secured-api-node) est construite au dessus de [**Node.js**](https://nodejs.org/) et s’appuie les modules suivants :
+
 - le framework web [**Express**](https://github.com/strongloop/express) pour l’implémentation des services REST/JSON et la gestion du routage
 - le module *node* [**cors**](https://github.com/expressjs/cors) pour le support CORS (compatible avec Express)
 - le middleware [**Passport**](http://passportjs.org/) pour la gestion de l’authentification sous *Node.js*, ainsi que le plugin [**passport-stormpath**](https://github.com/stormpath/passport-stormpath) pour l’accès au gestionnaire d’identité **Stormpath**
