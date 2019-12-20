@@ -9,6 +9,7 @@ legend: Cumulus, nuages de beau temps.
 ---
 ## Effet de mode ou tendance de fond ?
 La dernière version du **cycle des tendances technologiques** publiée par le cabinet **Gartner** en Juillet 2008 annonce l’émergence du **cloud computing** dans le paysage informatique de demain.
+
 <center>![Cycle des tendances 2008](https://blog.armstrong.space/wp-content/uploads/2008/08/gartner-hype-cycle2008.jpg)</center>
 
 Les crises financières puis économiques pourraient stimuler la montée en puissance de ce nouveau paradigme d’infrastructure notamment grâce aux économies de coût d’exploitation qu’il promet.
