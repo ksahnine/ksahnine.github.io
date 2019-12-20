@@ -31,7 +31,7 @@ On le sent, la voix ou le SMS ne constituent plus aujourd’hui les services de 
 - Les **utilisateurs**/**consommateurs** sont des acteurs clés du marché. Ce sont eux qui ont fait du SMS, service initialement considéré comme marginal par les opérateurs, un service apprécié et par ailleurs très lucratif.<br />
 Les nouveaux usages suscités par l’emblématique (et usité) Web 2.0, trouveraient un prolongement logique dans l’Internet mobile, tant le besoin de services connectés et personnalisables est une tendance lourde des industries numériques.
 
-## La singularité de l'Internet mobile
+## La singularité de l'Internet mobile
 
 La combinaison de quatre caractéristiques du terminal standard - téléphonie, mobilité, ultra-connectivité (GPRS/3G+,Wifi,Bluetooth) et géo-localisation (GPS/A-GPS) - font de l’Internet mobile un espace tout à fait singulier.<br />
 En outre, le téléphone mobile n’est pas l’ordinateur de bureau, fut-il portable. Il s’agit d’un objet personnel accompagnant au sens propre la vie de son propriétaire, lequel a su tisser une relation privilégiée comme en atteste la très instructive livraison du [sondage TNS Sofres](http://www.afom.fr/v4/STATIC/documents/TNS_2008_%20CP.pdf) de décembre 2008, en particulier dans le public féminin : 75 % des utilisatrices considèrent leur téléphone mobile comme un objet rassurant.
