@@ -39,6 +39,7 @@ On comprend pourquoi le secteur suscite un tel engouement, en particulier auprè
 
 ## Le téléphone mobile n'est pas l'ordinateur
 Dans la jungle des constructeurs, Nokia, Apple, Palm et RIM ont une position particulière en tant qu’éditeur du système d’exploitation de leurs propres terminaux.
+
 | Constructeur | OS            |
 | ------------ | ------------- |
 | Nokia        | Symbian OS    |
@@ -47,6 +48,7 @@ Dans la jungle des constructeurs, Nokia, Apple, Palm et RIM ont une position par
 | Palm         | Palm OS       |
 
 D’autres constructeurs comme HTC, Samsung, Motorola ou Sony Ericsson, nouent des partenariats avec des acteurs biens établis (Microsoft, Symbian, Palm) ou de nouveaux entrants (Google).
+
 | Constructeur  | OS            |
 | ------------- | ------------------------------------- |
 | HTC           | Windows Mobile / Android              |
