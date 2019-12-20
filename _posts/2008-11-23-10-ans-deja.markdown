@@ -1,0 +1,19 @@
+---
+layout: post
+title:  "1O ans déjà !"
+date:   2008-11-23 06:00:00
+categories: oss
+tags: regular
+image: /assets/couverture/stallman.jpg
+legend: Richard Stallman
+---
+Quelle plus belle occasion que celle de revenir sur un article rédigé à une époque où l’on ne parlait pas encore de blog !
+Cela fait en effet 10 ans, quasiment jour pour jour, que le site [Linux-France](http://www.linux-france.org/) publiait un article intitulé [*Un plaidoyer pour une Informatique Libre*](http://www.linux-france.org/article/these/sahnine/sahnine_libre_monoblock.html) et dont je suis l’auteur.
+
+Rédigé au début de l'année 1998, entre technique et prospective, j’y exposais d’une part l’idée selon laquelle le logiciel libre *sortait d’une phase d’incubation universitaire* pour partir à la conquête de l’informatique d’entreprise, à une époque où ces dernières étaient particulièrement frileuses, et d’autre part l’idée d’une *nouvelle donne économique* où la matière première informatique, libre et gratuite, susciterait un vaste marché de services.
+
+[Bonne lecture !](http://www.linux-france.org/article/these/sahnine/sahnine_libre_monoblock.html)
+
+[jekyll]:      http://jekyllrb.com
+[jekyll-gh]:   https://github.com/jekyll/jekyll
+[jekyll-help]: https://github.com/jekyll/jekyll-help
