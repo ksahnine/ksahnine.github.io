@@ -5,7 +5,7 @@ date:   2008-11-23 06:00:00
 categories: oss
 tags: regular
 image: /assets/couverture/stallman.jpg
-legend: Richard Stallman
+legend: Richard Stallman, figure historique du Logiciel Libre.
 ---
 Quelle plus belle occasion que celle de revenir sur un article rédigé à une époque où l’on ne parlait pas encore de blog !<br />
 Cela fait en effet 10 ans, quasiment jour pour jour, que le site [Linux-France](http://www.linux-france.org/) publiait un article intitulé [**Un plaidoyer pour une Informatique Libre**](http://www.linux-france.org/article/these/sahnine/sahnine_libre_monoblock.html) et dont je suis l’auteur.
