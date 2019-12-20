@@ -58,6 +58,7 @@ D’autres constructeurs comme HTC, Samsung, Motorola ou Sony Ericsson, nouent d
 | Motorola      | Symbian OS                            |
 | Sony Ericsson | Symbian OS / Android (2009)           |
 
+
 Nokia, qui a [repris le contrôle intégral de sa filiale Symbian](http://www.lemondeinformatique.fr/actualites/lire-symbian-avale-nokia-prevoit-une-plateforme-open-source-en-2010-27565.html), a compris la **position stratégique du système d’exploitation** dans le dispositif mobile.<br />
 Google, promoteur majeur du navigateur web comme plateforme d’exécution des clients riches (comme nous l’évoquions dans un récent article), démontre avec le lancement du projet **Android**, que le modèle n’est pas transposable dans l’univers mobile.<br />
 Apple, dont le succès de l’iPhone vient confirmer avec force la pertinence d’une stratégie d’intégration hardware/software, cherche à imposer *AppStore* comme plateforme de distribution d’applications pour l’iPhone, à l’image d’une combinaison réussie iPod/iTunes.
