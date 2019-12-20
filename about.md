@@ -17,4 +17,4 @@ N'hésitez pas à :
 - [consulter mon profil *Linked in*](http://fr.linkedin.com/in/ksahnine)
 
 ### Colophon
-L'image figurant sur la page d'accueil ainsi qu'en bas de page est un [Sinclair ZX81](https://fr.wikipedia.org/wiki/ZX81) que les moins de 30 ans ne peuvent pas connaître :-) et avec lequel j'ai eu la chance de faire mes premiers pas en informatique.
+L'image figurant sur la page d'accueil ainsi qu'en bas de page est un [Sinclair ZX81](https://fr.wikipedia.org/wiki/ZX81) que les moins de ~~20 ans~~ ~~30 ans~~ 40 ans ne peuvent pas connaître :-) et avec lequel j'ai eu la chance de faire mes premiers pas en informatique.
