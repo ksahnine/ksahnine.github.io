@@ -27,7 +27,7 @@ Le module GPRS **TC65** fait figure de module étalon. Plus récent et sophistiq
 
 ![Module XT75](/assets/article_images/xt75_xt65.jpg)
 
-Cinterion commercialise également des terminaux prêts à l’emploi, comme le TC65T (photo ci-dessous), un boîtier embarquant le module TC65, un adapteur secteur et un logement pour la carte SIM.
+Cinterion commercialise également des terminaux prêts à l’emploi, comme le **TC65T**, un boîtier embarquant le module TC65, un adapteur secteur et un logement pour la carte SIM.
 
 Le fait que les dispositifs matériels de Cinterion embarquent une machine virtuelle Java laissent imaginer tout le potentiel des applications embarquées. La configuration supportée est la CLDC 1.1. Une CLDC (*Configuration Limited Device Configuration*) définit les caractéristiques de la machine virtuelle embarquée. En version 1.1, elle se distingue de la plateforme Java SE par de très nombreuses simplifications (pas de gestion d’exceptions asynchrones, surcharge du class loader système interdit, une api très limitée (9 classes dans <code>java.lang.util</code> !), etc.).
 
