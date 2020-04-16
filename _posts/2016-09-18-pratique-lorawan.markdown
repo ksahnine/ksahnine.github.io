@@ -28,7 +28,7 @@ Remarquablement packagé, le kit de développement d’Objenious contient :
   - un détecteur filaire d’ouverture de porte
 - un jeu de résistances et de câbles
 
-<center>![Kit Objenious](assets/article_images/objenious-kit.png)</center>
+<center>![Kit Objenious]({{site.url}}/assets/article_images/objenious-kit.png)</center>
 
 ## Un peu de terminologie
 
