@@ -63,12 +63,12 @@ La page HTML est servie par le serveur `inoviabook.local`, tandis que les donné
 
 La requête AJAX échouerait si le navigateur ne supportait pas CORS. Comment la magie opère-t-elle ? Le mystère se dissipe en analysant la requête / réponse AJAX vers les serveurs de Youtube :
 
-![Entête de la requête CORS](http://blog.inovia-conseil.fr/wp-content/uploads/2015/04/req-1.png)
+<center><img src="{{site.url}}/assets/article_images/req-1.png" style="display: block; margin: auto;" /></center>
 
 > Le *navigateur* ajoute l’entête `Origin` avant d’émettre la requête cross-domain. Il contient le schéma HTTP, le serveur et le port de provenance (`http://inoviabook.local:8000`) de la page (`youtube.html`) à l’initiative de l’appel CORS.
 > Pour des raisons de sécurité, seul le navigateur est responsable de la valorisation de cet entête HTTP.
 
-![Entête de la réponse CORS](http://blog.inovia-conseil.fr/wp-content/uploads/2015/04/resp-1.png)
+<center><img src="{{site.url}}/assets/article_images/resp-1.png" style="display: block; margin: auto;" /></center>
 
 > La réponse du **serveur** contient l’entête `Access-Control-Allow-Origin` permettant d’indiquer au client qu’il est bien habilité à obtenir une réponse valide. La requête échouerait si l’entête n’était pas présent ou s’il contenait une valeur **ne concordant pas** avec la valeur de l’entête `Origin`.
 
