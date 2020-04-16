@@ -28,7 +28,7 @@ Remarquablement packagé, le kit de développement d’Objenious contient :
   - un détecteur filaire d’ouverture de porte
 - un jeu de résistances et de câbles
 
-<center>![Kit Objenious]({{site.url}}/assets/article_images/objenious-kit.png)</center>
+<center><img src="{{site.url}}/assets/article_images/objenious-kit.png" style="display: block; margin: auto;" /></center>
 
 ## Un peu de terminologie
 
@@ -49,7 +49,7 @@ Par rapport à SIGFOX, un réseau _LoRaWAN_ présente plusieurs avantages compar
 
 L’architecture type que nous allons expérimenter est décrite dans le schéma suivant :
 
-<center>![Architecture](assets/article_images/lora-objenious-arch.png)</center>
+<center><img src="{{site.url}}/assets/article_images/lora-objenious-arch.png" style="display: block; margin: auto;" /></center>
 
 Le dépôt du courrier dans la boîte aux lettres connectée met en oeuvre la chaîne de liaison suivante :
 
@@ -140,7 +140,7 @@ Le code ne présente aucune difficulté. Noter que :
 
 Raccordez le micro-contrôleur au programmateur FTDI fourni comme suit :
 
-<center>![Raccordement](assets/article_images/airboard-ftdi.png)</center>
+<center><img src="{{site.url}}/assets/article_images/airboard-ftdi.png" style="display: block; margin: auto;" /></center>
 
 Mettez sous tension le micro-contrôleur puis lancer la commande ci-dessous pour compiler et téléverser le programme :
 
@@ -152,7 +152,7 @@ pio run -t upload
 
 Le prototype utilise un capteur d’inclinaison ou de vibration [bon marché](http://aliexpress.com) fixé sur le volet de la boite aux lettre. On pourrait également utiliser un [interrupteur REED](https://fr.wikipedia.org/wiki/Interrupteur_reed) (à lame souple) et un aimant.
 
-<center>![Raccordement](assets/article_images/airboard-capteur.png)</center>
+<center><img src="{{site.url}}/assets/article_images/airboard-capteur.png" style="display: block; margin: auto;" /></center>
 
 ## Routage vers un serveur d'application
 
@@ -164,7 +164,7 @@ Naturellement, le backend peut être *auto-hébergé* sur un serveur Raspberry P
 
 Depuis [ce lien](https://spot.objenious.com/scenario-builder) de l’interface d’administration, créer un scénario de type **Routage**, sélectionner le type de capteurs à utiliser et saisir l’URL du point de terminaison du serveur Node-RED.
 
-<center>![Callback](assets/article_images/callback.png)</center>
+<center><img src="{{site.url}}/assets/article_images/callback.png" style="display: block; margin: auto;" /></center>
 
 Le message est publié par la plateforme d’Objenious vers le serveur d’application tiers sous la forme d’un appel HTTP (méthode POST) avec un contenu au format JSON structuré comme suit :
 
@@ -182,13 +182,13 @@ Outre les données purement applicative (propriété `data`), on trouvera les in
 
 Voici le flux de traitement **Node-RED** permettant de traiter les messages reroutés par le serveur d’Objenious :
 
-<center>![Node RED](assets/article_images/objenious-nodered.png)</center>
+<center><img src="{{site.url}}/assets/article_images/objenious-nodered.png" style="display: block; margin: auto;" /></center>
 
 Il est constitué de l’enchaînement des noeuds suivants :
 
 - noeud _Objenious in_ : _listener_ HTTP/POST interceptant les messages publiés par la platefome d’Objenious :
 
-<center>![Node RED](assets/article_images/nodered-objenious-in.png)</center>
+<center><img src="{{site.url}}/assets/article_images/nodered-objenious-in.png" style="display: block; margin: auto;" /></center>
 
 - noeud _Ack_ : fonction d’acquittement du message publié par Objenious (retourne ACK).
 - noeud _Objenious out_ : retourne la réponse HTTP contenant l’acquittement au serveur d’Objenious
