@@ -17,7 +17,7 @@ Sur le plan de l’analyse sociologique, j’aboutis aux mêmes conclusions que 
 - par ailleurs, les filles obtiennent de bien meilleurs résultats scolaires que les garçons
 
 La représentation visuelle du nuage des prénoms est réalisée avec **GNU Plot**, avec le pourcentage des mentions TB en abscisse et le nombre d’élèves en ordonnée (cliquer sur l’image pour l’agrandir).
-<center>[![Nuage des prénoms](http://blog.inovia-conseil.fr/wp-content/uploads/2015/07/brevet-mentions-2015.png)](http://blog.inovia-conseil.fr/wp-content/uploads/2015/07/brevet-mentions-2015.png)</center>
+<center><a href="https://github.com/ksahnine/datascience-brevet-mentions/raw/master/img/brevet-mentions-2015.png"><img src="{{site.url}}/assets/article_images/brevet-mentions-2015.png" style="display: block; margin: auto;" /></a></center>
 
 Dans cet article, je décrirai chacune des étapes m’ayant permis d’établir ce résultat, en usant abondamment de la **ligne de commande**.<br/>A travers cet article, j’espère pouvoir faire la démonstration qu’un Unixien est aussi un *Data Scientist* qui s’ignore.
 
@@ -40,7 +40,7 @@ La méthode utilisée suit les étapes suivantes :
 Le script d’extraction est conçu pour être **parallélisable**, sans quoi la durée du traitement serait au bas mot d’une journée sur une machine de série. Il n’extrait que les résultats des collèges d’une commune dont l’identifiant est passé en paramètre.
 - **Parallélisation des traitements** : les traitements d’extraction et d’analyse des données sont distribués via [**GNU Parallel**](http://www.gnu.org/software/parallel/) sur un **cluster Amazon EC2** constitué de **10 instances** `t2.micro` (1 CPU 3,3 Ghz / 1 Go RAM) sous Ubuntu. La parallélisation est orchestrée depuis un portable sous OS X.
 Le schéma ci-dessous décrit l’architecture de l’ensemble :
-![Nuage des prénoms](http://blog.inovia-conseil.fr/wp-content/uploads/2015/07/architecture.png)
+<center><img src="{{site.url}}/assets/article_images/architecture_aws.png" style="display: block; margin: auto;" /></center>
 - **Agrégation des données** : la consolidation des données issue des traitements réalisés par le cluster est effectuée sur un portable (sous OS X) à l’aide des outils de tout bon Unixien (`grep`, `awk`, `sed`, `join`, `paste`, `bc`, `sort`, `uniq`, etc)
 - **Visualisation** : pour faciliter l’interprétation des résultats, la visualisation des données est effectuée avec `gnuplot` sur un portable (sous OS X)
 
@@ -234,8 +234,7 @@ EOF
 {% endhighlight %}
 [<sub><sup>Source : `dataviz-results.sh`</sup></sub>](https://github.com/ksahnine/datascience-brevet-mentions/blob/master/app/dataviz-results.sh)
 
-<center><a href="http://blog.inovia-conseil.fr/wp-content/uploads/2015/07/brevet-mentions-2015.png"><img width="60%" src="http://blog.inovia-conseil.fr/wp-content/uploads/2015/07/brevet-mentions-2015.png" /></a></center>
-
+<center><a href="https://github.com/ksahnine/datascience-brevet-mentions/raw/master/img/brevet-mentions-2015.png"><img src="{{site.url}}/assets/article_images/brevet-mentions-2015.png" style="display: block; margin: auto;" /></a></center>
 
 [jekyll]:      http://jekyllrb.com
 [jekyll-gh]:   https://github.com/jekyll/jekyll

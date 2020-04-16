@@ -39,7 +39,7 @@ Par ailleurs, **Consul** est également :
 *Consul* est disponible sous [Linux, Windows et Mac OS](https://consul.io/downloads.html) mais seule l’utilisation sous Linux est recommandée en production.<br />
 Le schéma ci-dessous décrit l’architecture d’un cluster constitué de 3 noeuds hébergeant chacun un **agent Consul** et un **hôte Docker**. J’ai également représentés sur ce schéma les **services dockerisés** déployés (`svc1`, `svc2` et `svc3`), dont certains sont redondants (`svc1` et `svc2`) :
 
-![Architecture Docker/Consul](http://blog.inovia-conseil.fr/wp-content/uploads/2015/03/consul-cluster.png)
+<center><img src="{{site.url}}/assets/article_images/consul-cluster.png" style="display: block; margin: auto;" /></center>
 
 > **Note :** Je mets à disposition [deux configurations Vagrant](https://github.com/ksahnine/vagrant-config) pour provisionner localement ce cluster et expérimenter vous même les exemples illustrant cet article. Pour les impatients, consultez directement le paragraphe [suivant](#1).
 

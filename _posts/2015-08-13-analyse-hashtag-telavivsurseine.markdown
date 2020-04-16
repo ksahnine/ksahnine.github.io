@@ -66,7 +66,7 @@ Il est aisé de produire en une commande la série temporelle du nombre de tweet
 ~$ cat *.json | jq ".created_at" | xargs -I ? date -j -f "%a %h %d %H:%M:%S %z %Y" "?" "+%Y-%m-%d_%H:00:00" | sort | uniq -c | sed -e 's/^ *//;s/ /,/' | awk -F"," '{ print $2 "," $1}' > data.csv
 {% endhighlight %}
 La représentation graphique est réalisée avec **GNU Plot** :
-[![Timeseries du hashtag #TelAvivSurSeine](/assets/article_images/TelAv_timeseries.png)](/assets/article_images/TelAv_timeseries.png)
+<center><img src="{{site.url}}/assets/article_images/TelAv_timeseries.png" style="display: block; margin: auto;" /></center>
 Ce qui interpelle de prime abord, c'est le **pic brutal** du *10 Août* vers *19h*.<br />
 
 On peut mesurer l'influence d'un compte en comptabilisant le nombre de retweets.<br />
@@ -80,8 +80,7 @@ Etablissons le classement des comptes les plus retweetés le *10 Août* entre *1
 {% endhighlight %}
 On constate que le compte `@Campagnebds` ressort très largement en tête.<br />
 Ce pic peut donc être parfaitement corrélé avec l'annonce d'un [*tweet storm*](https://twitter.com/Campagnebds/status/630378884563906560) sur le compte de la campagne [BDS (*Boycott, Désinvestissement et Sanctions*)](https://fr.wikipedia.org/wiki/Boycott,_d%C3%A9sinvestissement_et_sanctions) :
-<center>![](/assets/article_images/bds.png)</center>
-
+<center><img src="{{site.url}}/assets/article_images/bds.png" style="display: block; margin: auto;" /></center>
 A noter la présence en seconde position du compte du *Parti de Gauche* : la polémique prend largement une **tournure politique**. On ne reverra plus jamais le compte du PdG à une telle position dans le classement des RT.
 
 Revenons au graphique. On ne constate pas de mouvement significatif entre le *03 Août*, date du premier tweet, et le *08 Août* peu avant midi.<br />
@@ -140,11 +139,11 @@ Sur la seule journée du *08*, les retweets de ces 10 comptes représentent **pr
 ### Courbe des tweets et RT par canal
 Nous avions vu plus haut que les principaux supports utilisés sont en moyenne, par ordre d'utilisation, l'*iPhone*, un terminal *Android* et un *navigateur web* non mobile.
 La distribution des tweets par canal est intéressante :
-[![Courbe des tweets via iPhone](/assets/article_images/iphone.png)](/assets/article_images/iphone.png)
+<center><img src="{{site.url}}/assets/article_images/iphone.png" style="display: block; margin: auto;" /></center>
 
-[![Courbe des tweets via Android](/assets/article_images/android.png)](/assets/article_images/android.png)
+<center><img src="{{site.url}}/assets/article_images/android.png" style="display: block; margin: auto;" /></center>
 
-[![Courbe des tweets via un navigateur Web](/assets/article_images/web.png)](/assets/article_images/web.png)
+<center><img src="{{site.url}}/assets/article_images/web.png" style="display: block; margin: auto;" /></center>
 
 Les profils d'activité pour les canaux *iPhone*, *Android* et *web* sont assez semblables.<br />
 En superposant les courbes, l'activité *web* est toujours substantiellement en deçà des supports *iPhone* ou *Android* **sauf durant le pic du *10 Août* vers 19h00**.

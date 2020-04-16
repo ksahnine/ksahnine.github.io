@@ -31,7 +31,7 @@ Dans de précédents articles d’*Inovia Blog*, nous avions d’une part dével
 Nous allons repartir de cet exemple pour construire l’infrastructure hébergeant ce service.<br />
 Toutes les tâches de construction et de configuration de l’infrastructure, décrite dans le schéma ci-dessous, sont coordonnées par Ansible et exécutées depuis un ordinateur portable (`laptop.local`).
 
-<center>![Architecture](http://blog.inovia-conseil.fr/wp-content/uploads/2015/01/ansible-docker-architecture.png)</center>
+<center><img src="{{site.url}}/assets/article_images/ansible-docker-architecture.png" style="display: block; margin: auto;" /></center>
 
 L’infrastructure technique est constituées de 2 serveurs Linux :
 

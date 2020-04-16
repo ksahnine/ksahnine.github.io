@@ -28,7 +28,7 @@ Conséquemment, le temps de démarrage d’une application **Dropwizard** est de
 ## Struture type d'une application
 Le schéma ci-dessous décrit les principaux éléments d’une application **Dropwizard** de type API RESTful :
 
-<center>![Architecture d'une application Dropwizard](/assets/article_images/architecture-generique.png)</center>
+<center><img src="{{site.url}}/assets/article_images/architecture-generique.png" style="display: block; margin: auto;" /></center>
 
 Les composants mis en oeuvre sont les suivants :
 

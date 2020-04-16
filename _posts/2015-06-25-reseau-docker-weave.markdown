@@ -32,7 +32,7 @@ Les routeurs sont en fait des conteneurs Docker maintenant entre eux une connexi
 Lorsque qu’un conteneur rejoint le réseau Weave, il est relié au routeur à travers une interface réseau virtuelle (bridge `weave`).
 ## Etude de cas
 Le schéma ci-dessous décrit l’architecture constituée de 2 serveurs hébergeant chacun un hôte Docker et un routeur Weave.
-<center>![Architecture](http://blog.inovia-conseil.fr/wp-content/uploads/2015/06/weave-usecase.png)</center>
+<center><img src="{{site.url}}/assets/article_images/weave-usecase.png" style="display: block; margin: auto;" /></center>
 
 Deux services dockerisés (`svc1`, `svc2`) sont déployés sur l’hôte `orion.local` (sous Ubuntu), tandis que le service `svc3` est déployé sur l’hôte `macbook.local` (sous *Boot2Docker*).<br />
 Les services dockerisés sont issus de l’image `ksahnine/dummy-http`, un service REST HTTP de test écoutant par défaut sur le port `8080` et utilisable comme suit :

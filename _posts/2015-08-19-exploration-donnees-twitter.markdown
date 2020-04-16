@@ -23,7 +23,7 @@ Nous verrons comment **extraire**, **explorer**, **synthétiser** et **visualise
 - identifier les photos les plus diffusées
 - visualiser le réseau social constitué des 15 comptes ayant le plus (re)tweeté et des 15 comptes les plus retweetés :
 
-<center>![Réseau social de différents protagonistes](/assets/article_images/social_network.png)</center>
+<center><img src="{{site.url}}/assets/article_images/social_network.png" style="display: block; margin: auto;" /></center>
 
 ## Collecte des données
 
@@ -132,7 +132,7 @@ plot 'courbe_tweets.csv' u 1:2 with lines title 'Timeseries #TelAvivSurSeine'
 EOF
 {% endhighlight %}
 
-[![Timeseries du hashtag #TelAvivSurSeine](/assets/article_images/TelAv_timeseries.png)](/assets/article_images/TelAv_timeseries.png)
+<center><img src="{{site.url}}/assets/article_images/TelAv_timeseries.png" style="display: block; margin: auto;" /></center>
 
 Autre exemple. Produisons le fichier `devices.csv` contenant la distribution des tweets par `device` :
 
@@ -158,7 +158,7 @@ plot 'devices.csv' u 1:xtic(2) notitle
 EOF
 {% endhighlight %}
 
-[![Distribution des tweets par device](/assets/article_images/TelAv_devices.png)](/assets/article_images/TelAv_devices.png)
+<center><img src="{{site.url}}/assets/article_images/TelAv_devices.png" style="display: block; margin: auto;" /></center>
 
 ### Eléments statistiques
 Les commandes ci-dessous permettent d'obtenir différents indicateurs statistiques sur l'ensemble du jeu de données. <br />
@@ -348,7 +348,7 @@ Pour visualiser le résultat, ouvrir un navigateur et consulter le lien [`http:/
 open http://localhost:8000
 {% endhighlight %}
 
-<center>![Réseau social de différents protagonistes](/assets/article_images/social_network.png)</center>
+<center><img src="{{site.url}}/assets/article_images/social_network.png" style="display: block; margin: auto;" /></center>
 
 Le graphe orienté est généré à l'aide de l'excellente librairie [D3](http://d3js.org/) pour laquelle j'ai consacré [un article](http://blog.inovia-conseil.fr/?p=110) il y a 3 ans.
 

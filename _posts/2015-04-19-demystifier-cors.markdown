@@ -59,7 +59,7 @@ Le code ci-dessous permet d’afficher les vignettes des 25 vidéos Youtube les 
 {% gist 9cfca5492994fbf924bd %}
 
 La page HTML est servie par le serveur `inoviabook.local`, tandis que les données sont issues du serveur `gdata.youtube.com` :
-<center>![CORS](http://blog.inovia-conseil.fr/wp-content/uploads/2015/04/arch-cors.png)</center>
+<center><img src="{{site.url}}/assets/article_images/arch-cors.png" style="display: block; margin: auto;" /></center>
 
 La requête AJAX échouerait si le navigateur ne supportait pas CORS. Comment la magie opère-t-elle ? Le mystère se dissipe en analysant la requête / réponse AJAX vers les serveurs de Youtube :
 
@@ -118,7 +118,7 @@ Content-Type: text/plain
 > On remarquera la présence des entêtes `Access-Control-Allow-Headers` et `Access-Control-Allow-Methods` contenant respectivement la liste des entêtes et méthodes HTTP permises par le serveur.
 > Leurs valeurs concordent avec celles des entêtes de requête `Access-Control-Request-Method` et `Access-Control-Request-Headers`. La réponse vaut donc autorisation pour le navigateur d’émettre la requête réelle, celle retournant la liste des 25 vidéos Youtube les plus populaires.
 
-<center>![Requête CORS avec requête préliminaire](http://blog.inovia-conseil.fr/wp-content/uploads/2015/04/cors-preflight.png)</center>
+<center><img src="{{site.url}}/assets/article_images/cors-preflight.png" style="display: block; margin: auto;" /></center>
 
 Les requêtes de contrôle peuvent poser des **problèmes de performance** car elles ont pour conséquence de doubler le nombre de *hits* vers le serveur. <br />
 Pour limiter le nombre de requêtes préliminaires, le serveur peut forcer le navigateur à mettre en cache la requête en rajoutant l’entête HTTP `Access-Control-Max-Age` dans la réponse.<br />

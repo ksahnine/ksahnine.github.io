@@ -20,7 +20,7 @@ Dans cet article, nous verrons :
 ## La communication avec le démon Docker
 Le schéma ci-dessous représente l’architecture type d’un serveur Linux (sous Ubuntu) hébergeant un hôte Docker. Le moteur Docker (serveur) est un démon écoutant par défaut sur un **socket UNIX** (`/var/run/docker.sock`).<br />
 Pour mémoire, les sockets UNIX permettent à deux ou plusieurs processus d’échanger des données de façon bi-directionnelle.
-<center>![Hôte Docker](http://blog.inovia-conseil.fr/wp-content/uploads/2015/05/docker-engine.png)</center>
+<center><img src="{{site.url}}/assets/article_images/docker-engine.png" style="display: block; margin: auto;" /></center>
 
 Ainsi, le client Docker **installé localement** interagit avec le démon via le socket UNIX `/var/run/docker.sock`. Sans surprise, le protocole d’échange utilisé par l’API Docker est de type **REST** comme nous allons le voir ci-après.
 
@@ -48,7 +48,7 @@ Maintenant, voyons à quoi ressemblerait une combinaison associant :
 
 - un hôte Docker avec activation de *Docker Remote API*
 - un client Docker localisé sur une machine distante
-<center>![Hôte Docker distant](http://blog.inovia-conseil.fr/wp-content/uploads/2015/05/docker-engine-remote.png)</center>
+<center><img src="{{site.url}}/assets/article_images/docker-engine-remote.png" style="display: block; margin: auto;" /></center>
 
 Voyons comment activer et utiliser *Docker Remote API* avec et sans certificats TLS.
 

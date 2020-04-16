@@ -18,7 +18,8 @@ Après avoir décrit la structure et l’utilisation d’un *“jot“*, nous ve
 
 # Structure d'un jeton JWT
 Un jeton JWT est une chaîne de caractères décomposable en 3 sections séparées par un point (`.`).
-<center>![Jeton JWT](/assets/article_images/jeton_jwt.png)</center>
+
+<center><img src="{{site.url}}/assets/article_images/jeton_jwt.png" style="display: block; margin: auto;" /></center>
 
 - **En-tête** : c’est un document au format JSON, **encodé en base 64** et contenant des méta-données. Il doit contenir au minimum le type de jeton et l’algorithme de chiffrement utilisé pour le signer numériquement. <br/>Exemple :<br />
 {% highlight text %}
@@ -54,7 +55,7 @@ Le schéma ci-dessous représente un dialogue entre un client (navigateur ou aut
 - un service d’authentification : `POST /api/authenticate`
 - un service à accès restreint retournant une liste de comptes : `GET /api/restricted/accounts`
 
-<center>![Cinématique JWT](/assets/article_images/cinematique_jwt.png)</center>
+<center><img src="{{site.url}}/assets/article_images/cinematique_jwt.png" style="display: block; margin: auto;" /></center>
 
 - dans un premier temps, le client cherche à accéder à une ressource protégée sans utiliser de jeton. Le service retourne une erreur avec un code **HTTP 401** (*Unauthorized*)
 - dans un deuxième temps, le client **s’authentifie**. Le service vérifie que les vecteurs d’accréditation sont corrects, **génère un jeton JWT avec une durée de vie prédéfinie** puis retourne la réponse sous la forme d’un document JSON contenant le jeton (attribut `token`).

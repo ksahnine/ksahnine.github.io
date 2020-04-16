@@ -21,11 +21,11 @@ L’attrait des solutions de Cinterion tient à la souplesse de la plateforme ma
 
 L’unité matérielle est le **module**, un dispositif informatique complet embarquant un processeur, plusieurs ports d’entrée-sortie (série,  USB, etc.), un modem GSM/GPRS et surtout une machine virtuelle Java.
 
-![Module GPS/GPRS TC65](/assets/article_images/tc65.jpg)
+<center><img src="{{site.url}}/assets/article_images/tc65.jpg" style="display: block; margin: auto;" /></center>
 
 Le module GPRS **TC65** fait figure de module étalon. Plus récent et sophistiqué, le module **XT75** est tri-bande (GSM/GPRS/EDGE) et incorpore une puce GPS, ce qui en fait un dispositif idéal pour développer un système de suivi de véhicules en temps réel.
 
-![Module XT75](/assets/article_images/xt75_xt65.jpg)
+<center><img src="{{site.url}}/assets/article_images/xt75_xt65.jpg" style="display: block; margin: auto;" /></center>
 
 Cinterion commercialise également des terminaux prêts à l’emploi, comme le **TC65T**, un boîtier embarquant le module TC65, un adapteur secteur et un logement pour la carte SIM.
 

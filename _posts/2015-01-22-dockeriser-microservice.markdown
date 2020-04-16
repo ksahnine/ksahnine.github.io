@@ -55,7 +55,7 @@ Si l’on ne dispose pas d’environnement de développement, on pourrait tout �
 ## Démarrage du conteneur
 Il n’existe pas d’hôte Docker natif pour les systèmes d’exploitation autres que Linux. Sous Windows ou Mac OS X, vous devez installer la VM ultra légère [Boot2docker](http://boot2docker.io/), basée sur *Virtual Box* et la distribution [*Tiny Core Linux*](http://tinycorelinux.net/).
 
-<center>![Hôte Docker](http://blog.inovia-conseil.fr/wp-content/uploads/2015/01/b2d.png)</center>
+<center><img src="{{site.url}}/assets/article_images/b2d.png" style="display: block; margin: auto;" /></center>
 
 Dans cette situation, les conteneurs Docker ne s’exécutent pas directement au dessus de l’OS mais **au sein de la machine virtuelle** *Boot2docker*.
 

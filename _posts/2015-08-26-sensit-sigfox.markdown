@@ -11,7 +11,7 @@ legend: L'objet connecté Sens'it
 
 Cette société a eu la courtoisie de me faire parvenir un exemplaire du [**Sens'it**](https://www.sensit.io/), un objet connecté intégrant plusieurs capteurs (**température**, **mouvement**, **son**) ainsi qu'un **bouton poussoir**.
 
-[//]: # (<center>![SensIt, le goodie connecté](/assets/article_images/sensit.png)</center>)
+<center><img src="{{site.url}}/assets/article_images/sensit.png" style="display: block; margin: auto;" /></center>
 
 Développé par [**AXIBLE technologies**](http://www.axible-connects-for-you.com/), partenaire de *SIGFOX*, *Sens'it* est utilisable sans connaissances informatiques pour, par exemple :
 
@@ -48,13 +48,15 @@ Noter que le réseau impose un certain nombre de contraintes :
 ## Un peu de hardware
 
 Je n'ai pas résisté à la tentation d'ouvrir le boitier :
-<center>![A l'intérieur du SensIt](/assets/article_images/sensit-inside.png)</center>
+
+<center><img src="{{site.url}}/assets/article_images/sensit-inside.png" style="display: block; margin: auto;" /></center>
 
 En zoomant, on remarquera en particulier :
 
 - à gauche : le microcontrôlleur PIC **PIC16F1718** de *Microchip*
 - à droite : le transceiver **CC1120** de *Texas Instrument* opérant sur la bande de fréquence utilisée par *SIGFOX* (868 MHz en Europe).
-<center>![Zoom](/assets/article_images/sensit-zoom.png)</center>
+
+<center><img src="{{site.url}}/assets/article_images/sensit-zoom.png" style="display: block; margin: auto;" /></center>
 
 [Anthonny Quérouil](https://twitter.com/anthonny_q) a [écrit un billet](http://anthonnyquerouil.fr/2015/08/24/Sensit-mon-petit-objet-connecte.html) très complet de présentation et d'utilisation du produit ainsi que de l'API REST.
 
@@ -71,7 +73,8 @@ Le service est développé sur une *stack* Python ([**Flask**](http://flask.poco
 A cet effet, j'ai utilisé l'excellente librairie [**BeautifulSoup**](http://www.crummy.com/software/BeautifulSoup/).
 
 Les notifications sont acheminées via [**Pushbullet**](https://www.pushbullet.com/), dont l'application est disponible sur une multitude de plateformes (*iOS*, *Android*, *Mac*, *Windows*, *Chrome*, etc.) :
-<center>![Notifications Vélib](/assets/article_images/velib.png)</center>
+
+<center><img src="{{site.url}}/assets/article_images/velib.png" style="display: block; margin: auto;" /></center>
 
 Le code du service est disponible sur [*GitHub*](https://github.com/ksahnine/sensit-sigfox/tree/master/apps/velib-callback).
 
@@ -105,7 +108,7 @@ location: 29 rue d'Astorg, Paris
 $ docker run -d -p 5000:5000 -v ~/config.yml:/app/conf/config.yml ksahnine/rpi-sensit-velib
 {% endhighlight %}
 - se connecter à [l'interface d'administration](https://www.sensit.io/) de **Sens'It** et configurer l'URL de *callback* du bouton :
-<center>![Notification Sens'it](/assets/article_images/sensit-config.png)</center>
+<center><img src="{{site.url}}/assets/article_images/sensit-config.png" style="display: block; margin: auto;" /></center>
 - double cliquer sur le *Sens'it* pour recevoir une notification
 
 > **Remarque** : Le `docker pull` initial est long sur un RPi model B. Néanmoins, la taille de l'image de base utilisée peut être largement optimisée.
@@ -113,7 +116,7 @@ $ docker run -d -p 5000:5000 -v ~/config.yml:/app/conf/config.yml ksahnine/rpi-s
 ## Eléments d'architecture
 Le schéma ci-dessous décrit l'ensemble de la chaîne de liaison :
 
-<center>![Chaîne de liaison](/assets/article_images/sensit-archi.png)</center>
+<center><img src="{{site.url}}/assets/article_images/sensit-archi.png" style="display: block; margin: auto;" /></center>
 
 - le double click du *Sens'it* donne lieu à l'émission d'un message via le réseau *SIGFOX*
 - *callback* des serveurs d'*AXIBLE* vers le service hébergé sur le Raspberry Pi

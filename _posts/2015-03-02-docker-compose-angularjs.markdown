@@ -18,13 +18,13 @@ Nous allons voir à travers l’étude d’un cas pratique comment **Docker Comp
 ## Etude de cas
 Dans le sillage de ma [série d’articles](/architecture/microservice/2015/01/12/emergence-microservices.html) traitant des architectures de microservices, en particulier celui consacré au développement d’une API RESTful avec **Dropwizard**, j’ai mis à disposition une application *AngularJS* permettant de consulter le trafic du métro parisien et dont le code source est [disponible sur Github](https://github.com/ksahnine/ratp-gui-angularjs) :
 
-<center>![IHM AngularJS](http://blog.inovia-conseil.fr/wp-content/uploads/2015/03/metro-gui.png)</center>
+<center><img src="{{site.url}}/assets/article_images/metro-gui.png" style="display: block; margin: auto;" /></center>
 
 Cette application servira de support à l’article.
 
 Le schéma ci-dessous décrit l’architecture type de l’environnement d’exécution du poste de développement que nous allons mettre au point avec **Docker Compose** :
 
-<center>![Architecture](http://blog.inovia-conseil.fr/wp-content/uploads/2015/03/archi-poste-dev.png)</center>
+<center><img src="{{site.url}}/assets/article_images/archi-poste-dev.png" style="display: block; margin: auto;" /></center>
 
 Elle est constituée :
 

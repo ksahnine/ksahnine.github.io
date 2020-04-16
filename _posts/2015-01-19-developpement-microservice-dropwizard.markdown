@@ -49,7 +49,7 @@ Le format de la réponse, au format **JSON**, contient une liste des prochains p
 ### Architecture
 Les différents composants constituant l’application sont représentés dans le schéma ci-dessous :
 
-<center>![Architecture applicative](http://blog.inovia-conseil.fr/wp-content/uploads/2015/01/architecture-app.png)</center>
+<center><img src="{{site.url}}/assets/article_images/architecture-app.png" style="display: block; margin: auto;" /></center>
 
 ###Configuration de l’application
 Le fichier de configuration de l’application `trafic-ratp.yml` est décrit au format **YAML**. On externalise en particulier le paramètre applicatif `urlRatp`, l’URL du portail de la RATP.
