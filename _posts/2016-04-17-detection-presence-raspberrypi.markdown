@@ -94,7 +94,7 @@ Il est constitué de l’enchaînement de noeuds suivants :
 <center><img src="{{site.url}}/assets/article_images/node-red-switch.png" style="display: block; margin: auto;" /></center>
 - noeud _Arrivé_ : traite l’événement émis lorsqu’un périphérique est proche du foyer
 <center><img src="{{site.url}}/assets/article_images/node-red-debug-node.png" style="display: block; margin: auto;" /></center>
-- noeud _Sorti_ : traite l’événement émis lorsqu’un périphérique quitte le foyer
+- noeud _Parti_ : traite l’événement émis lorsqu’un périphérique quitte le foyer
 
 [jekyll]:      http://jekyllrb.com
 [jekyll-gh]:   https://github.com/jekyll/jekyll
