@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Sample item"
+title:  "La détection de présence avec un Raspberry Pi 3 et Node-RED"
 date:   2016-04-17 06:00:00
 categories: iot raspberrypi
 tags: regular
